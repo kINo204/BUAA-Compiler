@@ -1,6 +1,30 @@
 #include <stdio.h>
+int getchar(){
+	char c; 
+	scanf("%c",&c); 
+	return (int)c; 
+}
+
+int getint(){
+	int t;
+	scanf("%d",&t);
+	while(getchar()!='\n');
+	return t;
+}
+
+/* Test level-b1. Contents:
+*/
+
+// Init error msgs.
+char e_c[20] = "";
+
+void oerr() {
+	for (int i = 0; i < 20; i++) {
+		printf("%c", e_c[i]);
+	}
+}
 
 int main() {
-	printf("Hello, world2!\n");
+	oerr();
 	return 0;
 }

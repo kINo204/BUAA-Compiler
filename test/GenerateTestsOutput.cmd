@@ -12,6 +12,7 @@ for %%i in (testfile*.txt) do (
 
     :: 拼接新的可执行文件名和输出文件名
     set "exefilename=testfile!remaining!.exe"
+    set "inputfilename=input!remaining!.txt"
     set "outputfilename=output!remaining!.txt"
 
     :: 使用gcc编译源文件
@@ -20,7 +21,7 @@ for %%i in (testfile*.txt) do (
     :: 检查gcc编译是否成功
     if !errorlevel! equ 0 (
         :: 编译成功，执行可执行文件并将输出重定向到output文件
-        !exefilename! > "!outputfilename!"
+        !exefilename! < "!inputfilename!" > "!outputfilename!"
         echo Execution output saved for: !exefilename!
         
         :: 清理生成的可执行文件

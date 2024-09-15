@@ -116,48 +116,48 @@ LOrExp
 				| RelExp ('<' | '>' | '<=' | '>=') AddExp
 				;
 
-				AddExp 
-					: MulExp
-					| AddExp ('+' | '−') MulExp
+AddExp 
+	: MulExp
+	| AddExp ('+' | '−') MulExp
+	;
+
+	MulExp 
+		: UnaryExp
+		| MulExp ('*' | '/' | '%') UnaryExp
+		;
+
+		UnaryExp 
+			: PrimaryExp
+			| Ident '(' [FuncRParams] ')'
+			| UnaryOp UnaryExp
+			;
+
+			UnaryOp 
+				: '+' | '−' | '!'
+				;
+
+			FuncRParams 
+				: Exp { ',' Exp }
+				;
+
+			PrimaryExp 
+				: '(' Exp ')'
+				| LVal
+				| Number
+				| Character
+				;
+				    
+				LVal 
+					: Ident ['[' Exp ']']
 					;
 
-					MulExp 
-						: UnaryExp
-						| MulExp ('*' | '/' | '%') UnaryExp
-						;
+				Number 
+					: IntConst
+					;
 
-						UnaryExp 
-							: PrimaryExp
-							| Ident '(' [FuncRParams] ')'
-							| UnaryOp UnaryExp
-							;
-
-							UnaryOp 
-								: '+' | '−' | '!'
-								;
-
-							FuncRParams 
-								: Exp { ',' Exp }
-								;
-
-							PrimaryExp 
-								: '(' Exp ')'
-								| LVal
-								| Number
-								| Character
-								;
-								    
-								LVal 
-									: Ident ['[' Exp ']']
-									;
-
-								Number 
-									: IntConst
-									;
-
-								Character 
-									: CharConst
-									;
+				Character 
+					: CharConst
+					;
 
 Ident
 	: IdentNonDigit
