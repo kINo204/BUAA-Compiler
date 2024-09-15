@@ -1,10 +1,12 @@
 @echo off
-setlocal enabledelayedexpansion
 if exist test_files.rar del test_files.rar
 
 for %%f in (testfile*.c) do (
     for /f "skip=14 delims=" %%a in (%%f) do (
-        echo %%a >> "%%~nf.txt"
+        set "str=%%a"
+        setlocal enabledelayedexpansion
+        echo(!str!>> "%%~nf.txt"
+        endlocal
     )
 )
 
