@@ -1,167 +1,163 @@
-CompUnit
-	: { Decl } { FuncDef } MainFuncDef
-	;
-
-Decl
-	: ConstDecl | VarDecl
-	;
-
-ConstDecl
-	: 'const' BType ConstDef { ',' ConstDef } ';'
-	;
-
 BType (* Basic types *)
 	: 'int'
 	| 'char'
 	;
 
-ConstDef 
-	: Ident [ '[' ConstExp ']' ] '=' ConstInitVal
+CompUnit
+	: { Decl } { FuncDef } MainFuncDef
 	;
 
-ConstInitVal 
-	: ConstExp
-	| '{' [ ConstExp { ',' ConstExp } ] '}'
-	| StringConst
-	;
+	FuncDef 
+		: FuncType Ident '(' [FuncFParams] ')' Block
+		;
 
-VarDecl 
-	: BType VarDef { ',' VarDef } ';'
-	;
+		FuncType 
+			: 'void'
+			| BType
+			;
 
-VarDef 
-	: Ident [ '=' InitVal ]
-	| Ident '[' ConstExp ']' [ '=' InitVal ]
-	;
+		FuncFParams 
+			: FuncFParam { ',' FuncFParam }
+			;
 
-InitVal 
-	: Exp
-	| '{' [ Exp { ',' Exp } ] '}'
-	| StringConst
-	;
+			FuncFParam 
+				: BType Ident ['[' ']']
+				;
 
-FuncDef 
-	: FuncType Ident '(' [FuncFParams] ')' Block
-	;
-
-MainFuncDef 
-	: 'int' 'main' '(' ')' Block
-	;
-
-FuncType 
-	: 'void'
-	| BType
-	;
-
-FuncFParams 
-	: FuncFParam { ',' FuncFParam }
-	;
-
-FuncFParam 
-	: BType Ident ['[' ']']
-	;
+	MainFuncDef 
+		: 'int' 'main' '(' ')' Block
+		;
 
 Block 
 	: '{' { BlockItem } '}'
 	;
 
-BlockItem 
-	: Decl
-	| Stmt
+	BlockItem 
+		: Decl
+		| Stmt
+		;
+
+Decl
+	: ConstDecl | VarDecl
 	;
+
+	ConstDecl
+		: 'const' BType ConstDef { ',' ConstDef } ';'
+		;
+
+		ConstDef 
+			: Ident [ '[' ConstExp ']' ] '=' ConstInitVal
+			;
+
+			ConstInitVal 
+			: ConstExp
+			| '{' [ ConstExp { ',' ConstExp } ] '}'
+			| StringConst
+			;
+
+	VarDecl 
+		: BType VarDef { ',' VarDef } ';'
+		;
+
+		VarDef 
+			: Ident [ '=' InitVal ]
+			| Ident '[' ConstExp ']' [ '=' InitVal ]
+			;
+
+			InitVal 
+				: Exp
+				| '{' [ Exp { ',' Exp } ] '}'
+				| StringConst
+				;
 
 Stmt 
-	: LVal '=' Exp ';'
-	| [Exp] ';'
-	| Block
-	| 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
-	| 'for' '(' [ForStmt] ';' [Cond] ';' [ForStmt] ')' Stmt
-	| 'break' ';'
-	| 'continue' ';'
-	| 'return' [Exp] ';'
-	| LVal '=' 'getint' '(' ')' ';'
-	| LVal '=' 'getchar' '(' ')' ';'
-	| 'printf' '('StringConst { ',' Exp } ')' ';'
+	(* assign *)	: LVal '=' Exp ';'
+	(* single *)	| [Exp] ';'
+	(* block  *)	| Block
+	(* ifstruct *)	| 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
+	(* forstruct *)	| 'for' '(' [ForStmt] ';' [Cond] ';' [ForStmt] ')' Stmt
+	(* break  *)	| 'break' ';'
+	(* continue *)	| 'continue' ';'
+	(* return  *)	| 'return' [Exp] ';'
+	(* Iint   *)	| LVal '=' 'getint' '(' ')' ';'
+	(* Ichar  *)	| LVal '=' 'getchar' '(' ')' ';'
+	(* Oprintf *)	| 'printf' '('StringConst { ',' Exp } ')' ';'
 	;
 
-ForStmt 
-	: LVal '=' Exp
-	;
+	ForStmt 
+		: LVal '=' Exp
+		;
 
-Exp 
-	: AddExp
-	;
+	Cond 
+		: LOrExp
+		;
+
+Exp : AddExp ;
  
-Cond 
-	: LOrExp
-	;
-
-LVal 
-	: Ident ['[' Exp ']']
-	;
-
-PrimaryExp 
-	: '(' Exp ')'
-	| LVal
-	| Number
-	| Character
-	;
-    
-Number 
-	: IntConst
-	;
-
-Character 
-	: CharConst
-	;
-
-UnaryExp 
-	: PrimaryExp
-	| Ident '(' [FuncRParams] ')'
-	| UnaryOp UnaryExp
-	;
-
-UnaryOp 
-	: '+' | '−' | '!'
-	;
-
-FuncRParams 
-	: Exp { ',' Exp }
-	;
-
-MulExp 
-	: UnaryExp
-	| MulExp ('*' | '/' | '%') UnaryExp
-	;
-
-AddExp 
-	: MulExp
-	| AddExp ('+' | '−') MulExp
-	;
-
-RelExp 
-	: AddExp
-	| RelExp ('<' | '>' | '<=' | '>=') AddExp
-	;
-
-EqExp 
-	: RelExp
-	| EqExp ('==' | '!=') RelExp
-	;
-
-LAndExp 
-	: EqExp
-	| LAndExp '&&' EqExp
-	;
+ConstExp : AddExp (* contains only ident for const vars *) ;
 
 LOrExp 
 	: LAndExp
 	| LOrExp '||' LAndExp
 	;
 
-ConstExp 
-	: AddExp
-	;
+	LAndExp 
+		: EqExp
+		| LAndExp '&&' EqExp
+		;
+
+		EqExp 
+			: RelExp
+			| EqExp ('==' | '!=') RelExp
+			;
+
+			RelExp 
+				: AddExp
+				| RelExp ('<' | '>' | '<=' | '>=') AddExp
+				;
+
+				AddExp 
+					: MulExp
+					| AddExp ('+' | '−') MulExp
+					;
+
+					MulExp 
+						: UnaryExp
+						| MulExp ('*' | '/' | '%') UnaryExp
+						;
+
+						UnaryExp 
+							: PrimaryExp
+							| Ident '(' [FuncRParams] ')'
+							| UnaryOp UnaryExp
+							;
+
+							UnaryOp 
+								: '+' | '−' | '!'
+								;
+
+							FuncRParams 
+								: Exp { ',' Exp }
+								;
+
+							PrimaryExp 
+								: '(' Exp ')'
+								| LVal
+								| Number
+								| Character
+								;
+								    
+								LVal 
+									: Ident ['[' Exp ']']
+									;
+
+								Number 
+									: IntConst
+									;
+
+								Character 
+									: CharConst
+									;
 
 Ident
 	: IdentNonDigit
@@ -169,23 +165,19 @@ Ident
 	| Ident Digit
 	;
 
-IdentNonDigit
-	: REGEX( [_a-zA-Z] )
-	;
+	IdentNonDigit
+		: REGEX( [_a-zA-Z] )
+		;
 
 IntConst
 	: '0'
 	| DecimalConst
 	;
 
-DecimalConst
-	: NonZeroDigit
-	| DecimalConst Digit
-	;
-
-Digit
-	: REGEX( [0-9] )
-	;
+	DecimalConst
+		: NonZeroDigit
+		| DecimalConst Digit
+		;
 
 CharConst
 	: '\'' Ascii '\''
@@ -193,6 +185,10 @@ CharConst
 
 StringConst
 	: '\"' { Ascii } '\"'
+	;
+
+Digit
+	: REGEX( [0-9] )
 	;
 
 Ascii

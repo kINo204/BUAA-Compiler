@@ -1,6 +1,49 @@
 #include <stdio.h>
+int getchar(){
+	char c; 
+	scanf("%c",&c); 
+	return (int)c; 
+}
 
-int main() {
-	printf("Hello, world4!\n");
-	return 0;
+int getint(){
+	int t;
+	scanf("%d",&t);
+	while(getchar()!='\n');
+	return t;
+}
+
+/* Test level-c0. Contents:
+	- MainFuncDef
+	- InStmt
+	- OutStmt
+	- comments
+	- Decl
+*/
+
+// MainFuncDef
+int main()
+{
+	// A. In/Out Stmt
+	printf("22371281\n");
+	printf("%d\n", getint());
+	printf("%c\n", getchar());
+
+	// B. Comments
+	// this should not be executed:
+	// printf("comment test failed! double-slash executed.\n");
+	/* printf("comment test failed! slash-star executed.\n"); */
+
+	// C. Decl
+	// 1. sing/mult def
+	const int ci0 = 0;
+	const int ci1 = 0, ci2 = 0;
+
+	const char cc0 = 'a';
+	const char cc1 = 'a', cc2 = 'a';
+
+	int vi0;
+	int vi1, vi2
+
+	char vc0;
+	char vc1, vc2;
 }
