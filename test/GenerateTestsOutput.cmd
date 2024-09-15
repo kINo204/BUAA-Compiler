@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: 遍历当前目录下所有以testfile为前缀的.c文件
-for %%i in (testfile*.txt) do (
+for %%i in (testfile*.c) do (
     set "filename=%%~ni"
     set "extension=%%~xi"
 
