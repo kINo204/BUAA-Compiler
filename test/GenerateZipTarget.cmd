@@ -14,4 +14,3 @@ for %%f in (testfile*.c) do (
 
 del testfile*.txt
 echo Done. All files have been processed and packed into a ZIP file.
-pause

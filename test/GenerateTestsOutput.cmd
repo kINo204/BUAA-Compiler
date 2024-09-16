@@ -32,4 +32,3 @@ for %%i in (testfile*.c) do (
 )
 
 echo All files processed.
-pause

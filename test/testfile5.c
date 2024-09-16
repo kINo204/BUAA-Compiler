@@ -14,10 +14,31 @@ int getint(){
 
 /* Test level-c1. Contents:
 	- global decl/func
-	- function
+	- function as exp
+	- embedded blocks
 */
 
+// A. Global var decl
+const int ci0 = 1;
+const int ci1 = 2, ci2 = 4;
+
+const char cc0 = '1';
+const char cc1 = '2', cc2 = '4';
+
+int vi0 = 1;
+int vi1 = 2, vi2 = 4;
+
+char vc0 = '1';
+char vc1 = '2', vc2 = '4';
+
+int add(int a, char b) {
+	return a + b;
+}
+
 int main() {
+	printf("22371281\n");
+	printf("err caught: ");
+	
 	// Init error msgs.
 	char e_c1 = '\0';
 	char e_c2 = '\0';
@@ -36,6 +57,23 @@ int main() {
 	char e_c15 = '\0';
 	char e_c16 = '\0';
 
+	if (ci0 + ci1 + ci2 != 7) e_c1 = '1';
+	if (cc0 + (cc1 - '0') + (cc2 - '0') != '7') e_c2 = '2';
+	if (vi0 + vi1 + vi2 != 7) e_c3 = '3';
+	if (vc0 + (vc1 - '0') + (vc2 - '0') != '7') e_c4 = '4';
+
+	// B. func
+	int c1 = add(1, '0');
+	if (c1 != '1') e_c5 = '5';
+
+	// C. Block
+	int b0 = 0;
+	{
+		int b0 = 5;
+		if (b0 != 5) e_c6 = '6';
+	}
+	if (b0 != 0) e_c6 = '6';
+	
 	// Error msg output.
 	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n"
 		, e_c1

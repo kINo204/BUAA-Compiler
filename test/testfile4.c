@@ -45,9 +45,11 @@ int main()
 
 	// A. In/Out Stmt
 	printf("22371281\n");
-	int a = getint();
+	int a;
+	a = getint();
 	printf("%d\n", a);
-	int b = getchar();
+	char b;
+	b = getchar();
 	printf("%c\n", b);
 	printf("err caught: ");
 
@@ -107,7 +109,38 @@ int main()
 	else v2 = 2;
 	if (v1 + v2 != 3) e_c15 = 'f';
 
+	int tmp;
 	for (;;) {
+		break;
+		printf("cannot break from loop\n");
+		return -1; // Can't break!
+	}
+	for (;;tmp=0) {
+		break;
+		printf("cannot break from loop\n");
+		return -1; // Can't break!
+	}
+	for (;1;tmp=0) {
+		break;
+		printf("cannot break from loop\n");
+		return -1; // Can't break!
+	}
+	for (;1;) {
+		break;
+		printf("cannot break from loop\n");
+		return -1; // Can't break!
+	}
+	for (tmp=0;;) {
+		break;
+		printf("cannot break from loop\n");
+		return -1; // Can't break!
+	}
+	for (tmp=0;1;) {
+		break;
+		printf("cannot break from loop\n");
+		return -1; // Can't break!
+	}
+	for (tmp=0;;tmp=0) {
 		break;
 		printf("cannot break from loop\n");
 		return -1; // Can't break!

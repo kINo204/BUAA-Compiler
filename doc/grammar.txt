@@ -60,8 +60,7 @@ Decl
 		;
 
 		VarDef 
-			: Ident [ '=' InitVal ]
-			| Ident '[' ConstExp ']' [ '=' InitVal ]
+			: Ident '[' ConstExp ']' [ '=' InitVal ]
 			;
 
 			InitVal 
@@ -97,23 +96,19 @@ Exp : AddExp ;
 ConstExp : AddExp (* contains only ident for const vars *) ;
 
 LOrExp 
-	: LAndExp
-	| LOrExp '||' LAndExp
+	: LAndExp { '||' LAndExp }
 	;
 
 	LAndExp 
-		: EqExp
-		| LAndExp '&&' EqExp
+		: EqExp { '&&' EqExp }
 		;
 
 		EqExp 
-			: RelExp
-			| EqExp ('==' | '!=') RelExp
+			: RelExp { ('==' | '!=') RelExp }
 			;
 
 			RelExp 
-				: AddExp
-				| RelExp ('<' | '>' | '<=' | '>=') AddExp
+				: AddExp { ('<' | '>' | '<=' | '>=') AddExp }
 				;
 
 AddExp 
