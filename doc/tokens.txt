@@ -1,0 +1,53 @@
+# Literals:
+
+IDENFR: identifier
+INTCON: integer const
+STRCON: string const
+CHRCON: char const
+
+# Keywords(*_TK):
+
+MAINTK
+CONSTTK
+VOIDTK
+INTTK
+CHARTK
+BREAKTK
+CONTINUETK
+IFTK
+ELSETK
+FORTK
+GETINTTK
+GETCHARTK
+PRINTFTK
+RETURNTK
+
+# Operators:
+
+NOT
+AND
+OR
+PLUS
+MINU
+MULT
+DIV
+MOD
+LSS: <
+LEQ: <=
+GRE: >
+GEQ: >=
+EQL: ==
+NEQ: !=
+
+ASSIGN
+
+# Syntax flag chars:
+
+SEMICN
+COMMA
+LPARENT
+RPARENT
+LBRACK
+RBRACK
+LBRACE
+RBRACE
