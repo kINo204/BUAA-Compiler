@@ -17,12 +17,11 @@ public class Lexer {
             System.err.println("Lexer marking not supported for this input stream!");
         }
         // loggerOut: STDOUT, lexer.txt
-        loggerOut.configureWriter("stdout", true);
+        //loggerOut.addWriter("stdout", new PrintWriter(System.out));
         loggerOut.addFileWriter("lexer out", "lexer.txt");
         // loggerErr: STDERR, error.txt
+        //loggerErr.addWriter("stderr", new PrintWriter(System.err));
         loggerErr.addFileWriter("lexer err", "error.txt");
-        loggerErr.configureWriter("stdout", false);
-        loggerErr.configureWriter("stderr", true);
     }
     public static Lexer getInstance() throws IOException {
         if (instance == null) {
@@ -245,13 +244,7 @@ public class Lexer {
         return token;
     }
 
-    public void flushLogs() throws IOException {
-        loggerOut.flush();
-        loggerErr.flush();
-    }
-
     public void closeLogs() throws IOException {
-        flushLogs();
         loggerOut.close();
         loggerErr.close();
     }
