@@ -1,3 +1,0 @@
-IDENFR a
-DIV /
-IDENFR b
