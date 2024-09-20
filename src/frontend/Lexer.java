@@ -18,6 +18,7 @@ public class Lexer {
             System.err.println("Lexer marking not supported for this input stream!");
         }
         // loggerOut: STDOUT, lexer.txt
+        loggerOut.configureWriter("stdout", true);
         loggerOut.addFileWriter("lexer out", "lexer.txt");
         // loggerErr: STDERR, error.txt
         loggerErr.addFileWriter("lexer err", "error.txt");
@@ -189,19 +190,22 @@ public class Lexer {
         }
 
         // Looping look-ahead tokens.
+        char last = ch;
         token = switch (ch) {
             case '\'' -> {
                 do {
+                    last = ch;
                     ch = (char) sourceInput.read();
                     str.append(ch);
-                } while (ch != '\'');
+                } while (ch != '\'' || last == '\\');
                 yield new Token(CHRCON, String.valueOf(str));
             }
             case '"' -> {
                 do {
+                    last = ch;
                     ch = (char) sourceInput.read();
                     str.append(ch);
-                } while (ch != '"');
+                } while (ch != '"' || last == '\\');
                 yield new Token(STRCON, String.valueOf(str));
             }
             default -> null;
