@@ -5,6 +5,7 @@ import io.Log;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 import static frontend.Token.TokenId.*;
@@ -17,10 +18,10 @@ public class Lexer {
             System.err.println("Lexer marking not supported for this input stream!");
         }
         // loggerOut: STDOUT, lexer.txt
-        //loggerOut.addWriter("stdout", new PrintWriter(System.out));
+        loggerOut.addWriter("stdout", new PrintWriter(System.out));
         loggerOut.addFileWriter("lexer out", "lexer.txt");
         // loggerErr: STDERR, error.txt
-        //loggerErr.addWriter("stderr", new PrintWriter(System.err));
+        loggerErr.addWriter("stderr", new PrintWriter(System.err));
         loggerErr.addFileWriter("lexer err", "error.txt");
     }
     public static Lexer getInstance() throws IOException {
