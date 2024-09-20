@@ -1,6 +1,7 @@
 # Customized
 .idea
 out
+target
 testfile.txt
 lexer.txt
 error.txt
