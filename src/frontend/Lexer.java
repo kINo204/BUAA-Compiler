@@ -245,7 +245,13 @@ public class Lexer {
         return token;
     }
 
-    public void close() throws IOException {
+    public void flushLogs() throws IOException {
+        loggerOut.flush();
+        loggerErr.flush();
+    }
+
+    public void closeLogs() throws IOException {
+        flushLogs();
         loggerOut.close();
         loggerErr.close();
     }

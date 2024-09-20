@@ -1,19 +1,16 @@
 package io;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.HashMap;
 
 public class Log {
-    private final BufferedWriter stdout = new BufferedWriter(new OutputStreamWriter(System.out));
-    private final BufferedWriter stderr = new BufferedWriter(new OutputStreamWriter(System.err));
+    private final Writer stdout = new BufferedWriter(new OutputStreamWriter(System.out));
+    private final Writer stderr = new OutputStreamWriter(System.err);
     private final HashMap<String, Boolean> config = new HashMap<>() {{
         put("stdout", true);
         put("stderr", false);
     }};
-    private final HashMap<String, BufferedWriter> writers = new HashMap<>() {{
+    private final HashMap<String, Writer> writers = new HashMap<>() {{
         put("stdout", stdout);
         put("stderr", stderr);
     }};
@@ -32,7 +29,7 @@ public class Log {
             System.err.println(this + " configureWriter(): writer not found!");
             return;
         }
-        config.replace(writerName, mode);
+        config.put(writerName, mode);
     }
 
     public void write(String str) throws IOException {
@@ -58,6 +55,12 @@ public class Log {
             if (config.get(writerName)) {
                 writers.get(writerName).write(str);
             }
+        }
+    }
+
+    public void flush() throws IOException {
+        for (String writerName : writers.keySet()) {
+            writers.get(writerName).flush();
         }
     }
 

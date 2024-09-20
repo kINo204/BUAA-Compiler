@@ -11,6 +11,6 @@ public class Compiler {
             Token token = lexer.read();
             if (token == null) break;
         }
-        lexer.close();
+        lexer.closeLogs();
     }
 }
