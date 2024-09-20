@@ -5,7 +5,6 @@ import io.Log;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import static frontend.Token.TokenId.*;
@@ -76,9 +75,10 @@ public class Lexer {
                 sourceInput.mark(1);
                 ch = (char) sourceInput.read();
                 if (ch == '/') {
+                    int ich;
                     do {
-                        ch = (char) sourceInput.read();
-                    } while (ch != '\n');
+                        ich = sourceInput.read();
+                    } while (ich != '\n' && ich != -1);
                 } else if (ch == '*') {
                     do {
                         ch = (char) sourceInput.read();
@@ -190,7 +190,7 @@ public class Lexer {
         }
 
         // Looping look-ahead tokens.
-        char last = ch;
+        char last;
         token = switch (ch) {
             case '\'' -> {
                 do {

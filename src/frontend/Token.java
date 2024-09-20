@@ -5,7 +5,7 @@ import java.math.BigInteger;
 public class Token {
     private final TokenId tokenId;
     private final String literal; // Original token string.
-    public Value val = new Value();
+    private final Value val = new Value();
 
     public static class Value {
         public int integer;
