@@ -1,5 +1,7 @@
 package frontend;
 
+import java.math.BigInteger;
+
 public class Token {
     private final TokenId tokenId;
     private final String literal; // Original token string.
@@ -7,6 +9,7 @@ public class Token {
 
     public static class Value {
         public int integer;
+        public BigInteger bigInteger;
         public char character;
         public String string;
     }
@@ -19,7 +22,13 @@ public class Token {
 
     private void parse() {
         switch (tokenId) {
-            case INTCON -> val.integer = Integer.parseInt(literal);
+            case INTCON -> {
+                try {
+                    val.integer = Integer.parseInt(literal);
+                } catch (NumberFormatException e) {
+                    val.bigInteger = new BigInteger(literal);
+                }
+            }
             case CHRCON -> val.character = literal.charAt(0);
             case STRCON -> val.string = literal.substring(1, literal.length() - 1); // Strip "" symbols
         }
