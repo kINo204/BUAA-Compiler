@@ -4,8 +4,11 @@ import java.io.*;
 import java.util.HashMap;
 
 public class Log {
+    private boolean on = false;
     private final HashMap<String, Boolean> config = new HashMap<>();
     private final HashMap<String, Writer> writers = new HashMap<>();
+
+    public void switchLogger(boolean on) { this.on = on; }
 
     public void addWriter(String writerName, Writer writer) {
         if (writers.containsKey(writerName)) {
@@ -34,6 +37,7 @@ public class Log {
     }
 
     public void println(Object o) throws IOException {
+        if (!on) return;
         final String str = o.toString() + "\n";
         for (String writerName : writers.keySet()) {
             if (config.get(writerName)) {

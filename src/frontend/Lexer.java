@@ -18,9 +18,11 @@ public class Lexer {
             System.err.println("Lexer marking not supported for this input stream!");
         }
         // loggerOut: STDOUT, lexer.txt
+        loggerOut.switchLogger(true);
         //loggerOut.addWriter("stdout", new PrintWriter(System.out));
         loggerOut.addFileWriter("lexer out", "lexer.txt");
         // loggerErr: STDERR, error.txt
+        loggerErr.switchLogger(true);
         //loggerErr.addWriter("stderr", new PrintWriter(System.err));
         loggerErr.addFileWriter("lexer err", "error.txt");
     }
