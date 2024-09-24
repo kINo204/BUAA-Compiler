@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-
+import java.util.LinkedList;
 import static frontend.Token.TokenId.*;
 
 public class Lexer {
@@ -18,10 +18,10 @@ public class Lexer {
             System.err.println("Lexer marking not supported for this input stream!");
         }
         // loggerOut: STDOUT, lexer.txt
-        loggerOut.addWriter("stdout", new PrintWriter(System.out));
+        //loggerOut.addWriter("stdout", new PrintWriter(System.out));
         loggerOut.addFileWriter("lexer out", "lexer.txt");
         // loggerErr: STDERR, error.txt
-        loggerErr.addWriter("stderr", new PrintWriter(System.err));
+        //loggerErr.addWriter("stderr", new PrintWriter(System.err));
         loggerErr.addFileWriter("lexer err", "error.txt");
     }
     public static Lexer getInstance() throws IOException {
@@ -33,6 +33,7 @@ public class Lexer {
 
     // Attributes and methods:
     private int currentLine = 1;
+    private final LinkedList<Token> readTokens = new LinkedList<>(); // LIFO, tokens already read in lookAhead.
     private final BufferedReader sourceInput = new BufferedReader(
             new FileReader("testfile.txt"));
     private final Log loggerOut = new Log();
@@ -56,18 +57,43 @@ public class Lexer {
     }
 
     public Token read() throws IOException {
+        if (!readTokens.isEmpty()) {
+            return readTokens.removeFirst();
+        } else {
+            return parseToken();
+        }
+    }
+
+    /**
+     * Look ahead token by offset, without advancing the lexer's parsing process.
+     * @param offset Token offset to look ahead. Use "0" to look at next token(same as read).
+     * @return The token read. If EOF reached or exceeded, returns null.
+     */
+    public Token lookAhead(int offset) throws IOException {
+        assert offset >= 0;
+        for (int i = 0; i <= offset; i++) {
+            readTokens.addLast(parseToken());
+            // If a null be added, we reach EOF. No need for parsing more tokens.
+            if (readTokens.getLast() == null)
+                break;
+        }
+        return readTokens.getLast();
+    }
+
+    // Returns null if EOF or token unidentified.
+    private Token parseToken() throws IOException {
         Token token;
-
         char ch;
-
         // Get the next non-blank char.
         while (true) {
             // Jump blanks.
             do {
                 int ich = sourceInput.read(); // Using integer to preserve EOF info.
-                if (ich == -1) return null; // EOF
+                if (ich == -1)
+                    return null; // EOF
                 ch = (char) ich;
-                if (ch == '\n') currentLine++;
+                if (ch == '\n')
+                    currentLine ++;
             } while (String.valueOf(ch).isBlank());
 
             // Deal with comments.
