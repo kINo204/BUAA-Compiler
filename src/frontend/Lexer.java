@@ -73,13 +73,14 @@ public class Lexer {
      */
     public Token lookAhead(int offset) throws IOException {
         assert offset >= 0;
-        for (int i = 0; i <= offset; i++) {
+        int size = readTokens.size();
+        for (int i = 0; i <= offset - size; i++) {
             readTokens.addLast(parseToken());
             // If a null be added, we reach EOF. No need for parsing more tokens.
             if (readTokens.getLast() == null)
                 break;
         }
-        return readTokens.getLast();
+        return readTokens.get(offset);
     }
 
     // Returns null if EOF or token unidentified.
