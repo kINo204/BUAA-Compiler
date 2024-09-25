@@ -13,13 +13,20 @@ public class Lexer {
         if (!input.markSupported()) {
             System.err.println("Lexer marking not supported for this input stream!");
         }
-        // loggerOut: STDOUT, lexer.txt
         loggerOut.switchLogger(true);
-        //loggerOut.addWriter("stdout", new PrintWriter(System.out));
         loggerOut.addFileWriter("lexer out", "lexer.txt");
-        // loggerErr: STDERR, error.txt
         loggerErr.switchLogger(true);
-        //loggerErr.addWriter("stderr", new PrintWriter(System.err));
+        loggerErr.addFileWriter("lexer err", "error.txt");
+    }
+
+    public Lexer(String inputString) throws IOException {
+        input = new BufferedReader(new StringReader(inputString));
+        if (!input.markSupported()) {
+            System.err.println("Lexer marking not supported for this input stream!");
+        }
+        loggerOut.switchLogger(true);
+        loggerOut.addFileWriter("lexer out", "lexer.txt");
+        loggerErr.switchLogger(true);
         loggerErr.addFileWriter("lexer err", "error.txt");
     }
 

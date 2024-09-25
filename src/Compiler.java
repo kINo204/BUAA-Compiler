@@ -7,7 +7,8 @@ import java.io.IOException;
 public class Compiler {
     /* Compiler execution entry point. */
     public static void main(String[] args) throws IOException {
-        Lexer lexer = new Lexer(new FileReader("testfile.txt"));
+        FileReader sourceProgram = new FileReader("testfile.txt");
+        Lexer lexer = new Lexer(sourceProgram);
         while (true) {
             Token token = lexer.read();
             if (token == null) break;
