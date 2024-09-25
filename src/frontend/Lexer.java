@@ -2,17 +2,15 @@ package frontend;
 
 import io.Log;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import static frontend.Token.TokenId.*;
 
 public class Lexer {
-    public Lexer() throws IOException {
-        if (!sourceInput.markSupported()) {
+    public Lexer(Reader reader) throws IOException {
+        input = new BufferedReader(reader);
+        if (!input.markSupported()) {
             System.err.println("Lexer marking not supported for this input stream!");
         }
         // loggerOut: STDOUT, lexer.txt
@@ -27,8 +25,7 @@ public class Lexer {
 
     private int currentLine = 1;
     private final LinkedList<Token> readTokens = new LinkedList<>(); // LIFO, tokens already read in lookAhead.
-    private final BufferedReader sourceInput = new BufferedReader(
-            new FileReader("testfile.txt"));
+    private final BufferedReader input;
     private final Log loggerOut = new Log();
     private final Log loggerErr = new Log();
     private static final HashMap<String, Token.TokenId> keywordsTbl = new HashMap<>();
@@ -92,7 +89,7 @@ public class Lexer {
         while (true) {
             // Jump blanks.
             do {
-                int ich = sourceInput.read(); // Using integer to preserve EOF info.
+                int ich = input.read(); // Using integer to preserve EOF info.
                 if (ich == -1)
                     return null; // EOF
                 ch = (char) ich;
@@ -102,21 +99,21 @@ public class Lexer {
 
             // Deal with comments.
             if (ch == '/') {
-                sourceInput.mark(1);
-                ch = (char) sourceInput.read();
+                input.mark(1);
+                ch = (char) input.read();
                 if (ch == '/') {
                     int ich;
                     do {
-                        ich = sourceInput.read();
+                        ich = input.read();
                     } while (ich != '\n' && ich != -1);
                 } else if (ch == '*') {
                     do {
-                        ch = (char) sourceInput.read();
+                        ch = (char) input.read();
                     } while (ch != '*');
-                    ch = (char) sourceInput.read();
+                    ch = (char) input.read();
                     assert ch == '/';
                 } else {
-                    sourceInput.reset();
+                    input.reset();
                     ch = '/';
                     break;
                 }
@@ -152,63 +149,63 @@ public class Lexer {
         // Finite look-ahead tokens.
         switch (ch) {
             case '>':
-                sourceInput.mark(1);
-                str.append((char) sourceInput.read());
+                input.mark(1);
+                str.append((char) input.read());
                 if (str.toString().equals(">=")) {
                     token = new Token(GEQ, ">=");
                 } else {
-                    sourceInput.reset();
+                    input.reset();
                     token = new Token(GRE, ">");
                 }
                 break;
             case '<':
-                sourceInput.mark(1);
-                str.append((char) sourceInput.read());
+                input.mark(1);
+                str.append((char) input.read());
                 if (str.toString().equals("<=")) {
                     token = new Token(LEQ, "<=");
                 } else {
-                    sourceInput.reset();
+                    input.reset();
                     token = new Token(LSS, "<");
                 }
                 break;
             case '=':
-                sourceInput.mark(1);
-                str.append((char) sourceInput.read());
+                input.mark(1);
+                str.append((char) input.read());
                 if (str.toString().equals("==")) {
                     token = new Token(EQL, "==");
                 } else {
-                    sourceInput.reset();
+                    input.reset();
                     token = new Token(ASSIGN, "=");
                 }
                 break;
             case '!':
-                sourceInput.mark(1);
-                str.append((char) sourceInput.read());
+                input.mark(1);
+                str.append((char) input.read());
                 if (str.toString().equals("!=")) {
                     token = new Token(NEQ, "!=");
                 } else {
-                    sourceInput.reset();
+                    input.reset();
                     token = new Token(NOT, "!");
                 }
                 break;
             case '&':
-                sourceInput.mark(1);
-                str.append((char) sourceInput.read());
+                input.mark(1);
+                str.append((char) input.read());
                 if (str.toString().equals("&&")) {
                     token = new Token(AND, "&&");
                 } else {
-                    sourceInput.reset();
+                    input.reset();
                     token = new Token(AND, "&&");
                     loggerErr.println(currentLine + " a");
                 }
                 break;
             case '|':
-                sourceInput.mark(1);
-                str.append((char) sourceInput.read());
+                input.mark(1);
+                str.append((char) input.read());
                 if (str.toString().equals("||")) {
                     token = new Token(OR, "||");
                 } else {
-                    sourceInput.reset();
+                    input.reset();
                     token = new Token(OR, "&&");
                     loggerErr.println(currentLine + " a");
                 }
@@ -225,7 +222,7 @@ public class Lexer {
             case '\'' -> {
                 do {
                     last = ch;
-                    ch = (char) sourceInput.read();
+                    ch = (char) input.read();
                     str.append(ch);
                 } while (ch != '\'' || last == '\\');
                 yield new Token(CHRCON, String.valueOf(str));
@@ -233,7 +230,7 @@ public class Lexer {
             case '"' -> {
                 do {
                     last = ch;
-                    ch = (char) sourceInput.read();
+                    ch = (char) input.read();
                     str.append(ch);
                 } while (ch != '"' || last == '\\');
                 yield new Token(STRCON, String.valueOf(str));
@@ -243,13 +240,13 @@ public class Lexer {
 
         if (Character.isDigit(ch)) {
             do {
-                sourceInput.mark(1);
-                ch = (char) sourceInput.read();
+                input.mark(1);
+                ch = (char) input.read();
                 if (Character.isDigit(ch)) {
                     str.append(ch);
                 }
             } while (Character.isDigit(ch));
-            sourceInput.reset();
+            input.reset();
             token = new Token(INTCON, String.valueOf(str));
         }
         if (token != null) {
@@ -259,13 +256,13 @@ public class Lexer {
 
         if (Character.isAlphabetic(ch) || ch == '_') {
             do {
-                sourceInput.mark(1);
-                ch = (char) sourceInput.read();
+                input.mark(1);
+                ch = (char) input.read();
                 if (Character.isDigit(ch) || Character.isAlphabetic(ch) || ch == '_') {
                     str.append(ch);
                 }
             } while (Character.isDigit(ch) || Character.isAlphabetic(ch) || ch == '_');
-            sourceInput.reset();
+            input.reset();
             token = new Token(
                     keywordsTbl.getOrDefault(String.valueOf(str), IDENFR),
                     String.valueOf(str));
@@ -275,7 +272,8 @@ public class Lexer {
         return token;
     }
 
-    public void closeLogs() throws IOException {
+    public void close() throws IOException {
+        input.close();
         loggerOut.close();
         loggerErr.close();
     }

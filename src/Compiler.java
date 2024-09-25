@@ -1,16 +1,17 @@
 import frontend.Lexer;
 import frontend.Token;
 
+import java.io.FileReader;
 import java.io.IOException;
 
 public class Compiler {
     /* Compiler execution entry point. */
     public static void main(String[] args) throws IOException {
-        Lexer lexer = new Lexer();
+        Lexer lexer = new Lexer(new FileReader("testfile.txt"));
         while (true) {
             Token token = lexer.read();
             if (token == null) break;
         }
-        lexer.closeLogs();
+        lexer.close();
     }
 }
