@@ -20,15 +20,27 @@
 
 ## 2. Lexical analysis
 
+Parse token on parser's call, or look ahead without advancing the cursor.
+
 ## 3. Syntax analysis
 
-## 4. Error handling
+### Step 1: Basic syntax
 
-## 5. Codegen
+Logic of parsing basic syntax into an AST.
 
-## 6. Test
+### Step 2: Lowering advanced syntax
 
-### 6.1 Design principles
+Add parsing logic for advanced syntax; then add AST transformation logic to transform AST including higher level syntax into a basic AST.
+
+## 4. Semantic analysis
+
+## 5. Error handling
+
+## 6. Code gen
+
+## 7. Tests
+
+### 7.1 Design principles
 
 - Principle 1: good if nothing printed. Only print when something goes wrong, so that output files contains less info of no use.
 

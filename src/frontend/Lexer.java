@@ -11,9 +11,7 @@ import java.util.LinkedList;
 import static frontend.Token.TokenId.*;
 
 public class Lexer {
-    // Single instance.
-    private static Lexer instance;
-    private Lexer() throws IOException {
+    public Lexer() throws IOException {
         if (!sourceInput.markSupported()) {
             System.err.println("Lexer marking not supported for this input stream!");
         }
@@ -26,14 +24,7 @@ public class Lexer {
         //loggerErr.addWriter("stderr", new PrintWriter(System.err));
         loggerErr.addFileWriter("lexer err", "error.txt");
     }
-    public static Lexer getInstance() throws IOException {
-        if (instance == null) {
-            instance = new Lexer();
-        }
-        return instance;
-    }
 
-    // Attributes and methods:
     private int currentLine = 1;
     private final LinkedList<Token> readTokens = new LinkedList<>(); // LIFO, tokens already read in lookAhead.
     private final BufferedReader sourceInput = new BufferedReader(
