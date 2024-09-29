@@ -1,0 +1,8 @@
+' Relations.
+
+Compiler --> Lexer
+
+Lexer *-- Log
+Token <-- Lexer
+
+@enduml

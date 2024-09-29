@@ -1,0 +1,42 @@
+@startuml
+class Compiler
+
+
+class Lexer
+Lexer : - currentLine : int
+Lexer : - readTokens : LinkedList<Token>
+Lexer : - input : BufferedReader
+Lexer : - loggerOut : Log
+Lexer : - loggerErr : Log
+Lexer : - keywordsTbl : HashMap<String, Token.TokenId>
+Lexer : + read() : Token
+Lexer : + lookAhead(int offset) : Token
+Lexer : - parseToken() : Token
+Lexer : + close() : void
+
+
+class Token
+Token : - tokenId : TokenId
+Token : - literal : String
+Token : - val : Value
+Token : + integer : int
+Token : + bigInteger : BigInteger
+Token : + character : char
+Token : + string : String
+Token : - parse() : void
+Token : + toString() : String
+
+
+class Log
+Log : - on : boolean
+Log : - config : HashMap<String, Boolean>
+Log : - writers : HashMap<String, Writer>
+Log : + switchLogger : void
+Log : + switchLogger(boolean on) : void
+Log : + addWriter(String writerName, Writer writer) : void
+Log : + addFileWriter(String writerName, String fileName) : void
+Log : + configureWriter(String writerName, Boolean mode) : void
+Log : + println(Object o) : void
+Log : + close() : void
+
+
