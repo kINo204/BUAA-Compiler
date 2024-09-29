@@ -13,6 +13,7 @@ set "OUTPUT_FILE=uml_defs.puml"
 REM 确保输出文件存在
 if exist "%OUTPUT_FILE%" rm "%OUTPUT_FILE%"
 echo @startuml> "%OUTPUT_FILE%"
+echo left to right direction>> "%OUTPUT_FILE%"
 
 REM 遍历目录及其子目录下的所有.java文件
 for /r "%SOURCE_DIR%" %%f in (*.java) do (

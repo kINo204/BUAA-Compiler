@@ -42,9 +42,21 @@ Further insight into the use of causes the following modification in design:
 
 3. Add `lookAhead()` method and supporting mechanisms.
 
-**The modification 1 & 2 is to enable a lexer to be reused during any period of compiling, as long as it is provided with a `Reader` or an input `String`.** This will combine with a reusable parser together to form a mechanism to "recompile" some code fragments when needed, e.x. when lowering a subtree of an AST.
+**The modification 1 & 2 intends to enable a lexer to be reused during any period of compiling, as long as it is provided with a `Reader` or an input `String`.** This will combine with a reusable parser together to form a mechanism to "recompile" some code fragments when needed, e.x. when lowering a subtree of an AST.
 
-The modicitication 3 is mainly to support the look-ahead operation, which 
+The modification 3 is mainly to support the look-ahead operation, which is used by the syntax analyser(parse).
+
+![Lexer General Design](img/design_lexer.png "Lexer General Design")
+
+#### 2.2.1 Look-ahead mechanisms
+
+In the new architecture, *only call to method `parseToken()` will advance the lexer's cursor and return a new token.* This method is set to private for use inside the Lexer class; meanwhile, *`read()` and `lookAhead(offset)`* are presented to users as interfaces for getting next and advance the cursor, or looking offset without moving the cursor.
+
+A new list `readTokens` stores the tokens already parsed out by `parseToken()`. Any request to a new token, either by `read()` or `lookAhead(offset)`, will first try to find if the required token is already in the list. If the token required is not in the list, `parseToken()` will be continuously called until the required token appears in the list. A difference between `read()` and `lookAhead()` is that read will remove the first token from `readTokens` while looking ahead won't.
+
+#### 2.2.2 Extracting input source
+
+The original input for Lexer is initialized within the Lexer class. However, a lexer should not only be able to be called once, and handle only the source program passed in at the very begenning; it should also be able to create several instances, each handling different piece of source input, even at the same time. So the new design provides 2 ways of setting the lexer's input: by passing in a `Reader` or by directly passing in a `String` to tokenize.
 
 ## 3. Syntax anaysis
 
