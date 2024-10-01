@@ -1,0 +1,998 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": true,
+    "cutInterfaceStructures": true,
+    "cutDataStructures": true,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "frontend.Parser",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1242788334 { 
+   	label=frontend
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   Lexer1242788334[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Lexer</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   currentLine: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   input: BufferedReader [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   loggerErr: Log [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   loggerOut: Log [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   readTokens: LinkedList&lt;Token&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ close()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ lookAhead(offset: int): Token</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseToken(): Token</TD></TR>
+<TR><TD ALIGN="LEFT" >+ read(): Token</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Parser1242788334[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Parser</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   lexer: Lexer [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   loggerErr: Log [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   loggerOut: Log [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   topLevel: AstNodeId [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- expectTokenId(tokenId: TokenId, errCode: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ parse(): AstNode</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseAddExp(): AstAddExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseBlock(): AstBlock</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseBlockItem(): AstBlockItem</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseCharacter(): AstCharacter</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseCompUnit(): AstCompUnit</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseCond(): AstCond</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseConstDecl(): AstConstDecl</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseConstDef(): AstConstDef</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseConstExp(): AstConstExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseConstInitVal(): AstConstInitVal</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseDecl(): AstDecl</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseEqExp(): AstEqExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseExp(): AstExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseForStmt(): AstForStmt</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseFuncDef(): AstFuncDef</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseFuncFParam(): AstFuncFParam</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseFuncFParams(): AstFuncFParams</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseFuncRParams(): AstFuncRParams</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseFuncType(): AstFuncType</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseInitVal(): AstInitVal</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseLAndExp(): AstLAndExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseLOrExp(): AstLOrExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseLVal(): AstLVal</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseMainFuncDef(): AstMainFuncDef</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseMulExp(): AstMulExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseNumber(): AstNumber</TD></TR>
+<TR><TD ALIGN="LEFT" >- parsePrimaryExp(): AstPrimaryExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseRelExp(): AstRelExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmt(): AstStmt</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtAssign(): AstStmtAssign</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtBlock(): AstStmtBlock</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtBreak(): AstStmtBreak</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtContinue(): AstStmtContinue</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtFor(): AstStmtFor</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtGetchar(): AstStmtGetchar</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtGetint(): AstStmtGetint</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtIf(): AstStmtIf</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtPrintf(): AstStmtPrintf</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtReturn(): AstStmtReturn</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseStmtSingleExp(): AstStmtSingleExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseUnaryExp(): AstUnaryExp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseUnaryOp(): AstUnaryOp</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseVarDecl(): AstVarDecl</TD></TR>
+<TR><TD ALIGN="LEFT" >- parseVarDef(): AstVarDef</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+
+subgraph cluster_2101832705 { 
+   	label=datastruct
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   Token2101832705[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Token</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   literal: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   tokenId: TokenId [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   val: Value [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >- parse()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+
+subgraph cluster_3366 { 
+   	label=io
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   Log3366[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Log</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   config: HashMap&lt;String, Boolean&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   on: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   writers: HashMap&lt;String, Writer&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addFileWriter(writerName: String, fileName: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ addWriter(writerName: String, writer: Writer)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ close()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ configureWriter(writerName: String, mode: Boolean)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ println(o: Object)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ switchLogger(on: boolean)</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+
+subgraph cluster_96898 { 
+   	label=ast
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   AstAddExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstAddExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   mulExps: ArrayList&lt;AstMulExp&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addMulExp(mulExp: AstMulExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstBlock1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstBlock</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   blockItems: ArrayList&lt;AstBlockItem&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addBlockItem(blockItem: AstBlockItem)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstBlockItem1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstBlockItem</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   content: AstNode [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstCharacter1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstCharacter</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   charConst: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstCompUnit1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstCompUnit</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   decls: ArrayList&lt;AstDecl&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   funcDefs: ArrayList&lt;AstFuncDef&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   mainFuncDef: AstMainFuncDef [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addDecl(decl: AstDecl)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ addFuncDef(funcDef: AstFuncDef)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstCond1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstCond</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   lOrExp: AstLOrExp [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstConstDecl1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstConstDecl</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   constDefs: ArrayList&lt;AstConstDef&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   type: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addConstDef(constDef: AstConstDef)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstConstDef1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstConstDef</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   constExp: AstConstExp [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   constInitVal: AstConstInitVal [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ident: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstConstExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstConstExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   astAddExp: AstAddExp [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstConstInitVal1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstConstInitVal</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   constExp: AstConstExp [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   constExps: ArrayList&lt;AstConstExp&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   stringConst: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addConstExp(constExp: AstConstExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstDecl1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstDecl</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   content: AstNode [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstEqExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstEqExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   relExps: ArrayList&lt;AstRelExp&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addRelExp(relExp: AstRelExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   astAddExp: AstAddExp [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstForStmt1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstForStmt</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   exp: AstExp [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   lVal: AstLVal [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstFuncDef1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstFuncDef</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   block: AstBlock [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   funcFParams: AstFuncFParams [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   funcType: AstFuncType [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ident: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstFuncFParam1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstFuncFParam</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   ident: Token [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   isArray: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   type: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstFuncFParams1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstFuncFParams</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   funcFParams: ArrayList&lt;AstFuncFParam&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addFuncFParam(funcFParam: AstFuncFParam)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstFuncRParams1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstFuncRParams</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   exps: ArrayList&lt;AstExp&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addExp(exp: AstExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstFuncType1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstFuncType</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   type: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstInitVal1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstInitVal</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   exp: AstExp [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   exps: ArrayList&lt;AstExp&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   stringConst: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addExp(exp: AstExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstLAndExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstLAndExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   eqExps: ArrayList&lt;AstEqExp&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addEqExp(eqExp: AstEqExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstLOrExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstLOrExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   lAndExps: ArrayList&lt;AstLAndExp&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addLAndExp(lAndExp: AstLAndExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstLVal1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstLVal</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   exp: AstExp [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ident: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstMainFuncDef1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstMainFuncDef</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   block: AstBlock [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstMulExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstMulExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   unaryExps: ArrayList&lt;AstUnaryExp&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addUnaryExp(unaryExp: AstUnaryExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstNode1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstNode</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   astNodeId: AstNodeId [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTree(style: String): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstNumber1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstNumber</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   intConst: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstPrimaryExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstPrimaryExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   bracedExp: AstExp [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   character: AstCharacter [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   lVal: AstLVal [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   number: AstNumber [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstRelExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstRelExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   addExps: ArrayList&lt;AstAddExp&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addAddExp(addExp: AstAddExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmt1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmt</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtAssign1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtAssign</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   exp: AstExp [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   lVal: AstLVal [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtBlock1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtBlock</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   block: AstBlock [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtBreak1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtBreak</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtContinue1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtContinue</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtFor1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtFor</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   cond: AstCond [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   firstForStmt: AstForStmt [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   stmt: AstStmt [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   thirdForStmt: AstForStmt [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtGetchar1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtGetchar</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   lVal: AstLVal [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtGetint1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtGetint</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   lVal: AstLVal [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtIf1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtIf</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   cond: AstCond [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   elseStmt: AstStmt [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ifStmt: AstStmt [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtPrintf1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtPrintf</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   exps: ArrayList&lt;AstExp&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   stringConst: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addExp(exp: AstExp)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtReturn1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtReturn</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   exp: AstExp [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstStmtSingleExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstStmtSingleExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   exp: AstExp [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstUnaryExp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstUnaryExp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstUnaryOp1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstUnaryOp</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   op: Token [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstVarDecl1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstVarDecl</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   type: Token [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   varDefs: ArrayList&lt;AstVarDef&gt; [0..*]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addVarDef(varDef: AstVarDef)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+AstVarDef1940463597[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)AstVarDef</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   constExp: AstConstExp [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   ident: Token [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   initVal: AstInitVal [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ buildTreeBrack(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ buildTreeConsole(): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+
+'edges    
+AstFuncRParams1940463597 -> AstExp1940463597[label="exps
+[0..*]"];
+AstNode1940463597 -> AstAddExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstBlock1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstBlockItem1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstCharacter1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstCompUnit1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstCond1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstConstDecl1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstConstDef1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstConstExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstConstInitVal1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstDecl1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstEqExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstForStmt1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstFuncDef1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstFuncFParam1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstFuncFParams1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstFuncRParams1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstFuncType1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstInitVal1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstLAndExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstLOrExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstLVal1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstMainFuncDef1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstMulExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstNumber1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstPrimaryExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstRelExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstStmt1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstUnaryExp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstUnaryOp1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstVarDecl1940463597[arrowhead=none, arrowtail=empty, dir=both];
+AstNode1940463597 -> AstVarDef1940463597[arrowhead=none, arrowtail=empty, dir=both];
+Lexer1242788334 -> Log3366[label="loggerErr
+[0..1]"];
+Lexer1242788334 -> Log3366[label="loggerOut
+[0..1]"];
+Lexer1242788334 -> Token2101832705[label="readTokens
+[0..*]"];
+Parser1242788334 -> AstBlock1940463597[label="parseBlock() -> addBlockItem()"];
+Parser1242788334 -> AstConstInitVal1940463597[label="parseConstInitVal() -> addConstExp()"];
+Parser1242788334 -> AstInitVal1940463597[label="parseInitVal() -> addExp()"];
+Parser1242788334 -> AstStmtPrintf1940463597[label="parseStmtPrintf() -> addExp()"];
+Parser1242788334 -> Lexer1242788334[label="lexer
+[0..1]"];
+Parser1242788334 -> Log3366[label="loggerErr
+[0..1]"];
+Parser1242788334 -> Log3366[label="loggerOut
+[0..1]"];
+    
+}
+@enduml

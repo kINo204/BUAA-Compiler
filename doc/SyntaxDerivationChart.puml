@@ -1,0 +1,105 @@
+@startuml
+
+() CompUnit
+() FuncDef
+() FuncType
+() FuncFParams
+() FuncFParam
+() MainFuncDef
+() Block
+() BlockItem
+() Decl
+() ConstDecl
+() ConstDef
+() ConstInitVal
+() VarDecl
+() VarDef
+() InitVal
+() Stmt
+() ForStmt
+() Cond
+() Exp
+() ConstExp
+() LOrExp
+() LAndExp
+() EqExp
+() RelExp
+() AddExp
+() MulExp
+() UnaryExp
+() FuncRParams
+() PrimaryExp
+() LVal
+
+CompUnit -> Decl
+CompUnit -> FuncDef
+CompUnit -> MainFuncDef
+
+FuncDef -> FuncType
+FuncDef -> FuncFParams
+FuncDef -> Block
+
+FuncFParams -> FuncFParam
+
+MainFuncDef -> Block
+
+Block -> BlockItem
+
+BlockItem -> Decl
+BlockItem -> Stmt
+
+Decl -> ConstDecl
+Decl -> VarDecl
+
+ConstDecl -> ConstDef
+
+ConstDef -> ConstExp
+ConstDef -> ConstInitVal
+
+ConstInitVal -> ConstExp
+
+VarDecl -> VarDef
+
+VarDef -> ConstExp
+VarDef -> InitVal
+
+InitVal -> Exp
+
+Stmt -> LVal
+Stmt -> Exp
+Stmt -> Block
+Stmt -> Cond
+Stmt -> Stmt
+Stmt -> ForStmt
+
+ForStmt -> LVal
+ForStmt -> Exp
+
+Cond -> LOrExp
+
+Exp -> AddExp
+
+ConstExp -> AddExp
+
+LOrExp -> LAndExp
+
+LAndExp -> EqExp
+
+EqExp -> RelExp
+
+RelExp -> AddExp
+
+AddExp -> MulExp
+
+MulExp -> UnaryExp
+
+UnaryExp -> UnaryExp
+UnaryExp -> PrimaryExp
+UnaryExp -> FuncRParams
+
+FuncRParams -> Exp
+
+PrimaryExp -> Exp
+PrimaryExp -> LVal
+
+@enduml

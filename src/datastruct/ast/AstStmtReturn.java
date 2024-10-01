@@ -1,0 +1,19 @@
+package datastruct.ast;
+
+public class AstStmtReturn extends AstStmt {
+    private AstExp exp = null;
+
+    public void setExp(AstExp exp) {
+        this.exp = exp;
+    }
+
+    @Override
+    public String buildTreeBrack() {
+        return null;
+    }
+
+    @Override
+    public String buildTreeConsole() {
+        return null;
+    }
+}

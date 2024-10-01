@@ -1,6 +1,7 @@
-package frontend;
+package datastruct;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class Token {
     private final TokenId tokenId;
@@ -32,6 +33,22 @@ public class Token {
             case CHRCON -> val.character = literal.charAt(0);
             case STRCON -> val.string = literal.substring(1, literal.length() - 1); // Strip "" symbols
         }
+    }
+
+    public TokenId getTokenId() {
+        return tokenId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Token token)) return false;
+        return tokenId == token.tokenId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tokenId);
     }
 
     @Override

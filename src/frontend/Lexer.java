@@ -1,40 +1,33 @@
 package frontend;
 
+import datastruct.Token;
 import io.Log;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
-import static frontend.Token.TokenId.*;
+import static datastruct.Token.TokenId.*;
 
 public class Lexer {
-    public Lexer(Reader reader) throws IOException {
+    public Lexer(Reader reader, Log o, Log e) throws IOException {
+        // Init input.
         input = new BufferedReader(reader);
         if (!input.markSupported()) {
             System.err.println("Lexer marking not supported for this input stream!");
         }
-        loggerOut.switchLogger(true);
-        loggerOut.addFileWriter("lexer out", "lexer.txt");
-        loggerErr.switchLogger(true);
-        loggerErr.addFileWriter("lexer err", "error.txt");
-    }
 
-    public Lexer(String inputString) throws IOException {
-        input = new BufferedReader(new StringReader(inputString));
-        if (!input.markSupported()) {
-            System.err.println("Lexer marking not supported for this input stream!");
-        }
-        loggerOut.switchLogger(true);
-        loggerOut.addFileWriter("lexer out", "lexer.txt");
-        loggerErr.switchLogger(true);
-        loggerErr.addFileWriter("lexer err", "error.txt");
+        // Init output.
+        loggerOut = o;
+        loggerErr = e;
     }
 
     private int currentLine = 1;
+    private int parsingLineNo = 1; // The line number the lexer's cursor is on.
     private final LinkedList<Token> readTokens = new LinkedList<>(); // LIFO, tokens already read in lookAhead.
+    private final LinkedList<Integer> lineNos = new LinkedList<>();
     private final BufferedReader input;
-    private final Log loggerOut = new Log();
-    private final Log loggerErr = new Log();
+    private final Log loggerOut;
+    private final Log loggerErr;
     private static final HashMap<String, Token.TokenId> keywordsTbl = new HashMap<>();
     static {
         keywordsTbl.put("main", MAINTK);
@@ -53,12 +46,21 @@ public class Lexer {
         keywordsTbl.put("return", RETURNTK);
     }
 
+    public int getCurrentLine() {
+        return currentLine;
+    }
+
     public Token read() throws IOException {
+        Token t;
         if (!readTokens.isEmpty()) {
-            return readTokens.removeFirst();
+            t = readTokens.removeFirst();
+            currentLine = lineNos.removeFirst();
         } else {
-            return parseToken();
+            t = parseToken();
+            currentLine = parsingLineNo;
         }
+        loggerOut.println(t);
+        return t;
     }
 
     /**
@@ -81,6 +83,7 @@ public class Lexer {
         // Else continue parsing.
         for (int i = 0; i <= offset - size; i++) {
             readTokens.addLast(parseToken());
+            lineNos.addLast(parsingLineNo);
             // If a null be added, we reach EOF. No need for parsing more tokens.
             if (readTokens.getLast() == null)
                 break;
@@ -101,7 +104,7 @@ public class Lexer {
                     return null; // EOF
                 ch = (char) ich;
                 if (ch == '\n')
-                    currentLine ++;
+                    parsingLineNo++;
             } while (String.valueOf(ch).isBlank());
 
             // Deal with comments.
@@ -112,10 +115,16 @@ public class Lexer {
                     int ich;
                     do {
                         ich = input.read();
+                        if (ich == '\n') {
+                            parsingLineNo++;
+                        }
                     } while (ich != '\n' && ich != -1);
                 } else if (ch == '*') {
                     do {
                         ch = (char) input.read();
+                        if (ch == '\n') {
+                            parsingLineNo++;
+                        }
                     } while (ch != '*');
                     ch = (char) input.read();
                     assert ch == '/';
@@ -147,7 +156,6 @@ public class Lexer {
             default -> null;
         };
         if (token != null) {
-            loggerOut.println(token);
             return token;
         }
 
@@ -203,7 +211,7 @@ public class Lexer {
                 } else {
                     input.reset();
                     token = new Token(AND, "&&");
-                    loggerErr.println(currentLine + " a");
+                    loggerErr.println(parsingLineNo + " a");
                 }
                 break;
             case '|':
@@ -214,12 +222,11 @@ public class Lexer {
                 } else {
                     input.reset();
                     token = new Token(OR, "&&");
-                    loggerErr.println(currentLine + " a");
+                    loggerErr.println(parsingLineNo + " a");
                 }
                 break;
         }
         if (token != null) {
-            loggerOut.println(token);
             return token;
         }
 
@@ -257,7 +264,6 @@ public class Lexer {
             token = new Token(INTCON, String.valueOf(str));
         }
         if (token != null) {
-            loggerOut.println(token);
             return token;
         }
 
@@ -275,7 +281,6 @@ public class Lexer {
                     String.valueOf(str));
         }
 
-        if (token != null) { loggerOut.println(token); }
         return token;
     }
 

@@ -1,14 +1,14 @@
-BType (* Basic types *)
+BType (* Basic types *) (* No output *)
 	: 'int'
 	| 'char'
 	;
 
-CompUnit
+CompUnit (* Compiler entry point *)
 	: { Decl } { FuncDef } MainFuncDef
 	;
 
 	FuncDef 
-		: FuncType Ident '(' [FuncFParams] ')' Block
+		: FuncType Ident '(' [ FuncFParams ] ')' Block
 		;
 
 		FuncType 
@@ -21,7 +21,7 @@ CompUnit
 			;
 
 			FuncFParam 
-				: BType Ident ['[' ']']
+				: BType Ident [ '[' ']' ]
 				;
 
 	MainFuncDef 
@@ -32,12 +32,12 @@ Block
 	: '{' { BlockItem } '}'
 	;
 
-	BlockItem 
+	BlockItem  (* No output *)
 		: Decl
 		| Stmt
 		;
 
-Decl
+Decl (* No output *)
 	: ConstDecl | VarDecl
 	;
 
@@ -60,7 +60,7 @@ Decl
 		;
 
 		VarDef 
-			: Ident '[' ConstExp ']' [ '=' InitVal ]
+			: Ident [ '[' ConstExp ']' ] [ '=' InitVal ]
 			;
 
 			InitVal 
@@ -71,15 +71,16 @@ Decl
 
 Stmt 
 	(* assign *)	: LVal '=' Exp ';'
-	(* single *)	| [Exp] ';'
+	(* single *)	| [ Exp ] ';'
+	(* Iint   *)	| LVal '=' 'getint' '(' ')' ';'
+	(* Ichar  *)	| LVal '=' 'getchar' '(' ')' ';'
+	
 	(* block  *)	| Block
 	(* ifstruct *)	| 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
 	(* forstruct *)	| 'for' '(' [ForStmt] ';' [Cond] ';' [ForStmt] ')' Stmt
 	(* break  *)	| 'break' ';'
 	(* continue *)	| 'continue' ';'
 	(* return  *)	| 'return' [Exp] ';'
-	(* Iint   *)	| LVal '=' 'getint' '(' ')' ';'
-	(* Ichar  *)	| LVal '=' 'getchar' '(' ')' ';'
 	(* Oprintf *)	| 'printf' '('StringConst { ',' Exp } ')' ';'
 	;
 
@@ -112,13 +113,11 @@ LOrExp
 				;
 
 AddExp 
-	: MulExp
-	| AddExp ('+' | '−') MulExp
+	: MulExp { ('+' | '−') MulExp }
 	;
 
 	MulExp 
-		: UnaryExp
-		| MulExp ('*' | '/' | '%') UnaryExp
+		: UnaryExp { ('*' | '/' | '%') UnaryExp }
 		;
 
 		UnaryExp 
@@ -154,7 +153,10 @@ AddExp
 					: CharConst
 					;
 
-Ident
+
+(* Terminals *)
+
+Ident (* Vt *)
 	: IdentNonDigit
 	| Ident IdentNonDigit
 	| Ident Digit
@@ -164,7 +166,7 @@ Ident
 		: REGEX( [_a-zA-Z] )
 		;
 
-IntConst
+IntConst(* Vt *)
 	: '0'
 	| DecimalConst
 	;
@@ -174,11 +176,11 @@ IntConst
 		| DecimalConst Digit
 		;
 
-CharConst
+CharConst(* Vt *)
 	: '\'' Ascii '\''
 	;
 
-StringConst
+StringConst(* Vt *)
 	: '\"' { Ascii } '\"'
 	;
 
