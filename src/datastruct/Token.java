@@ -58,6 +58,8 @@ public class Token {
 
     @SuppressWarnings("SpellCheckingInspection")
     public enum TokenId {
+        EOF,
+
         // Literals:
         IDENFR, // identifier
         INTCON, // integer const

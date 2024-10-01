@@ -4,9 +4,10 @@ import datastruct.Token;
 import io.Log;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
+
 import static datastruct.Token.TokenId.*;
+
 
 public class Lexer {
     public Lexer(Reader reader, Log o, Log e) throws IOException {
@@ -23,8 +24,8 @@ public class Lexer {
 
     private int currentLine = 1;
     private int parsingLineNo = 1; // The line number the lexer's cursor is on.
-    private final LinkedList<Token> readTokens = new LinkedList<>(); // LIFO, tokens already read in lookAhead.
-    private final LinkedList<Integer> lineNos = new LinkedList<>();
+    private final ArrayDeque<Token> readTokens = new ArrayDeque<>(); // LIFO, tokens already read in lookAhead.
+    private final ArrayDeque<Integer> lineNos = new ArrayDeque<>();
     private final BufferedReader input;
     private final Log loggerOut;
     private final Log loggerErr;
@@ -73,11 +74,17 @@ public class Lexer {
         int size = readTokens.size();
         // Token already buffered:
         if (offset < size) {
-            return readTokens.get(offset);
+            int ind = 0;
+            for (Token t : readTokens) {
+                if (ind == offset) {
+                    return t;
+                }
+                ind += 1;
+            }
         }
         // Token not parsed yet:
         // If EOF has been reached, return.
-        if (!readTokens.isEmpty() && readTokens.getLast() == null) {
+        if (!readTokens.isEmpty() && readTokens.getLast().getTokenId() == EOF) {
             return null;
         }
         // Else continue parsing.
@@ -85,7 +92,7 @@ public class Lexer {
             readTokens.addLast(parseToken());
             lineNos.addLast(parsingLineNo);
             // If a null be added, we reach EOF. No need for parsing more tokens.
-            if (readTokens.getLast() == null)
+            if (readTokens.getLast().getTokenId() == EOF)
                 break;
         }
         return readTokens.getLast();
@@ -101,7 +108,7 @@ public class Lexer {
             do {
                 int ich = input.read(); // Using integer to preserve EOF info.
                 if (ich == -1)
-                    return null; // EOF
+                    return new Token(EOF, null); // EOF
                 ch = (char) ich;
                 if (ch == '\n')
                     parsingLineNo++;
