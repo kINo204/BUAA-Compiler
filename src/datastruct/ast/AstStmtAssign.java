@@ -1,8 +1,8 @@
 package datastruct.ast;
 
 public class AstStmtAssign extends AstStmt {
-    private AstLVal lVal;
-    private AstExp exp;
+    public AstLVal lVal;
+    public AstExp exp;
 
     public void setExp(AstExp exp) {
         this.exp = exp;

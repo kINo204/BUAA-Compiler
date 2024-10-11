@@ -1,7 +1,5 @@
 package datastruct.ast;
 
-import datastruct.Token;
-
 import java.util.ArrayList;
 
 public class AstVarDecl extends AstNode {
@@ -9,8 +7,8 @@ public class AstVarDecl extends AstNode {
         super(AstNodeId.VarDecl);
     }
 
-    private Token type;
-    private final ArrayList<AstVarDef> varDefs = new ArrayList<>();
+    public Token type;
+    public final ArrayList<AstVarDef> varDefs = new ArrayList<>();
 
     public void setType(Token type) {
         this.type = type;

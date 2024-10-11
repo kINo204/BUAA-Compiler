@@ -5,7 +5,7 @@ public class AstBlockItem extends AstNode {
         super(AstNodeId.BlockItem);
     }
 
-    private AstNode content;
+    public AstNode content;
 
     public void setContent(AstNode content) {
         this.content = content;

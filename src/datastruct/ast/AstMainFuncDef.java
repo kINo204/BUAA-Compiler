@@ -5,7 +5,7 @@ public class AstMainFuncDef extends AstNode{
         super(AstNodeId.MainFuncDef);
     }
 
-    private AstBlock block;
+    public AstBlock block;
 
     public void setBlock(AstBlock block) {
         this.block = block;

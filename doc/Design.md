@@ -26,7 +26,7 @@ The lexical analysis section of the compiler provides several modules: I/O handl
 
 | Class          | Function          | Description                                                  |
 | -------------- | ----------------- | ------------------------------------------------------------ |
-| datastruct.Token | Datatype of token | Restore all information of a token, including token type `tokenId`, literal string `literal` and attributes `val`. |
+| datastruct.ast.Token | Datatype of token | Restore all information of a token, including token type `tokenId`, literal string `literal` and attributes `val`. |
 | frontend.Lexer | Lexical analyzer  | Use a `BufferedReader` of `System.in` for input, and provide `read()` for fetching the next token. Each contains two loggers `stdout` and `stderr` generating output info in `read()` process. |
 | io.Log         | Log output        | This is a reusable logger class. Contains a table of writers to put the same info to various output. Provide `addWriter`, `addFilewriter` and `configureWriter` for writer configurations. |
 
@@ -70,6 +70,56 @@ Add parsing logic for advanced syntax; then add AST transformation logic to tran
 
 ## 4. Semantic analysis
 
+### 4.1 Symbol datatypes
+
+Datatypes for symbols are as follow:
+
+```
+Symbol
+=> SymVar
+=> SymFunc
+```
+
+Different symbol types are distinguished by `SymId` defined in class `Symbol`.
+
+**To extract inner info of `Symbol`,** each symbol is created from a piece of code `AstNode piece`, implementing symbol parsing details. User can simply write: `symTbl.addSyms(Symbol.from(astNode))`!
+
+### 4.2 Symbol table
+
+Under instruction of the *KISS* principle, design choices are made for the symbol table as listed below:
+
+- **An individual module**, interacting with other components instead of part of either of them.
+- **Persistent rather than temporary symbol data storage** for its individuality. 
+- **Using graph representation instead of a stack** mainly for persistency, but also for extensibility in language's semantics(means that the `SymTbl` class may be reused by compilers of other languages).
+
+```
+SymTbl {
+    curScope = TreeRoot,
+    curId = 1, // for pushing only
+    Tree<(Scope, isVisited)> = [ (Scope, 0) ]
+}
+
+Scope {
+	id = 1,
+	visited = 0,
+    upper,
+    List<Scope> lowers,
+    List<Symbol> = []
+}
+```
+
+`SymTbl` provides several methods for editing and accessing symbol info, abstracting out the *scope* managing details:
+
+| Methods       | Description                                                  |
+| ------------- | ------------------------------------------------------------ |
+| (Constructor) | The `SymTbl`'s constructor initialize an empty symbol table, with a single `Scope` already setup for the outer scope. |
+| initVisits    | Prepare for visits: reset `isVisited` status for all scopes, and place `curScope` at the root scope. |
+| searchSym     | Search for the  `Symbol` by specified symbol string, from the current scope up to the scope tree's root. |
+| addSyms       | Add all `Symbol`s in the given collection.                   |
+| pushScope     | Create a new sub-scope under the current scope with `curId + 1`. |
+| enterScope    | Enter the next unvisited sub-scope of the current scope.     |
+| exitScope     | Return to the upper scope of the current scope.              |
+
 ## 5. Error handling
 
 ## 6. Code gen
@@ -78,6 +128,8 @@ Add parsing logic for advanced syntax; then add AST transformation logic to tran
 
 ### 7.1 Design principles
 
-- Principle 1: good if nothing printed. Only print when something goes wrong, so that output files contains less info of no use.
+- Principle 0: Keep it simple.
+
+- Principle 1: good if nothing printed. Only print when something goes wrong.
 
 - Principle 2: testing by incrementing; that is, testing a part of the basic functionalities, and use those already tested for the next testcase.

@@ -1,13 +1,11 @@
 package datastruct.ast;
 
-import datastruct.Token;
-
 public class AstUnaryOp extends AstNode {
     public AstUnaryOp() {
         super(AstNodeId.UnaryOp);
     }
 
-    private Token op;
+    public Token op;
 
     public void setOp(Token op) {
         this.op = op;

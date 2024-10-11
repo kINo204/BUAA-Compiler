@@ -5,8 +5,8 @@ public class AstForStmt extends AstNode {
         super(AstNodeId.ForStmt);
     }
 
-    private AstLVal lVal;
-    private AstExp exp;
+    public AstLVal lVal;
+    public AstExp exp;
 
     public void setlVal(AstLVal lVal) {
         this.lVal = lVal;

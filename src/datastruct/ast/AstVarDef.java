@@ -1,15 +1,13 @@
 package datastruct.ast;
 
-import datastruct.Token;
-
 public class AstVarDef extends AstNode {
     public AstVarDef() {
         super(AstNodeId.VarDef);
     }
 
-    private Token ident;
-    private AstConstExp constExp = null;
-    private AstInitVal initVal = null;
+    public Token ident;
+    public AstConstExp constExp = null;
+    public AstInitVal initVal = null;
 
     public void setIdent(Token ident) {
         this.ident = ident;

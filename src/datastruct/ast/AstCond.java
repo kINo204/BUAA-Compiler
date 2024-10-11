@@ -5,7 +5,7 @@ public class AstCond extends AstNode {
         super(AstNodeId.Cond);
     }
 
-    private AstLOrExp lOrExp;
+    public AstLOrExp lOrExp;
 
     public void setlOrExp(AstLOrExp lOrExp) {
         this.lOrExp = lOrExp;

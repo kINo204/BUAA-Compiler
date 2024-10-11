@@ -7,7 +7,7 @@ public class AstLAndExp extends AstNode {
         super(AstNodeId.LAndExp);
     }
 
-    private final ArrayList<AstEqExp> eqExps = new ArrayList<>();
+    public final ArrayList<AstEqExp> eqExps = new ArrayList<>();
 
     public void addEqExp(AstEqExp eqExp) {
         eqExps.add(eqExp);

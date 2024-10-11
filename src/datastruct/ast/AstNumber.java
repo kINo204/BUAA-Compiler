@@ -1,13 +1,11 @@
 package datastruct.ast;
 
-import datastruct.Token;
-
 public class AstNumber extends AstNode {
     public AstNumber() {
         super(AstNodeId.Number);
     }
 
-    private Token intConst;
+    public Token intConst;
 
     public void setIntConst(Token intConst) {
         this.intConst = intConst;

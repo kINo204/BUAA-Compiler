@@ -1,10 +1,10 @@
 package datastruct.ast;
 
 public class AstStmtFor extends AstStmt {
-    private AstForStmt firstForStmt = null;
-    private AstCond cond = null;
-    private AstForStmt thirdForStmt = null;
-    private AstStmt stmt;
+    public AstForStmt firstForStmt = null;
+    public AstCond cond = null;
+    public AstForStmt thirdForStmt = null;
+    public AstStmt stmt;
 
     public void setFirstForStmt(AstForStmt firstForStmt) {
         this.firstForStmt = firstForStmt;

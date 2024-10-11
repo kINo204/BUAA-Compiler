@@ -7,7 +7,7 @@ public class AstEqExp extends AstNode {
         super(AstNodeId.EqExp);
     }
 
-    private final ArrayList<AstRelExp> relExps = new ArrayList<>();
+    public final ArrayList<AstRelExp> relExps = new ArrayList<>();
 
     public void addRelExp(AstRelExp relExp) {
         relExps.add(relExp);

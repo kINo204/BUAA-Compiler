@@ -1,8 +1,8 @@
 package datastruct.ast;
 
 public class AstUnaryExpUnaryOp extends AstUnaryExp {
-    private AstUnaryOp unaryOp;
-    private AstUnaryExp unaryExp;
+    public AstUnaryOp unaryOp;
+    public AstUnaryExp unaryExp;
 
     public void setUnaryOp(AstUnaryOp unaryOp) {
         this.unaryOp = unaryOp;

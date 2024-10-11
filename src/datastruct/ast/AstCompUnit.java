@@ -7,9 +7,9 @@ public class AstCompUnit extends AstNode{
         super(AstNodeId.CompUnit);
     }
 
-    private final ArrayList<AstDecl> decls = new ArrayList<>();
-    private final ArrayList<AstFuncDef> funcDefs = new ArrayList<>();
-    private AstMainFuncDef mainFuncDef;
+    public final ArrayList<AstDecl> decls = new ArrayList<>();
+    public final ArrayList<AstFuncDef> funcDefs = new ArrayList<>();
+    public AstMainFuncDef mainFuncDef;
 
     public void addDecl(AstDecl decl) {
         decls.add(decl);

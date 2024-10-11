@@ -1,7 +1,7 @@
 package datastruct.ast;
 
 public class AstStmtReturn extends AstStmt {
-    private AstExp exp = null;
+    public AstExp exp = null;
 
     public void setExp(AstExp exp) {
         this.exp = exp;

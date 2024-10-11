@@ -6,10 +6,10 @@ public class AstPrimaryExp extends AstNode {
     }
 
     // Choose one between the four:
-    private AstExp bracedExp = null;
-    private AstLVal lVal = null;
-    private AstNumber number = null;
-    private AstCharacter character = null;
+    public AstExp bracedExp = null;
+    public AstLVal lVal = null;
+    public AstNumber number = null;
+    public AstCharacter character = null;
 
     public void setBracedExp(AstExp bracedExp) {
         this.bracedExp = bracedExp;

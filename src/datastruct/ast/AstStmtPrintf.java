@@ -1,12 +1,10 @@
 package datastruct.ast;
 
-import datastruct.Token;
-
 import java.util.ArrayList;
 
 public class AstStmtPrintf extends AstStmt {
-    private Token stringConst;
-    private final ArrayList<AstExp> exps = new ArrayList<>();
+    public Token stringConst;
+    public final ArrayList<AstExp> exps = new ArrayList<>();
 
     public void setStringConst(Token stringConst) {
         this.stringConst = stringConst;

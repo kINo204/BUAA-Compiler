@@ -1,9 +1,9 @@
 package datastruct.ast;
 
 public class AstStmtIf extends AstStmt {
-    private AstCond cond;
-    private AstStmt ifStmt;
-    private AstStmt elseStmt = null;
+    public AstCond cond;
+    public AstStmt ifStmt;
+    public AstStmt elseStmt = null;
 
     public void setCond(AstCond cond) {
         this.cond = cond;

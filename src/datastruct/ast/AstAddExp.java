@@ -7,7 +7,7 @@ public class AstAddExp extends AstNode {
         super(AstNodeId.AddExp);
     }
 
-    private final ArrayList<AstMulExp> mulExps = new ArrayList<>();
+    public final ArrayList<AstMulExp> mulExps = new ArrayList<>();
 
     public void addMulExp(AstMulExp mulExp) {
         mulExps.add(mulExp);

@@ -1,16 +1,16 @@
 package frontend;
 
-import datastruct.Token;
+import datastruct.ast.Token;
 import io.Log;
 
 import java.io.*;
 import java.util.*;
 
-import static datastruct.Token.TokenId.*;
+import static datastruct.ast.Token.TokenId.*;
 
 
 public class Lexer {
-    public Lexer(Reader reader, Log o, Log e) throws IOException {
+    public Lexer(Reader reader, Log o, Log e) {
         // Init input.
         input = new BufferedReader(reader);
         if (!input.markSupported()) {
@@ -108,7 +108,7 @@ public class Lexer {
             do {
                 int ich = input.read(); // Using integer to preserve EOF info.
                 if (ich == -1)
-                    return new Token(EOF, null); // EOF
+                    return new Token(EOF, null, parsingLineNo); // EOF
                 ch = (char) ich;
                 if (ch == '\n')
                     parsingLineNo++;
@@ -147,19 +147,19 @@ public class Lexer {
 
         // Predictable tokens by 1 char.
         token = switch (ch) {
-            case ';' -> new Token(SEMICN, ";");
-            case ',' -> new Token(COMMA, ",");
-            case '(' -> new Token(LPARENT, "(");
-            case ')' -> new Token(RPARENT, ")");
-            case '[' -> new Token(LBRACK, "[");
-            case ']' -> new Token(RBRACK, "]");
-            case '{' -> new Token(LBRACE, "{");
-            case '}' -> new Token(RBRACE, "}");
-            case '+' -> new Token(PLUS, "+");
-            case '-' -> new Token(MINU, "-");
-            case '*' -> new Token(MULT, "*");
-            case '/' -> new Token(DIV, "/");
-            case '%' -> new Token(MOD, "%");
+            case ';' -> new Token(SEMICN, ";", parsingLineNo);
+            case ',' -> new Token(COMMA, ",", parsingLineNo);
+            case '(' -> new Token(LPARENT, "(", parsingLineNo);
+            case ')' -> new Token(RPARENT, ")", parsingLineNo);
+            case '[' -> new Token(LBRACK, "[", parsingLineNo);
+            case ']' -> new Token(RBRACK, "]", parsingLineNo);
+            case '{' -> new Token(LBRACE, "{", parsingLineNo);
+            case '}' -> new Token(RBRACE, "}", parsingLineNo);
+            case '+' -> new Token(PLUS, "+", parsingLineNo);
+            case '-' -> new Token(MINU, "-", parsingLineNo);
+            case '*' -> new Token(MULT, "*", parsingLineNo);
+            case '/' -> new Token(DIV, "/", parsingLineNo);
+            case '%' -> new Token(MOD, "%", parsingLineNo);
             default -> null;
         };
         if (token != null) {
@@ -174,50 +174,50 @@ public class Lexer {
                 input.mark(1);
                 str.append((char) input.read());
                 if (str.toString().equals(">=")) {
-                    token = new Token(GEQ, ">=");
+                    token = new Token(GEQ, ">=", parsingLineNo);
                 } else {
                     input.reset();
-                    token = new Token(GRE, ">");
+                    token = new Token(GRE, ">", parsingLineNo);
                 }
                 break;
             case '<':
                 input.mark(1);
                 str.append((char) input.read());
                 if (str.toString().equals("<=")) {
-                    token = new Token(LEQ, "<=");
+                    token = new Token(LEQ, "<=", parsingLineNo);
                 } else {
                     input.reset();
-                    token = new Token(LSS, "<");
+                    token = new Token(LSS, "<", parsingLineNo);
                 }
                 break;
             case '=':
                 input.mark(1);
                 str.append((char) input.read());
                 if (str.toString().equals("==")) {
-                    token = new Token(EQL, "==");
+                    token = new Token(EQL, "==", parsingLineNo);
                 } else {
                     input.reset();
-                    token = new Token(ASSIGN, "=");
+                    token = new Token(ASSIGN, "=", parsingLineNo);
                 }
                 break;
             case '!':
                 input.mark(1);
                 str.append((char) input.read());
                 if (str.toString().equals("!=")) {
-                    token = new Token(NEQ, "!=");
+                    token = new Token(NEQ, "!=", parsingLineNo);
                 } else {
                     input.reset();
-                    token = new Token(NOT, "!");
+                    token = new Token(NOT, "!", parsingLineNo);
                 }
                 break;
             case '&':
                 input.mark(1);
                 str.append((char) input.read());
                 if (str.toString().equals("&&")) {
-                    token = new Token(AND, "&&");
+                    token = new Token(AND, "&&", parsingLineNo);
                 } else {
                     input.reset();
-                    token = new Token(AND, "&&");
+                    token = new Token(AND, "&&", parsingLineNo);
                     loggerErr.println(parsingLineNo + " a");
                 }
                 break;
@@ -225,10 +225,10 @@ public class Lexer {
                 input.mark(1);
                 str.append((char) input.read());
                 if (str.toString().equals("||")) {
-                    token = new Token(OR, "||");
+                    token = new Token(OR, "||", parsingLineNo);
                 } else {
                     input.reset();
-                    token = new Token(OR, "&&");
+                    token = new Token(OR, "&&", parsingLineNo);
                     loggerErr.println(parsingLineNo + " a");
                 }
                 break;
@@ -246,7 +246,7 @@ public class Lexer {
                     ch = (char) input.read();
                     str.append(ch);
                 } while (ch != '\'' || last == '\\');
-                yield new Token(CHRCON, String.valueOf(str));
+                yield new Token(CHRCON, String.valueOf(str), parsingLineNo);
             }
             case '"' -> {
                 do {
@@ -254,7 +254,7 @@ public class Lexer {
                     ch = (char) input.read();
                     str.append(ch);
                 } while (ch != '"' || last == '\\');
-                yield new Token(STRCON, String.valueOf(str));
+                yield new Token(STRCON, String.valueOf(str), parsingLineNo);
             }
             default -> null;
         };
@@ -268,7 +268,7 @@ public class Lexer {
                 }
             } while (Character.isDigit(ch));
             input.reset();
-            token = new Token(INTCON, String.valueOf(str));
+            token = new Token(INTCON, String.valueOf(str), parsingLineNo);
         }
         if (token != null) {
             return token;
@@ -285,7 +285,7 @@ public class Lexer {
             input.reset();
             token = new Token(
                     keywordsTbl.getOrDefault(String.valueOf(str), IDENFR),
-                    String.valueOf(str));
+                    String.valueOf(str), parsingLineNo);
         }
 
         return token;

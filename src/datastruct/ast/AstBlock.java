@@ -7,7 +7,7 @@ public class AstBlock extends AstNode{
         super(AstNodeId.Block);
     }
 
-    private final ArrayList<AstBlockItem> blockItems = new ArrayList<>();
+    public final ArrayList<AstBlockItem> blockItems = new ArrayList<>();
 
     public void addBlockItem(AstBlockItem blockItem) {
         blockItems.add(blockItem);

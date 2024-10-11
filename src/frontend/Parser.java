@@ -1,24 +1,31 @@
 package frontend;
 
-import datastruct.Token;
+import datastruct.ast.Token;
 import datastruct.ast.*;
+import datastruct.symbol.Symbol;
+import datastruct.symtbl.SymTbl;
 import io.Log;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import static datastruct.Token.TokenId.*;
+import static datastruct.ast.Token.TokenId.*;
 
 public class Parser {
     private final Lexer lexer;
     private final AstNode.AstNodeId topLevel;
     private final Log loggerOut;
     private final Log loggerErr;
+
+    // Generated data:
+    private final SymTbl symTbl;
+
     public Parser(Lexer lexer, String topLevel, Log o, Log e) {
         this.lexer = lexer;
         this.topLevel = AstNode.AstNodeId.valueOf(topLevel);
         loggerOut = o;
         loggerErr = e;
+        symTbl = new SymTbl(loggerOut, loggerErr);
     }
 
     public void close() throws IOException {
@@ -37,6 +44,10 @@ public class Parser {
         }
     }
 
+    public SymTbl getSymTbl() {
+        return symTbl;
+    }
+
     // Parsing entry point.
     public AstNode parse() throws IOException {
         return switch (topLevel) {
@@ -46,7 +57,7 @@ public class Parser {
             case FuncFParams -> parseFuncFParams();
             case FuncFParam -> parseFuncFParam();
             case MainFuncDef -> parseMainFuncDef();
-            case Block -> parseBlock();
+            case Block -> parseBlock(true);
             case BlockItem -> parseBlockItem();
             case Decl -> parseDecl();
             case ConstDecl -> parseConstDecl();
@@ -98,6 +109,7 @@ public class Parser {
 
     private AstFuncDef parseFuncDef() throws IOException { // j
         AstFuncDef funcDef = new AstFuncDef();
+        symTbl.pushScope();
 
         // FuncType
         funcDef.setFuncType(parseFuncType());
@@ -114,9 +126,13 @@ public class Parser {
         // ')'
         expectTokenId(RPARENT, "j");
         // Block
-        funcDef.setBlock(parseBlock());
+        funcDef.setBlock(parseBlock(false));
 
         loggerOut.println(funcDef);
+
+        symTbl.exitScope();
+        symTbl.addSyms(Symbol.from(funcDef));
+
         return funcDef;
     }
 
@@ -142,6 +158,7 @@ public class Parser {
         }
 
         loggerOut.println(funcFParams);
+        symTbl.addSyms(Symbol.from(funcFParams));
         return funcFParams;
     }
 
@@ -167,6 +184,7 @@ public class Parser {
 
     private AstMainFuncDef parseMainFuncDef() throws IOException { // j
         AstMainFuncDef mainFuncDef = new AstMainFuncDef();
+        symTbl.pushScope();
 
         // 'int'
         assert lexer.lookAhead(0).getTokenId() == INTTK;
@@ -179,14 +197,16 @@ public class Parser {
 		lexer.read();
         expectTokenId(RPARENT, "j");
         // Block
-        mainFuncDef.setBlock(parseBlock());
+        mainFuncDef.setBlock(parseBlock(false));
 
         loggerOut.println(mainFuncDef);
+        symTbl.exitScope();
         return mainFuncDef;
     }
 
-    private AstBlock parseBlock() throws IOException {
+    private AstBlock parseBlock(boolean createScope) throws IOException {
         AstBlock block = new AstBlock();
+        if (createScope) symTbl.pushScope();
 
         // '{'
         assert lexer.lookAhead(0).getTokenId() == LBRACE;
@@ -200,6 +220,8 @@ public class Parser {
 		lexer.read();
 
         loggerOut.println(block);
+
+        if (createScope) symTbl.exitScope();
         return block;
     }
 
@@ -250,6 +272,7 @@ public class Parser {
         expectTokenId(SEMICN, "i");
 
         loggerOut.println(constDecl);
+        symTbl.addSyms(Symbol.from(constDecl));
         return constDecl;
     }
 
@@ -310,6 +333,7 @@ public class Parser {
         expectTokenId(SEMICN, "i");
 
         loggerOut.println(varDecl);
+        symTbl.addSyms(Symbol.from(varDecl));
         return varDecl;
     }
 
@@ -438,7 +462,7 @@ public class Parser {
 
     private AstStmtBlock parseStmtBlock() throws IOException {
         AstStmtBlock stmtBlock = new AstStmtBlock();
-        stmtBlock.setBlock(parseBlock());
+        stmtBlock.setBlock(parseBlock(true));
         loggerOut.println(stmtBlock);
         return stmtBlock;
     }

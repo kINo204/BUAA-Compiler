@@ -1,13 +1,11 @@
 package datastruct.ast;
 
-import datastruct.Token;
-
 public class AstFuncType extends AstNode {
     public AstFuncType() {
         super(AstNodeId.FuncType);
     }
 
-    private Token type;
+    public Token type;
 
     public void setType(Token type) {
         this.type = type;

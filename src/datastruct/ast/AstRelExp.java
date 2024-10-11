@@ -7,7 +7,7 @@ public class AstRelExp extends AstNode {
         super(AstNodeId.RelExp);
     }
 
-    private final ArrayList<AstAddExp> addExps = new ArrayList<>();
+    public final ArrayList<AstAddExp> addExps = new ArrayList<>();
 
     public void addAddExp(AstAddExp addExp) {
         addExps.add(addExp);

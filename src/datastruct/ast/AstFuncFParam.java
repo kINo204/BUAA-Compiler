@@ -1,15 +1,13 @@
 package datastruct.ast;
 
-import datastruct.Token;
-
 public class AstFuncFParam extends AstNode{
     public AstFuncFParam() {
         super(AstNodeId.FuncFParam);
     }
 
-    private Token type;
-    private Token ident;
-    private boolean isArray;
+    public Token type;
+    public Token ident;
+    public boolean isArray;
 
     public void setType(Token type) {
         this.type = type;

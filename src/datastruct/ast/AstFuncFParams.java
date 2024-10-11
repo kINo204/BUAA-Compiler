@@ -7,7 +7,7 @@ public class AstFuncFParams extends AstNode{
         super(AstNodeId.FuncFParams);
     }
 
-    private final ArrayList<AstFuncFParam> funcFParams = new ArrayList<>();
+    public final ArrayList<AstFuncFParam> funcFParams = new ArrayList<>();
 
     public void addFuncFParam(AstFuncFParam funcFParam) {
         funcFParams.add(funcFParam);

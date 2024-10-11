@@ -7,7 +7,7 @@ public class AstFuncRParams extends AstNode {
         super(AstNodeId.FuncRParams);
     }
 
-    private final ArrayList<AstExp> exps = new ArrayList<>();
+    public final ArrayList<AstExp> exps = new ArrayList<>();
 
     public void addExp(AstExp exp) {
         exps.add(exp);

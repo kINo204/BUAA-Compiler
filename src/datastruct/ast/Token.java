@@ -1,11 +1,12 @@
-package datastruct;
+package datastruct.ast;
 
 import java.math.BigInteger;
 import java.util.Objects;
 
 public class Token {
-    private final TokenId tokenId;
-    private final String literal; // Original token string.
+    public final int lineNo;
+    public final TokenId tokenId;
+    public final String literal; // Original token string.
     private final Value val = new Value();
 
     public static class Value {
@@ -15,9 +16,10 @@ public class Token {
         public String string;
     }
 
-    public Token(Token.TokenId tokenId, String literal) {
+    public Token(Token.TokenId tokenId, String literal, int lineNo) {
         this.tokenId = tokenId;
         this.literal = literal;
+        this.lineNo = lineNo;
         parse();
     }
 

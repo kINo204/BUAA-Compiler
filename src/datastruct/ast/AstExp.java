@@ -5,7 +5,7 @@ public class AstExp extends AstNode {
         super(AstNodeId.Exp);
     }
 
-    private AstAddExp astAddExp;
+    public AstAddExp astAddExp;
 
     public void setAstAddExp(AstAddExp astAddExp) {
         this.astAddExp = astAddExp;

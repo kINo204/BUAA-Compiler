@@ -1,7 +1,7 @@
 package datastruct.ast;
 
 public class AstStmtGetint extends AstStmt {
-    private AstLVal lVal;
+    public AstLVal lVal;
 
     public void setlVal(AstLVal lVal) {
         this.lVal = lVal;

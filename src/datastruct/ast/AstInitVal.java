@@ -1,7 +1,5 @@
 package datastruct.ast;
 
-import datastruct.Token;
-
 import java.util.ArrayList;
 
 public class AstInitVal extends AstNode {
@@ -9,9 +7,9 @@ public class AstInitVal extends AstNode {
         super(AstNodeId.InitVal);
     }
 
-    private AstExp exp = null;
-    private final ArrayList<AstExp> exps = new ArrayList<>();
-    private Token stringConst = null;
+    public AstExp exp = null;
+    public final ArrayList<AstExp> exps = new ArrayList<>();
+    public Token stringConst = null;
 
     public void setExp(AstExp exp) {
         this.exp = exp;

@@ -5,7 +5,7 @@ public class AstDecl extends AstNode{
         super(AstNodeId.Decl);
     }
 
-    private AstNode content;
+    public AstNode content;
 
     public void setContent(AstNode content) {
         this.content = content;

@@ -5,7 +5,7 @@ public class AstConstExp extends AstNode {
         super(AstNodeId.ConstExp);
     }
 
-    private AstAddExp astAddExp;
+    public AstAddExp astAddExp;
 
     public void setAstAddExp(AstAddExp astAddExp) {
         this.astAddExp = astAddExp;
