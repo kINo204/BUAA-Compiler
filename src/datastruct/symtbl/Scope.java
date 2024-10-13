@@ -1,25 +1,42 @@
 package datastruct.symtbl;
 
+import datastruct.ast.Token;
 import datastruct.symbol.Symbol;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Scope {
+class Scope {
     private final int id;
+
     final Scope upperScope;
     final ArrayList<Scope> subScopes = new ArrayList<>();
-    public final boolean isLoop;
-    public final Symbol.SymId functionEnv;
-    int subScopeIndex = 0;
-    final HashMap<String, Symbol> symbolMap = new HashMap<>();
-    final ArrayList<Symbol> symbolArray = new ArrayList<>();
 
-    Scope(int id, Scope upperScope, boolean isLoop, Symbol.SymId functionEnv) {
+    final boolean inLoop;
+    final Symbol.SymId functionEnv;
+
+    int subScopeVisitingIndex = 0;
+    private final HashMap<String, Symbol> symbolMap = new HashMap<>();
+    private final ArrayList<Symbol> symbolArray = new ArrayList<>();
+
+    Scope(int id, Scope upperScope, boolean inLoop, Symbol.SymId functionEnv) {
         this.id = id;
         this.upperScope = upperScope;
-        this.isLoop = isLoop;
+        this.inLoop = inLoop;
         this.functionEnv = functionEnv;
+    }
+
+    boolean containsSym(String literal) {
+        return symbolMap.containsKey(literal);
+    }
+
+    Symbol searchSym(String literal) {
+        return symbolMap.get(literal);
+    }
+
+    void addSym(Symbol symbol) {
+        symbolMap.put(symbol.literal, symbol);
+        symbolArray.add(symbol);
     }
 
     @Override

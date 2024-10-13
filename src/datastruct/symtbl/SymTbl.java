@@ -27,7 +27,7 @@ public class SymTbl {
     public void initVisits() {
         currentScope = scopesRoot;
         for (Scope s : scopes) {
-            s.subScopeIndex = 0;
+            s.subScopeVisitingIndex = 0;
         }
     }
 
@@ -35,8 +35,9 @@ public class SymTbl {
         String literal = token.literal;
         Scope seaching = currentScope;
         while (seaching != null) {
-            if (seaching.symbolMap.containsKey(literal)) {
-                return seaching.symbolMap.get(literal);
+            Symbol res = seaching.searchSym(literal);
+            if (res != null) {
+                return res;
             } else {
                 seaching = seaching.upperScope;
             }
@@ -46,11 +47,10 @@ public class SymTbl {
 
     public void addSymbol(Symbol s) throws IOException {
         // We ignore any redefined symbol at the time.
-        if (currentScope.symbolMap.containsKey(s.literal)) {
+        if (currentScope.containsSym(s.literal)) {
             loggerErr.println(s.lineNo + " b");
         } else {
-            currentScope.symbolMap.put(s.literal, s);
-            currentScope.symbolArray.add(s);
+            currentScope.addSym(s);
         }
     }
 
@@ -64,7 +64,7 @@ public class SymTbl {
 
     public void pushScope(boolean isLoop, Symbol.SymId enterFuncEnv) {
         Scope newScope = new Scope(++curId, currentScope,
-                isLoop || currentScope.isLoop,
+                isLoop || currentScope.inLoop,
                 enterFuncEnv == null ? currentScope.functionEnv : enterFuncEnv
                 );
         currentScope.subScopes.add(newScope);
@@ -75,7 +75,7 @@ public class SymTbl {
 
     public void enterScope() {
         currentScope = currentScope.subScopes.get(
-                currentScope.subScopeIndex++);
+                currentScope.subScopeVisitingIndex++);
     }
 
     // Used both in visit and editing.
@@ -84,7 +84,7 @@ public class SymTbl {
     }
 
     public boolean inLoop() {
-        return currentScope.isLoop;
+        return currentScope.inLoop;
     }
 
     public Symbol.SymId curFuncEnv() {
