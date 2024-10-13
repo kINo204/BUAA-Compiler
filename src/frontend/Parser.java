@@ -4,7 +4,6 @@ import datastruct.ast.Token;
 import datastruct.ast.*;
 import io.Log;
 
-import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Arrays;
 
