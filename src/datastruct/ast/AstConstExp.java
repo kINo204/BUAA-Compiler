@@ -7,6 +7,11 @@ public class AstConstExp extends AstNode {
 
     public AstAddExp astAddExp;
 
+    @Override
+    public String toString() {
+        return astAddExp.toString();
+    }
+
     public void setAstAddExp(AstAddExp astAddExp) {
         this.astAddExp = astAddExp;
     }

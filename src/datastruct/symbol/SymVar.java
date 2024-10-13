@@ -1,35 +1,32 @@
 package datastruct.symbol;
 
-import datastruct.ast.AstConstDef;
 import datastruct.ast.AstFuncFParam;
 import datastruct.ast.AstVarDef;
 import datastruct.ast.Token;
 
 public class SymVar extends Symbol {
-    public SymVar(Token.TokenId typePrefix, AstVarDef n) {
+    public final boolean isArray;
+
+    public SymVar(AstVarDef varDef) {
         super(
-                 switch (typePrefix) {
-                        case INTTK -> n.constExp == null ? SymId.Int : SymId.IntArray;
-                        case CHARTK -> n.constExp == null ? SymId.Char : SymId.CharArray;
-                        default -> null; // Error
-                }
-        , n.ident);
+                varDef.constExp == null ? (
+                                varDef.type.tokenId == Token.TokenId.INTTK ? SymId.Int : SymId.Char
+                        ) : (
+                                varDef.type.tokenId == Token.TokenId.INTTK ? SymId.IntArray : SymId.CharArray
+                        ),
+                varDef.ident
+        );
+        isArray = varDef.constExp != null;
     }
 
-    public SymVar(Token.TokenId typePrefix, AstConstDef n) {
+    public SymVar(AstFuncFParam param) {
         super(
-                switch (typePrefix) {
-                    case INTTK -> n.constExp == null ? SymId.ConstInt: SymId.ConstIntArray;
-                    case CHARTK -> n.constExp == null ? SymId.ConstChar : SymId.ConstCharArray;
-                    default -> null; // Error
-                }
-        , n.ident);
-    }
-
-    public SymVar(AstFuncFParam n) {
-        super(
-                n.type.tokenId == Token.TokenId.INTTK ? (!n.isArray ? SymId.Int : SymId.IntArray) :
-                n.type.tokenId == Token.TokenId.CHARTK ? (!n.isArray ? SymId.Char : SymId.CharArray) :
-                null, n.ident);
+                !param.isArray ? (
+                                param.type.tokenId == Token.TokenId.INTTK ? SymId.Int : SymId.Char
+                        ) : (
+                                param.type.tokenId == Token.TokenId.INTTK ? SymId.IntArray : SymId.CharArray
+                        ),
+        param.ident);
+        isArray = param.isArray;
     }
 }

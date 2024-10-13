@@ -5,6 +5,7 @@ public class AstVarDef extends AstNode {
         super(AstNodeId.VarDef);
     }
 
+    public Token type;
     public Token ident;
     public AstConstExp constExp = null;
     public AstInitVal initVal = null;

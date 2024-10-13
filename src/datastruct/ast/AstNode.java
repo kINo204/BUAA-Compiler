@@ -44,7 +44,7 @@ public abstract class AstNode {
         Character
     }
 
-    public String toString() {
+    public String output() {
         return "<" + astNodeId.toString() + ">";
     }
 

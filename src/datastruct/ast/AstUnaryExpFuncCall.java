@@ -4,6 +4,11 @@ public class AstUnaryExpFuncCall extends AstUnaryExp {
     public Token funcIdent;
     public AstFuncRParams funcRParams = null;
 
+    @Override
+    public String toString() {
+        return funcIdent.literal + "(" + funcRParams.toString() + ")";
+    }
+
     public void setFuncIdent(Token funcIdent) {
         this.funcIdent = funcIdent;
     }

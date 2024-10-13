@@ -3,6 +3,7 @@ package datastruct.ast;
 import java.util.ArrayList;
 
 public class AstStmtPrintf extends AstStmt {
+    public Token printfTk;
     public Token stringConst;
     public final ArrayList<AstExp> exps = new ArrayList<>();
 

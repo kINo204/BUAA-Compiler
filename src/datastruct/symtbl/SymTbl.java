@@ -1,10 +1,10 @@
 package datastruct.symtbl;
 
+import datastruct.ast.Token;
 import datastruct.symbol.Symbol;
 import io.Log;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class SymTbl {
@@ -17,7 +17,7 @@ public class SymTbl {
     private final Log loggerErr;
 
     public SymTbl(Log o, Log e) {
-        scopesRoot = new Scope(curId, null);
+        scopesRoot = new Scope(curId, null, false, null);
         scopes.add(scopesRoot);
         currentScope = scopesRoot;
         loggerOut = o;
@@ -31,7 +31,8 @@ public class SymTbl {
         }
     }
 
-    public Symbol searchSym(String literal) {
+    public Symbol searchSym(Token token) {
+        String literal = token.literal;
         Scope seaching = currentScope;
         while (seaching != null) {
             if (seaching.symbolMap.containsKey(literal)) {
@@ -43,15 +44,13 @@ public class SymTbl {
         return null;
     }
 
-    public void addSyms(ArrayList<Symbol> symbols) throws IOException {
-        for (Symbol s : symbols) {
-            // We ignore any redefined symbol at the time.
-            if (currentScope.symbolMap.containsKey(s.literal)) {
-                loggerErr.println(s.lineNo + " b");
-            } else {
-                currentScope.symbolMap.put(s.literal, s);
-                currentScope.symbolArray.add(s);
-            }
+    public void addSymbol(Symbol s) throws IOException {
+        // We ignore any redefined symbol at the time.
+        if (currentScope.symbolMap.containsKey(s.literal)) {
+            loggerErr.println(s.lineNo + " b");
+        } else {
+            currentScope.symbolMap.put(s.literal, s);
+            currentScope.symbolArray.add(s);
         }
     }
 
@@ -63,8 +62,11 @@ public class SymTbl {
     - If stmt: ( if-stmt ) Stmt
      */
 
-    public void pushScope() {
-        Scope newScope = new Scope(++curId, currentScope);
+    public void pushScope(boolean isLoop, Symbol.SymId enterFuncEnv) {
+        Scope newScope = new Scope(++curId, currentScope,
+                isLoop || currentScope.isLoop,
+                enterFuncEnv == null ? currentScope.functionEnv : enterFuncEnv
+                );
         currentScope.subScopes.add(newScope);
         scopes.add(newScope);
         // Enter that new scope:
@@ -79,6 +81,14 @@ public class SymTbl {
     // Used both in visit and editing.
     public void exitScope() {
         currentScope = currentScope.upperScope;
+    }
+
+    public boolean inLoop() {
+        return currentScope.isLoop;
+    }
+
+    public Symbol.SymId curFuncEnv() {
+        return currentScope.functionEnv;
     }
 
     @Override

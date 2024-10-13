@@ -11,6 +11,19 @@ public class AstPrimaryExp extends AstNode {
     public AstNumber number = null;
     public AstCharacter character = null;
 
+    @Override
+    public String toString() {
+        if (bracedExp != null) {
+            return "(" + bracedExp + ")";
+        } else if (lVal != null) {
+            return lVal.toString();
+        } else if (number != null) {
+            return number.toString();
+        } else {
+            return character.toString();
+        }
+    }
+
     public void setBracedExp(AstExp bracedExp) {
         this.bracedExp = bracedExp;
     }

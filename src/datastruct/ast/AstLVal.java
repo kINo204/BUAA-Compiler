@@ -8,6 +8,15 @@ public class AstLVal extends AstNode {
     public Token ident;
     public AstExp exp = null;
 
+    @Override
+    public String toString() {
+        String str = ident.toString();
+        if (exp != null) {
+            str += "[" + exp + "]";
+        }
+        return str;
+    }
+
     public void setIdent(Token ident) {
         this.ident = ident;
     }

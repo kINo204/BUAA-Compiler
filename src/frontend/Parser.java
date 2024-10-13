@@ -2,10 +2,9 @@ package frontend;
 
 import datastruct.ast.Token;
 import datastruct.ast.*;
-import datastruct.symbol.Symbol;
-import datastruct.symtbl.SymTbl;
 import io.Log;
 
+import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -17,21 +16,11 @@ public class Parser {
     private final Log loggerOut;
     private final Log loggerErr;
 
-    // Generated data:
-    private final SymTbl symTbl;
-
     public Parser(Lexer lexer, String topLevel, Log o, Log e) {
         this.lexer = lexer;
         this.topLevel = AstNode.AstNodeId.valueOf(topLevel);
         loggerOut = o;
         loggerErr = e;
-        symTbl = new SymTbl(loggerOut, loggerErr);
-    }
-
-    public void close() throws IOException {
-        loggerOut.close();
-        loggerErr.close();
-        lexer.close();
     }
 
     // Helpers.
@@ -40,12 +29,8 @@ public class Parser {
         if (lexer.lookAhead(0).getTokenId() == tokenId) {
             lexer.read();
         } else {
-            loggerErr.println(lexer.getCurrentLine() + " " + errCode);
+            loggerErr.error(lexer.getCurrentLine(), errCode);
         }
-    }
-
-    public SymTbl getSymTbl() {
-        return symTbl;
     }
 
     // Parsing entry point.
@@ -57,14 +42,14 @@ public class Parser {
             case FuncFParams -> parseFuncFParams();
             case FuncFParam -> parseFuncFParam();
             case MainFuncDef -> parseMainFuncDef();
-            case Block -> parseBlock(true);
+            case Block -> parseBlock();
             case BlockItem -> parseBlockItem();
             case Decl -> parseDecl();
             case ConstDecl -> parseConstDecl();
-            case ConstDef -> parseConstDef();
+            case ConstDef -> parseConstDef(null);
             case ConstInitVal -> parseConstInitVal();
             case VarDecl -> parseVarDecl();
-            case VarDef -> parseVarDef();
+            case VarDef -> parseVarDef(null);
             case InitVal -> parseInitVal();
             case Stmt -> parseStmt();
             case ForStmt -> parseForStmt();
@@ -103,13 +88,12 @@ public class Parser {
         // MainFuncDef
         compUnit.setMainFuncDef(parseMainFuncDef());
 
-        loggerOut.println(compUnit);
+        loggerOut.println(compUnit.output());
         return compUnit;
     }
 
     private AstFuncDef parseFuncDef() throws IOException { // j
         AstFuncDef funcDef = new AstFuncDef();
-        symTbl.pushScope();
 
         // FuncType
         funcDef.setFuncType(parseFuncType());
@@ -120,18 +104,16 @@ public class Parser {
 		lexer.read();
         // [ FuncFParams ]
         Token.TokenId t = lexer.lookAhead(0).getTokenId();
-        if (t != RPARENT) {
+        if (t == CHARTK || t == INTTK) {
             funcDef.setFuncFParams(parseFuncFParams());
         }
         // ')'
         expectTokenId(RPARENT, "j");
         // Block
-        funcDef.setBlock(parseBlock(false));
+        funcDef.setBlock(parseBlock());
 
-        loggerOut.println(funcDef);
+        loggerOut.println(funcDef.output());
 
-        symTbl.exitScope();
-        symTbl.addSyms(Symbol.from(funcDef));
 
         return funcDef;
     }
@@ -142,7 +124,7 @@ public class Parser {
         // 'void' | BType
         funcType.setType(lexer.read());
 
-        loggerOut.println(funcType);
+        loggerOut.println(funcType.output());
         return funcType;
     }
 
@@ -157,8 +139,7 @@ public class Parser {
             funcFParams.addFuncFParam(parseFuncFParam());
         }
 
-        loggerOut.println(funcFParams);
-        symTbl.addSyms(Symbol.from(funcFParams));
+        loggerOut.println(funcFParams.output());
         return funcFParams;
     }
 
@@ -178,13 +159,12 @@ public class Parser {
             funcFParam.setArray(false);
         }
 
-        loggerOut.println(funcFParam);
+        loggerOut.println(funcFParam.output());
         return funcFParam;
     }
 
     private AstMainFuncDef parseMainFuncDef() throws IOException { // j
         AstMainFuncDef mainFuncDef = new AstMainFuncDef();
-        symTbl.pushScope();
 
         // 'int'
         assert lexer.lookAhead(0).getTokenId() == INTTK;
@@ -197,16 +177,14 @@ public class Parser {
 		lexer.read();
         expectTokenId(RPARENT, "j");
         // Block
-        mainFuncDef.setBlock(parseBlock(false));
+        mainFuncDef.setBlock(parseBlock());
 
-        loggerOut.println(mainFuncDef);
-        symTbl.exitScope();
+        loggerOut.println(mainFuncDef.output());
         return mainFuncDef;
     }
 
-    private AstBlock parseBlock(boolean createScope) throws IOException {
+    private AstBlock parseBlock() throws IOException {
         AstBlock block = new AstBlock();
-        if (createScope) symTbl.pushScope();
 
         // '{'
         assert lexer.lookAhead(0).getTokenId() == LBRACE;
@@ -217,11 +195,10 @@ public class Parser {
         }
         // '}'
         assert lexer.lookAhead(0).getTokenId() == RBRACE;
-		lexer.read();
+		block.braceEnd = lexer.read();
 
-        loggerOut.println(block);
+        loggerOut.println(block.output());
 
-        if (createScope) symTbl.exitScope();
         return block;
     }
 
@@ -236,7 +213,7 @@ public class Parser {
             blockItem.setContent(parseStmt());
         }
 
-        // loggerOut.println(blockItem);
+        // loggerOut.println(blockItem.output());
         return blockItem;
     }
 
@@ -249,7 +226,7 @@ public class Parser {
             decl.setContent(parseVarDecl());
         }
 
-        // loggerOut.println(decl);
+        // loggerOut.println(decl.output());
         return decl;
     }
 
@@ -262,23 +239,23 @@ public class Parser {
         // BType
         constDecl.setType(lexer.read());
         // ConstDef
-        constDecl.addConstDef(parseConstDef());
+        constDecl.addConstDef(parseConstDef(constDecl.type));
         // { , ConstDef }
         while (lexer.lookAhead(0).getTokenId() == COMMA) {
             lexer.read();
-            constDecl.addConstDef(parseConstDef());
+            constDecl.addConstDef(parseConstDef(constDecl.type));
         }
         // ;
         expectTokenId(SEMICN, "i");
 
-        loggerOut.println(constDecl);
-        symTbl.addSyms(Symbol.from(constDecl));
+        loggerOut.println(constDecl.output());
         return constDecl;
     }
 
-    private AstConstDef parseConstDef() throws IOException { // k
+    private AstConstDef parseConstDef(Token type) throws IOException { // k
         AstConstDef constDef = new AstConstDef();
 
+        constDef.type = type;
         // Ident
         constDef.setIdent(lexer.read());
         // [ '[' ConstExp ']' ]
@@ -293,7 +270,7 @@ public class Parser {
         // ConstInitVal
         constDef.setConstInitVal(parseConstInitVal());
 
-        loggerOut.println(constDef);
+        loggerOut.println(constDef.output());
         return constDef;
     }
 
@@ -317,7 +294,7 @@ public class Parser {
             constInitVal.setConstExp(parseConstExp());
         }
 
-        loggerOut.println(constInitVal);
+        loggerOut.println(constInitVal.output());
         return constInitVal;
     }
 
@@ -325,21 +302,21 @@ public class Parser {
         AstVarDecl varDecl = new AstVarDecl();
 
         varDecl.setType(lexer.read());
-        varDecl.addVarDef(parseVarDef());
+        varDecl.addVarDef(parseVarDef(varDecl.type));
         while (lexer.lookAhead(0).getTokenId() == COMMA) {
             lexer.read();
-            varDecl.addVarDef(parseVarDef());
+            varDecl.addVarDef(parseVarDef(varDecl.type));
         }
         expectTokenId(SEMICN, "i");
 
-        loggerOut.println(varDecl);
-        symTbl.addSyms(Symbol.from(varDecl));
+        loggerOut.println(varDecl.output());
         return varDecl;
     }
 
-    private AstVarDef parseVarDef() throws IOException { // k
+    private AstVarDef parseVarDef(Token type) throws IOException { // k
         AstVarDef varDef = new AstVarDef();
 
+        varDef.type = type;
         varDef.setIdent(lexer.read());
         if (lexer.lookAhead(0).getTokenId() == LBRACK) {
             lexer.read();
@@ -351,7 +328,7 @@ public class Parser {
             varDef.setInitVal(parseInitVal());
         }
 
-        loggerOut.println(varDef);
+        loggerOut.println(varDef.output());
         return varDef;
     }
 
@@ -375,7 +352,7 @@ public class Parser {
             initVal.setExp(parseExp());
         }
 
-        loggerOut.println(initVal);
+        loggerOut.println(initVal.output());
         return initVal;
     }
 
@@ -426,7 +403,7 @@ public class Parser {
             stmt = parseStmtAssign();
         }
 
-        // loggerOut.println(stmt);
+        // loggerOut.println(stmt.output());
         return stmt;
     }
 
@@ -442,7 +419,7 @@ public class Parser {
         // ;
         expectTokenId(SEMICN, "i");
 
-        loggerOut.println(stmtAssign);
+        loggerOut.println(stmtAssign.output());
         return stmtAssign;
     }
 
@@ -456,32 +433,37 @@ public class Parser {
             lexer.read(); // TODO expect?
         }
 
-        loggerOut.println(stmtSingleExp);
+        loggerOut.println(stmtSingleExp.output());
         return stmtSingleExp;
     }
 
     private AstStmtBlock parseStmtBlock() throws IOException {
         AstStmtBlock stmtBlock = new AstStmtBlock();
-        stmtBlock.setBlock(parseBlock(true));
-        loggerOut.println(stmtBlock);
+        stmtBlock.setBlock(parseBlock());
+        loggerOut.println(stmtBlock.output());
         return stmtBlock;
     }
 
     private AstStmtIf parseStmtIf() throws IOException { // j
         AstStmtIf stmtIf = new AstStmtIf();
+
         assert lexer.lookAhead(0).getTokenId() == IFTK;
 		lexer.read();
+
         assert lexer.lookAhead(0).getTokenId() == LPARENT;
 		lexer.read();
+
         stmtIf.setCond(parseCond());
+
         expectTokenId(RPARENT, "j");
+
         stmtIf.setIfStmt(parseStmt());
         if (lexer.lookAhead(0).getTokenId() == ELSETK) {
             lexer.read();
             stmtIf.setElseStmt(parseStmt());
         }
 
-        loggerOut.println(stmtIf);
+        loggerOut.println(stmtIf.output());
         return stmtIf;
     }
 
@@ -508,52 +490,57 @@ public class Parser {
 		lexer.read();
         stmtFor.setStmt(parseStmt());
 
-        loggerOut.println(stmtFor);
+        loggerOut.println(stmtFor.output());
         return stmtFor;
     }
 
     private AstStmtBreak parseStmtBreak() throws IOException { // i
         assert lexer.lookAhead(0).getTokenId() == BREAKTK;
-		lexer.read();
-        expectTokenId(SEMICN, "i");
         AstStmtBreak stmtBreak = new AstStmtBreak();
-        loggerOut.println(stmtBreak);
+		stmtBreak.token = lexer.read();
+        expectTokenId(SEMICN, "i");
+        loggerOut.println(stmtBreak.output());
         return stmtBreak;
     }
 
     private AstStmtContinue parseStmtContinue() throws IOException { // i
         assert lexer.lookAhead(0).getTokenId() == CONTINUETK;
-		lexer.read();
-        expectTokenId(SEMICN, "i");
         AstStmtContinue stmtContinue = new AstStmtContinue();
-        loggerOut.println(stmtContinue);
+		stmtContinue.token = lexer.read();
+        expectTokenId(SEMICN, "i");
+        loggerOut.println(stmtContinue.output());
         return stmtContinue;
     }
 
     private AstStmtReturn parseStmtReturn() throws IOException { // i
         AstStmtReturn stmtReturn = new AstStmtReturn();
         assert lexer.lookAhead(0).getTokenId() == RETURNTK;
-		lexer.read();
+		stmtReturn.returnTk = lexer.read();
         if (lexer.lookAhead(0).getTokenId() != SEMICN) {
             stmtReturn.setExp(parseExp());
         }
         expectTokenId(SEMICN, "i");
-        loggerOut.println(stmtReturn);
+        loggerOut.println(stmtReturn.output());
         return stmtReturn;
     }
 
     private AstStmtGetint parseStmtGetint() throws IOException { // i, j
         AstStmtGetint stmtGetint = new AstStmtGetint();
+
         stmtGetint.setlVal(parseLVal());
+
         assert lexer.lookAhead(0).getTokenId() == ASSIGN;
 		lexer.read();
+
         assert lexer.lookAhead(0).getTokenId() == GETINTTK;
 		lexer.read();
+
         assert lexer.lookAhead(0).getTokenId() == LPARENT;
 		lexer.read();
+
         expectTokenId(RPARENT, "j");
         expectTokenId(SEMICN, "i");
-        loggerOut.println(stmtGetint);
+        loggerOut.println(stmtGetint.output());
         return stmtGetint;
     }
 
@@ -568,14 +555,14 @@ public class Parser {
 		lexer.read();
         expectTokenId(RPARENT, "j");
         expectTokenId(SEMICN, "i");
-        loggerOut.println(stmtGetchar);
+        loggerOut.println(stmtGetchar.output());
         return stmtGetchar;
     }
 
     private AstStmtPrintf parseStmtPrintf() throws IOException { // i, j
         AstStmtPrintf stmtPrintf = new AstStmtPrintf();
         assert lexer.lookAhead(0).getTokenId() == PRINTFTK;
-		lexer.read();
+		stmtPrintf.printfTk = lexer.read();
         assert lexer.lookAhead(0).getTokenId() == LPARENT;
 		lexer.read();
         stmtPrintf.setStringConst(lexer.read());
@@ -585,7 +572,7 @@ public class Parser {
         }
         expectTokenId(RPARENT, "j");
         expectTokenId(SEMICN, "i");
-        loggerOut.println(stmtPrintf);
+        loggerOut.println(stmtPrintf.output());
         return stmtPrintf;
     }
 
@@ -595,28 +582,28 @@ public class Parser {
         assert lexer.lookAhead(0).getTokenId() == ASSIGN;
 		lexer.read();
         forStmt.setExp(parseExp());
-        loggerOut.println(forStmt);
+        loggerOut.println(forStmt.output());
         return forStmt;
     }
 
     private AstCond parseCond() throws IOException {
         AstCond cond = new AstCond();
         cond.setlOrExp(parseLOrExp());
-        loggerOut.println(cond);
+        loggerOut.println(cond.output());
         return cond;
     }
 
     private AstExp parseExp() throws IOException {
         AstExp exp = new AstExp();
         exp.setAstAddExp(parseAddExp());
-        loggerOut.println(exp);
+        loggerOut.println(exp.output());
         return exp;
     }
 
     private AstConstExp parseConstExp() throws IOException {
         AstConstExp constExp = new AstConstExp();
         constExp.setAstAddExp(parseAddExp());
-        loggerOut.println(constExp);
+        loggerOut.println(constExp.output());
         return constExp;
     }
 
@@ -624,11 +611,11 @@ public class Parser {
         AstLOrExp lOrExp = new AstLOrExp();
         lOrExp.addLAndExp(parseLAndExp());
         while (lexer.lookAhead(0).getTokenId() == OR) {
-            loggerOut.println(lOrExp);
+            loggerOut.println(lOrExp.output());
             lexer.read();
             lOrExp.addLAndExp(parseLAndExp());
         }
-        loggerOut.println(lOrExp);
+        loggerOut.println(lOrExp.output());
         return lOrExp;
     }
 
@@ -636,11 +623,11 @@ public class Parser {
         AstLAndExp lAndExp = new AstLAndExp();
         lAndExp.addEqExp(parseEqExp());
         while (lexer.lookAhead(0).getTokenId() == AND) {
-            loggerOut.println(lAndExp);
+            loggerOut.println(lAndExp.output());
             lexer.read();
             lAndExp.addEqExp(parseEqExp());
         }
-        loggerOut.println(lAndExp);
+        loggerOut.println(lAndExp.output());
         return lAndExp;
     }
 
@@ -649,11 +636,11 @@ public class Parser {
         eqExp.addRelExp(parseRelExp());
         while (Arrays.asList(EQL, NEQ)
                 .contains(lexer.lookAhead(0).getTokenId())) {
-            loggerOut.println(eqExp);
+            loggerOut.println(eqExp.output());
             lexer.read();
             eqExp.addRelExp(parseRelExp());
         }
-        loggerOut.println(eqExp);
+        loggerOut.println(eqExp.output());
         return eqExp;
     }
 
@@ -662,11 +649,11 @@ public class Parser {
         relExp.addAddExp(parseAddExp());
         while (Arrays.asList(GRE, GEQ, LSS, LEQ)
                 .contains(lexer.lookAhead(0).getTokenId())) {
-            loggerOut.println(relExp);
+            loggerOut.println(relExp.output());
             lexer.read();
             relExp.addAddExp(parseAddExp());
         }
-        loggerOut.println(relExp);
+        loggerOut.println(relExp.output());
         return relExp;
     }
 
@@ -675,11 +662,11 @@ public class Parser {
         addExp.addMulExp(parseMulExp());
         while (Arrays.asList(PLUS, MINU)
                 .contains(lexer.lookAhead(0).getTokenId())) {
-            loggerOut.println(addExp);
+            loggerOut.println(addExp.output());
             lexer.read();
             addExp.addMulExp(parseMulExp());
         }
-        loggerOut.println(addExp);
+        loggerOut.println(addExp.output());
         return addExp;
     }
 
@@ -688,11 +675,11 @@ public class Parser {
         mulExp.addUnaryExp(parseUnaryExp());
         while (Arrays.asList(MULT, DIV, MOD)
                 .contains(lexer.lookAhead(0).getTokenId())) {
-            loggerOut.println(mulExp);
+            loggerOut.println(mulExp.output());
             lexer.read();
             mulExp.addUnaryExp(parseUnaryExp());
         }
-        loggerOut.println(mulExp);
+        loggerOut.println(mulExp.output());
         return mulExp;
     }
 
@@ -710,28 +697,34 @@ public class Parser {
                 && lexer.lookAhead(1).getTokenId() == LPARENT) {
             AstUnaryExpFuncCall unaryExpFuncCall = new AstUnaryExpFuncCall();
             unaryExpFuncCall.setFuncIdent(lexer.read());
+
             assert lexer.lookAhead(0).getTokenId() == LPARENT;
             lexer.read();
-            if (lexer.lookAhead(0).getTokenId() != RPARENT) {
+
+            Token.TokenId t = lexer.lookAhead(0).getTokenId();
+            if (Arrays.asList( // Search int FIRST(FuncRParams)
+                    PLUS, MINU, NOT, // UnaryOp
+                    IDENFR, // FuncCall, LVal
+                    LPARENT, INTCON, CHRCON
+                    )
+                    .contains(t)) {
                 unaryExpFuncCall.setFuncRParams(parseFuncRParams());
-                expectTokenId(RPARENT, "j");
-            } else {
-                lexer.read();
             }
+            expectTokenId(RPARENT, "j");
             unaryExp = unaryExpFuncCall;
         } else { // PrimaryExp
             AstUnaryExpPrimary unaryExpPrimary = new AstUnaryExpPrimary();
             unaryExpPrimary.setPrimaryExp(parsePrimaryExp());
             unaryExp = unaryExpPrimary;
         }
-        loggerOut.println(unaryExp);
+        loggerOut.println(unaryExp.output());
         return unaryExp;
     }
 
     private AstUnaryOp parseUnaryOp() throws IOException {
         AstUnaryOp unaryOp = new AstUnaryOp();
         unaryOp.setOp(lexer.read());
-        loggerOut.println(unaryOp);
+        loggerOut.println(unaryOp.output());
         return unaryOp;
     }
 
@@ -742,7 +735,7 @@ public class Parser {
             lexer.read();
             funcRParams.addExp(parseExp());
         }
-        loggerOut.println(funcRParams);
+        loggerOut.println(funcRParams.output());
         return funcRParams;
     }
 
@@ -766,7 +759,7 @@ public class Parser {
                 break;
             default:
         }
-        loggerOut.println(primaryExp);
+        loggerOut.println(primaryExp.output());
         return primaryExp;
     }
 
@@ -778,21 +771,21 @@ public class Parser {
             lVal.setExp(parseExp());
             expectTokenId(RBRACK, "k");
         }
-        loggerOut.println(lVal);
+        loggerOut.println(lVal.output());
         return lVal;
     }
 
     private AstNumber parseNumber() throws IOException {
         AstNumber number = new AstNumber();
         number.setIntConst(lexer.read());
-        loggerOut.println(number);
+        loggerOut.println(number.output());
         return number;
     }
 
     private AstCharacter parseCharacter() throws IOException {
         AstCharacter character = new AstCharacter();
         character.setCharConst(lexer.read());
-        loggerOut.println(character);
+        loggerOut.println(character.output());
         return character;
     }
 }

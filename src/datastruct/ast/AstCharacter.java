@@ -7,6 +7,11 @@ public class AstCharacter extends AstNode {
 
     public Token charConst;
 
+    @Override
+    public String toString() {
+        return charConst.toString();
+    }
+
     public void setCharConst(Token charConst) {
         this.charConst = charConst;
     }

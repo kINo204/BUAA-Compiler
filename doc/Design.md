@@ -120,6 +120,10 @@ Scope {
 | enterScope    | Enter the next unvisited sub-scope of the current scope.     |
 | exitScope     | Return to the upper scope of the current scope.              |
 
+### 4.3 The AST validator
+
+In semantic analysis phase, an AST provided by the parser is passed to an "validator", who will **validate semantics, reporting any error it encounters, and try performing certain error recovery operations on the AST.** A program with semantic errors may be compiled with recoveries or be refused by the compiler, based on design choices within the validator; however, a validator **ensures the "translator" in the later compiling stage always gets a valid AST, and only need to perform translation operations.**
+
 ## 5. Error handling
 
 ## 6. Code gen

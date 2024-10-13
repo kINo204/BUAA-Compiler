@@ -1,6 +1,8 @@
 package datastruct.ast;
 
 public class AstStmtReturn extends AstStmt {
+
+    public Token returnTk;
     public AstExp exp = null;
 
     public void setExp(AstExp exp) {

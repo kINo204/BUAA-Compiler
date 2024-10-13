@@ -5,6 +5,7 @@ public class AstConstDef extends AstNode{
         super(AstNodeId.ConstDef);
     }
 
+    public Token type;
     public Token ident;
     public AstConstExp constExp = null;
     public AstConstInitVal constInitVal;

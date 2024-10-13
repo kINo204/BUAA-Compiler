@@ -8,6 +8,7 @@ public class AstBlock extends AstNode{
     }
 
     public final ArrayList<AstBlockItem> blockItems = new ArrayList<>();
+    public Token braceEnd;
 
     public void addBlockItem(AstBlockItem blockItem) {
         blockItems.add(blockItem);

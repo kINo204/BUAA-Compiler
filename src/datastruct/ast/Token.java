@@ -7,7 +7,7 @@ public class Token {
     public final int lineNo;
     public final TokenId tokenId;
     public final String literal; // Original token string.
-    private final Value val = new Value();
+    public final Value val = new Value();
 
     public static class Value {
         public int integer;
@@ -53,9 +53,13 @@ public class Token {
         return Objects.hash(tokenId);
     }
 
+    public String output() {
+        return tokenId.toString() + " " + literal;
+    }
+
     @Override
     public String toString() {
-        return tokenId.toString() + " " + literal;
+        return literal;
     }
 
     @SuppressWarnings("SpellCheckingInspection")

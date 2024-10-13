@@ -7,6 +7,11 @@ public class AstNumber extends AstNode {
 
     public Token intConst;
 
+    @Override
+    public String toString() {
+        return intConst.toString();
+    }
+
     public void setIntConst(Token intConst) {
         this.intConst = intConst;
     }

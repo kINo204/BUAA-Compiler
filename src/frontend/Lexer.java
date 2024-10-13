@@ -10,6 +10,15 @@ import static datastruct.ast.Token.TokenId.*;
 
 
 public class Lexer {
+    @Override
+    public String toString() {
+        try {
+            return "#LINE=" + currentLine + " NEXT=" + lookAhead(0).toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Lexer(Reader reader, Log o, Log e) {
         // Init input.
         input = new BufferedReader(reader);
@@ -218,7 +227,7 @@ public class Lexer {
                 } else {
                     input.reset();
                     token = new Token(AND, "&&", parsingLineNo);
-                    loggerErr.println(parsingLineNo + " a");
+                    loggerErr.error(parsingLineNo, "a");
                 }
                 break;
             case '|':
@@ -229,7 +238,7 @@ public class Lexer {
                 } else {
                     input.reset();
                     token = new Token(OR, "&&", parsingLineNo);
-                    loggerErr.println(parsingLineNo + " a");
+                    loggerErr.error(parsingLineNo, "a");
                 }
                 break;
         }
@@ -238,22 +247,30 @@ public class Lexer {
         }
 
         // Looping look-ahead tokens.
-        char last;
+        boolean escape = false;
         token = switch (ch) {
             case '\'' -> {
                 do {
-                    last = ch;
                     ch = (char) input.read();
                     str.append(ch);
-                } while (ch != '\'' || last == '\\');
+                    if (ch == '\\') {
+                        escape = !escape;
+                    }
+                    if (ch == '\'' || ch == '"') {
+                        if (escape) {
+                            escape = false;
+                        } else {
+                            if (ch == '\'') break;
+                        }
+                    }
+                } while (true);
                 yield new Token(CHRCON, String.valueOf(str), parsingLineNo);
             }
             case '"' -> {
                 do {
-                    last = ch;
                     ch = (char) input.read();
                     str.append(ch);
-                } while (ch != '"' || last == '\\');
+                } while (ch != '"');
                 yield new Token(STRCON, String.valueOf(str), parsingLineNo);
             }
             default -> null;
@@ -291,9 +308,4 @@ public class Lexer {
         return token;
     }
 
-    public void close() throws IOException {
-        input.close();
-        loggerOut.close();
-        loggerErr.close();
-    }
 }

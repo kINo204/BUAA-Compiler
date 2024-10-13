@@ -14,6 +14,17 @@ public class AstAddExp extends AstNode {
     }
 
     @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        for (AstMulExp mulExp : mulExps) {
+            str.append(mulExp.toString());
+            str.append("+");
+        }
+        str.deleteCharAt(str.length() - 1);
+        return str.toString();
+    }
+
+    @Override
     public String buildTreeBrack() {
         return null;
     }

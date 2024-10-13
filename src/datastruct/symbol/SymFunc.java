@@ -1,8 +1,17 @@
 package datastruct.symbol;
 
 import datastruct.ast.AstFuncDef;
+import datastruct.ast.AstFuncFParam;
+import datastruct.ast.Token;
+
+import java.util.ArrayList;
+
+import static datastruct.ast.Token.TokenId.CHARTK;
+import static datastruct.ast.Token.TokenId.INTTK;
 
 public class SymFunc extends Symbol {
+    public final ArrayList<SymId> types = new ArrayList<>();
+
     public SymFunc(AstFuncDef n) {
         super(
             switch (n.funcType.type.getTokenId()) {
@@ -12,5 +21,21 @@ public class SymFunc extends Symbol {
                 default -> null;
             }
         , n.ident);
+        if (n.funcFParams != null) { // No is-const considered!
+            for (AstFuncFParam param : n.funcFParams.funcFParams)
+                if (param.type.tokenId == INTTK) {
+                    if (param.isArray) {
+                        types.add(SymId.IntArray);
+                    } else {
+                        types.add(SymId.Int);
+                    }
+                } else if (param.type.tokenId == CHARTK) {
+                    if (param.isArray) {
+                        types.add(SymId.CharArray);
+                    } else {
+                        types.add(SymId.Char);
+                    }
+                } else assert false; // invalid token
+        }
     }
 }

@@ -1,10 +1,12 @@
 package io;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Log {
     private boolean on = false;
+    private final HashMap<Integer, String> errors = new HashMap<>();
     private final HashMap<String, Boolean> config = new HashMap<>();
     private final HashMap<String, Writer> writers = new HashMap<>();
 
@@ -39,9 +41,29 @@ public class Log {
     public void println(Object o) throws IOException {
         if (!on) return;
         final String str = o.toString() + "\n";
-        for (String writerName : writers.keySet()) {
-            if (config.get(writerName)) {
-                writers.get(writerName).write(str);
+        for (Writer writer : writers.values()) {
+            writer.write(str);
+        }
+    }
+
+    public void print(Object o) throws IOException {
+        if (!on) return;
+        final String str = o.toString();
+        for (Writer writer : writers.values()) {
+            writer.write(str);
+        }
+    }
+
+    public void error(int lineNo, String errCode) {
+        errors.putIfAbsent(lineNo, errCode);
+    }
+
+    public void executePrint() throws IOException {
+        final Object[] lineNumberArray = errors.keySet().toArray();
+        Arrays.sort(lineNumberArray);
+        for (Object line : lineNumberArray) {
+            for (Writer writer : writers.values()) {
+                writer.write(line + " " + errors.get((Integer) line) + "\n");
             }
         }
     }

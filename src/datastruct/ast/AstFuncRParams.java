@@ -14,6 +14,16 @@ public class AstFuncRParams extends AstNode {
     }
 
     @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (AstExp exp : exps) {
+            stringBuilder.append(exp).append(",");
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        return stringBuilder.toString();
+    }
+
+    @Override
     public String buildTreeBrack() {
         return null;
     }
