@@ -110,7 +110,7 @@ public class Validator {
         } else if (unaryExp instanceof AstUnaryExpFuncCall s) {
             validate(s.funcIdent, true);
 
-            // Validating params.
+            // Validating params types.
             SymFunc sym = (SymFunc) symTbl.searchSym(s.funcIdent);
             if (sym != null) {
                 final ArrayList<SymId> fParams = sym.types;
@@ -120,7 +120,11 @@ public class Validator {
                     }
                     return;
                 }
+
                 final ArrayList<AstExp> rParams = s.funcRParams.exps;
+                for (AstExp exp : rParams) {
+                    validate(exp);
+                }
                 if (fParams.size() != rParams.size()) {
                     e.error(s.funcIdent.lineNo, "d");
                 }
@@ -267,11 +271,14 @@ public class Validator {
         }
     }
 
-    private void validate(AstStmtPrintf stmtPrintf) {
+    private void validate(AstStmtPrintf stmtPrintf) throws IOException {
         final int nExp = stmtPrintf.exps.size();
         final int nFmt = ("#" + stmtPrintf.stringConst.val.string + "$").split("%d|%c").length - 1;
         if (nExp != nFmt)
             e.error(stmtPrintf.printfTk.lineNo, "l");
+        for (AstExp exp : stmtPrintf.exps) {
+            validate(exp);
+        }
     }
 
     private void validate(AstCond cond) throws IOException {

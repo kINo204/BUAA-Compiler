@@ -65,7 +65,7 @@ Decl (* No output *)
 
 			InitVal 
 				: Exp
-				| '{' [ Exp { ',' Exp } ] '}'
+				| '{' [ Exp { ',' Exp } ] '}'  (* 0 or multi *)
 				| StringConst
 				;
 
