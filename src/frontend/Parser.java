@@ -371,7 +371,7 @@ public class Parser {
             return stmt;
         }
 
-        // Look ahead until the ';'. TODO wrong!
+        // Look ahead until the ';'.
         int ind = 0;
         boolean hasAssignTk = false;
         boolean hasGetintTk = false;
