@@ -371,13 +371,16 @@ public class Parser {
             return stmt;
         }
 
-        // Look ahead until the ';'.
+        // Look ahead until the ';'. TODO wrong!
         int ind = 0;
         boolean hasAssignTk = false;
         boolean hasGetintTk = false;
         boolean hasGetchrTk = false;
-        Token.TokenId t = lexer.lookAhead(ind).getTokenId();
-        while (t != SEMICN) {
+        Token tk = lexer.lookAhead(ind);
+        Token.TokenId t = tk.tokenId;
+        final int startLineNo = tk.lineNo;
+        /* If no semicolon found till EOL, we consider it an error. */
+        while (t != SEMICN && tk.lineNo == startLineNo) {
             if (t == ASSIGN) {
                 hasAssignTk = true;
             }
@@ -390,7 +393,8 @@ public class Parser {
                 break;
             }
             ind += 1;
-            t = lexer.lookAhead(ind).getTokenId();
+            tk = lexer.lookAhead(ind);
+            t = tk.tokenId;
         }
         if (!hasAssignTk) { // SingleExp with not-null Exp
             stmt = parseStmtSingleExp();
