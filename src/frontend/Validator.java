@@ -26,12 +26,14 @@ public class Validator {
     private final Log loggerErr;
     private final Type type = new Type();
 
+
     public Validator(AstCompUnit ast, Log loggerOut, Log loggerErr) {
         this.ast = ast;
         symTbl = new SymTbl(loggerOut, loggerErr);
         this.loggerErr = loggerErr;
     }
 
+    /* Validation Entry */
     public void validateAst() throws IOException {
         vCompUnit(ast);
     }
@@ -45,22 +47,29 @@ public class Validator {
     }
 
     private void vFuncDef(AstFuncDef funcDef) throws IOException {
-        Symbol function = Symbol.from(funcDef);
-        symTbl.addSymbol(function);
-        symTbl.pushScope(false, function.symId);
+        // Ident DEF
+        Symbol functionSym = Symbol.from(funcDef);
+        symTbl.addSymbol(functionSym);
 
+        // Enter function scope.
+        symTbl.pushScope(false, functionSym.symId);
+
+        // ( [ FuncFParams ] ) DEF
         if (funcDef.funcFParams != null) {
             for (AstFuncFParam param : funcDef.funcFParams.funcFParams)
                 symTbl.addSymbol(Symbol.from(param));
         }
+
+        // Block
         vBlock(funcDef.block, false, false);
 
-        if (function.symId != SymId.VoidFunc) {
+        // Validate return stmt.
+        if (functionSym.symId != SymId.VoidFunc) {
             // Should contain return statement.
-            if (funcDef.block.blockItems.isEmpty()
-                    || !(funcDef.block.blockItems.get(
-                    funcDef.block.blockItems.size() - 1
-            ).content instanceof AstStmtReturn)) {
+            if (funcDef.block.blockItems.isEmpty() // no stmt at all
+                    || ! (funcDef.block.blockItems.get(funcDef.block.blockItems.size() - 1)
+                    .content instanceof AstStmtReturn) // not retStmt
+            ) {
                 loggerErr.error(funcDef.block.braceEnd.lineNo, "g");
             }
         }
@@ -70,26 +79,39 @@ public class Validator {
 
     private void vMainFuncDef(AstMainFuncDef mainFuncDef) throws IOException {
         symTbl.pushScope(false, SymId.IntFunc);
+
+        // Block
         vBlock(mainFuncDef.block, false, false);
 
         // Should contain return statement.
         if (mainFuncDef.block.blockItems.isEmpty()
-                || !(mainFuncDef.block.blockItems.get(
-                mainFuncDef.block.blockItems.size() - 1
-        ).content instanceof AstStmtReturn)) {
+                || !(mainFuncDef.block.blockItems.get(mainFuncDef.block.blockItems.size() - 1)
+                .content instanceof AstStmtReturn)) {
             loggerErr.error(mainFuncDef.block.braceEnd.lineNo, "g");
         }
 
         symTbl.exitScope();
     }
 
-    private void vBlock(AstBlock block, boolean scoped, boolean enterLoop) throws IOException {
-        if (scoped) symTbl.pushScope(enterLoop, null);
+    /**
+     *
+     * @param block The AstBlock node to be validated.
+     * @param enterScope if the block should create scope on itself. If inside a function,
+     *               this is set to false because the function handles the scope itself.
+     * @param enterLoop true if this block starts a loop structure.
+     */
+    private void vBlock(AstBlock block, boolean enterScope, boolean enterLoop) throws IOException {
+        if (enterScope) {
+            symTbl.pushScope(enterLoop, null);
+        }
 
+        // 0..* BlockItem
         for (AstBlockItem blockItem : block.blockItems)
             vBlockItem(blockItem);
 
-        if (scoped) symTbl.exitScope();
+        if (enterScope) {
+            symTbl.exitScope();
+        }
     }
 
     private void vBlockItem(AstBlockItem blockItem) throws IOException {
@@ -152,50 +174,66 @@ public class Validator {
 
     private void vStmt(AstStmt stmt, boolean enterLoop) throws IOException {
         if (stmt instanceof AstStmtAssign s) {
-            vLVal(s.lVal); // Redefinition and not defined error eliminated here.
+            vLVal(s.lVal); // Undefined error eliminated here.
             vExp(s.exp);
             if (symTbl.searchSym(s.lVal.ident) instanceof SymConstVar)
                 loggerErr.error(s.lVal.ident.lineNo, "h");
+
         } else if (stmt instanceof AstStmtSingleExp s) {
             if (s.exp != null)
                 vExp(s.exp);
+
         } else if (stmt instanceof AstStmtGetint s) {
             vLVal(s.lVal);
             if (symTbl.searchSym(s.lVal.ident) instanceof SymConstVar)
                 loggerErr.error(s.lVal.ident.lineNo, "h");
+
         } else if (stmt instanceof AstStmtGetchar s) {
             vLVal(s.lVal);
+            if (symTbl.searchSym(s.lVal.ident) instanceof SymConstVar)
+                loggerErr.error(s.lVal.ident.lineNo, "h");
+
         } else if (stmt instanceof AstStmtBlock s) {
             vBlock(s.block, true, enterLoop);
+
         } else if (stmt instanceof AstStmtIf s) {
             vCond(s.cond);
             vStmt(s.ifStmt, false);
             if (s.elseStmt != null)
                 vStmt(s.elseStmt, false);
+
         } else if (stmt instanceof AstStmtFor s) {
             if (s.firstForStmt != null) {
                 vLVal(s.firstForStmt.lVal);
                 vExp(s.firstForStmt.exp);
+                if (symTbl.searchSym(s.firstForStmt.lVal.ident) instanceof SymConstVar)
+                    loggerErr.error(s.firstForStmt.lVal.ident.lineNo, "h");
             }
             if (s.cond != null)
                 vCond(s.cond);
             if (s.thirdForStmt != null) {
                 vLVal(s.thirdForStmt.lVal);
                 vExp(s.thirdForStmt.exp);
+                if (symTbl.searchSym(s.thirdForStmt.lVal.ident) instanceof SymConstVar)
+                    loggerErr.error(s.thirdForStmt.lVal.ident.lineNo, "h");
             }
             vStmt(s.stmt, true);
+
         } else if (stmt instanceof AstStmtBreak s) {
             if (!symTbl.inLoop()) {
                 loggerErr.error(s.token.lineNo, "m");
             }
+
         } else if (stmt instanceof AstStmtContinue s) {
             if (!symTbl.inLoop()) {
                 loggerErr.error(s.token.lineNo, "m");
             }
+
         } else if (stmt instanceof AstStmtReturn s) {
             if (s.exp != null && symTbl.curFuncEnv() == SymId.VoidFunc) {
                 loggerErr.error(s.returnTk.lineNo, "f");
             }
+
         } else if (stmt instanceof AstStmtPrintf s) {
             vStmtPrintf(s);
         }
