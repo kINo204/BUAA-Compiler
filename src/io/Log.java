@@ -58,7 +58,7 @@ public class Log {
         errors.putIfAbsent(lineNo, errCode);
     }
 
-    public void executePrint() throws IOException {
+    public void executePrintErrors() throws IOException {
         final Object[] lineNumberArray = errors.keySet().toArray();
         Arrays.sort(lineNumberArray);
         for (Object line : lineNumberArray) {

@@ -13,14 +13,12 @@ public class SymTbl {
     private Scope currentScope;
     private int curId = 1;
 
-    private final Log loggerOut;
     private final Log loggerErr;
 
-    public SymTbl(Log o, Log e) {
+    public SymTbl(Log e) {
         scopesRoot = new Scope(curId, null, false, null);
         scopes.add(scopesRoot);
         currentScope = scopesRoot;
-        loggerOut = o;
         loggerErr = e;
     }
 

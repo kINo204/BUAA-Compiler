@@ -3,6 +3,8 @@ import frontend.Lexer;
 import frontend.Parser;
 import frontend.Validator;
 import io.Log;
+import ir.datastruct.Ir;
+import ir.datastruct.IrMaker;
 
 import java.io.*;
 
@@ -10,41 +12,62 @@ public class Compiler {
     /* Compiler execution entry point. */
     public static void main(String[] args) throws IOException {
         FileReader sourceProgram = new FileReader("testfile.txt");
-        Writer stdout = new PrintWriter(System.out);
-        Writer stderr = new PrintWriter(System.err);
-        Writer symbolOut = new FileWriter("symbol.txt");
+
+        // Configure loggers.
+        Writer lexerWriter = new FileWriter("lexer.txt");
+        Log lexerOut = new Log();
+        lexerOut.addWriter("file", lexerWriter);
+        lexerOut.switchLogger(true);
+
+        Writer parserWriter = new FileWriter("parser.txt");
+        Log parserOut = new Log();
+        parserOut.addWriter("file", parserWriter);
+        parserOut.switchLogger(true);
+
+        Writer symbolWriter = new FileWriter("symbol.txt");
+        Log symbolOut = new Log();
+        symbolOut.addWriter("file", symbolWriter);
+        symbolOut.switchLogger(true);
+
+        Writer irWriter = new FileWriter("ir.txt");
+        Log irOut = new Log();
+        irOut.addWriter("file", irWriter);
+        irOut.switchLogger(true);
+
+        Writer programWriter = new FileWriter("mips.txt");
+        Log programOut = new Log();
+        programOut.addWriter("file", programWriter);
+        programOut.switchLogger(true);
+
         Writer err = new FileWriter("error.txt");
-
-        Log o = new Log();
-//        o.addWriter("stdout", stdout);
-//        o.addWriter("file out", parserOut);
-//        o.switchLogger(true);
-
-        Log o1 = new Log();
-//        o1.addWriter("stdout", stdout);
-        o1.addWriter("file out", symbolOut);
-        o1.switchLogger(true);
-
         Log e = new Log();
-//        e.addWriter("stderr", stderr);
         e.addWriter("file err", err);
         e.switchLogger(true);
 
-        Lexer lexer = new Lexer(sourceProgram, o, e);
+        // Connect the compiler.
+        Lexer lexer = new Lexer(sourceProgram, lexerOut, e);
 
-        Parser parser = new Parser(lexer, "CompUnit", o, e);
+        Parser parser = new Parser(lexer, "CompUnit", parserOut, e);
         AstCompUnit ast = (AstCompUnit) parser.parse();
-        Validator validator = new Validator(ast, o, e);
+
+        Validator validator = new Validator(ast, e);
         validator.validateAst();
-        o1.print(validator.symTbl);
+        symbolOut.print(validator.symTbl);
 
-        o.executePrint();
-        o1.executePrint();
-        e.executePrint();
+        IrMaker irMaker = new IrMaker(ast, validator.symTbl);
+        Ir ir = irMaker.make();
+        irOut.print(ir);
 
+        // Execute printing errors.
+        e.executePrintErrors();
+
+        // Closing streams.
         sourceProgram.close();
-        o.close();
-        o1.close();
+        lexerOut.close();
+        parserOut.close();
+        symbolOut.close();
+        irOut.close();
+        programOut.close();
         e.close();
     }
 }

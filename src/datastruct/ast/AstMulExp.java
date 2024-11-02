@@ -1,8 +1,12 @@
 package datastruct.ast;
 
+import datastruct.symbol.Symbol;
+
 import java.util.ArrayList;
 
 public class AstMulExp extends AstNode{
+    public Symbol.SymId type = null;
+
     public AstMulExp() {
         super(AstNodeId.MulExp);
     }

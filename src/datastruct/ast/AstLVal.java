@@ -1,6 +1,10 @@
 package datastruct.ast;
 
+import datastruct.symbol.Symbol;
+
 public class AstLVal extends AstNode {
+    public Symbol.SymId type = null;
+
     public AstLVal() {
         super(AstNodeId.LVal);
     }

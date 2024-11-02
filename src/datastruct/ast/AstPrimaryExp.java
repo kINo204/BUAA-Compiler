@@ -1,6 +1,10 @@
 package datastruct.ast;
 
+import datastruct.symbol.Symbol;
+
 public class AstPrimaryExp extends AstNode {
+    public Symbol.SymId type = null;
+
     public AstPrimaryExp() {
         super(AstNodeId.PrimaryExp);
     }

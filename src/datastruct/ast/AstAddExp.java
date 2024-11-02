@@ -1,13 +1,18 @@
 package datastruct.ast;
 
+import datastruct.symbol.Symbol;
+
 import java.util.ArrayList;
 
 public class AstAddExp extends AstNode {
+    public Symbol.SymId type = null;
+
     public AstAddExp() {
         super(AstNodeId.AddExp);
     }
 
     public final ArrayList<AstMulExp> mulExps = new ArrayList<>();
+    public final ArrayList<Token.TokenId> operators = new ArrayList<>();
 
     public void addMulExp(AstMulExp mulExp) {
         mulExps.add(mulExp);
@@ -32,5 +37,9 @@ public class AstAddExp extends AstNode {
     @Override
     public String buildTreeConsole() {
         return null;
+    }
+
+    public void addOperator(Token read) {
+        operators.add(read.tokenId);
     }
 }

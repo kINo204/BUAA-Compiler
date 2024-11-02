@@ -136,6 +136,8 @@ AddExp
 
 			PrimaryExp 
 				: '(' Exp ')'
+
+				(* "Values" are here *)
 				| LVal
 				| Number
 				| Character

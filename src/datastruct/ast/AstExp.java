@@ -1,19 +1,23 @@
 package datastruct.ast;
 
+import datastruct.symbol.Symbol;
+
 public class AstExp extends AstNode {
+    public Symbol.SymId type = null;
+
     public AstExp() {
         super(AstNodeId.Exp);
     }
 
-    public AstAddExp astAddExp;
+    public AstAddExp addExp;
 
     @Override
     public String toString() {
-        return astAddExp.toString();
+        return addExp.toString();
     }
 
-    public void setAstAddExp(AstAddExp astAddExp) {
-        this.astAddExp = astAddExp;
+    public void setAddExp(AstAddExp addExp) {
+        this.addExp = addExp;
     }
 
     @Override

@@ -598,7 +598,7 @@ public class Parser {
 
     private AstExp parseExp() throws IOException {
         AstExp exp = new AstExp();
-        exp.setAstAddExp(parseAddExp());
+        exp.setAddExp(parseAddExp());
         loggerOut.println(exp.output());
         return exp;
     }
@@ -666,7 +666,7 @@ public class Parser {
         while (Arrays.asList(PLUS, MINU)
                 .contains(lexer.lookAhead(0).getTokenId())) {
             loggerOut.println(addExp.output());
-            lexer.read();
+            addExp.addOperator(lexer.read());
             addExp.addMulExp(parseMulExp());
         }
         loggerOut.println(addExp.output());

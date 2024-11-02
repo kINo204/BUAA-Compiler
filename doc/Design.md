@@ -56,7 +56,7 @@ A new list `readTokens` stores the tokens already parsed out by `parseToken()`. 
 
 #### 2.2.2 Extracting input source
 
-The original input for Lexer is initialized within the Lexer class. However, a lexer should not only be able to be called once, and handle only the source program passed in at the very begenning; it should also be able to create several instances, each handling different piece of source input, even at the same time. So the new design provides 2 ways of setting the lexer's input: by passing in a `Reader` or by directly passing in a `String` to tokenize.
+The original input for Lexer is initialized within the Lexer class. However, a lexer should not only be able to be called once, and handle only the source ir passed in at the very begenning; it should also be able to create several instances, each handling different piece of source input, even at the same time. So the new design provides 2 ways of setting the lexer's input: by passing in a `Reader` or by directly passing in a `String` to tokenize.
 
 ## 3. Syntax anaysis
 
@@ -122,7 +122,7 @@ Scope {
 
 ### 4.3 The AST validator
 
-In semantic analysis phase, an AST provided by the parser is passed to an "validator", who will **validate semantics, reporting any error it encounters, and try performing certain error recovery operations on the AST.** A program with semantic errors may be compiled with recoveries or be refused by the compiler, based on design choices within the validator; however, a validator **ensures the "translator" in the later compiling stage always gets a valid AST, and only need to perform translation operations.**
+In semantic analysis phase, an AST provided by the parser is passed to an "validator", who will **validate semantics, reporting any error it encounters, and try performing certain error recovery operations on the AST.** A ir with semantic errors may be compiled with recoveries or be refused by the compiler, based on design choices within the validator; however, a validator **ensures the "translator" in the later compiling stage always gets a valid AST, and only need to perform translation operations.**
 
 ## 5. Error handling
 

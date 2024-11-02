@@ -24,12 +24,12 @@ public class Validator {
 
     // Components
     private final Log loggerErr;
-    private final Type type = new Type();
+    private final Type typer = new Type();
 
 
-    public Validator(AstCompUnit ast, Log loggerOut, Log loggerErr) {
+    public Validator(AstCompUnit ast, Log loggerErr) {
         this.ast = ast;
-        symTbl = new SymTbl(loggerOut, loggerErr);
+        symTbl = new SymTbl(loggerErr);
         this.loggerErr = loggerErr;
     }
 
@@ -255,10 +255,12 @@ public class Validator {
 
     private void vConstExp(AstConstExp constExp) throws IOException {
         vAddExp(constExp.astAddExp);
+        constExp.type = typer.typeof(constExp);
     }
 
     private void vExp(AstExp exp) throws IOException {
-        vAddExp(exp.astAddExp);
+        vAddExp(exp.addExp);
+        exp.type = typer.typeof(exp);
     }
 
     private void vLOrExp(AstLOrExp lOrExp) throws IOException {
@@ -278,7 +280,9 @@ public class Validator {
             for (AstUnaryExp unaryExp : mulExp.unaryExps) {
                 vUnaryExp(unaryExp);
             }
+            mulExp.type = typer.typeof(mulExp);
         }
+        addExp.type = typer.typeof(addExp);
     }
 
     private void vUnaryExp(AstUnaryExp unaryExp) throws IOException {
@@ -309,7 +313,7 @@ public class Validator {
                 }
                 for (int i = 0; i < Math.min(fParams.size(), rParams.size()); i++) {
                     SymId fp = fParams.get(i);
-                    SymId rp = type.typeof(rParams.get(i));
+                    SymId rp = typer.typeof(rParams.get(i));
                     if (fp == IntArray || fp == CharArray) {
                         if (rp == Int || rp == Char) {
                             loggerErr.error(s.funcIdent.lineNo, "e");
@@ -326,8 +330,8 @@ public class Validator {
                     }
                 }
             }
-
         }
+        unaryExp.type = typer.typeof(unaryExp);
     }
 
     private void vPrimaryExp(AstPrimaryExp primaryExp) throws IOException {
@@ -336,12 +340,14 @@ public class Validator {
         } else if (primaryExp.lVal != null) {
             vLVal(primaryExp.lVal);
         }
+        primaryExp.type = typer.typeof(primaryExp);
     }
 
     private void vLVal(AstLVal lVal) throws IOException {
         vIdent(lVal.ident, false);
         if (lVal.exp != null)
             vExp(lVal.exp);
+        lVal.type = typer.typeof(lVal);
     }
 
     private void vIdent(Token ident, boolean isFuncCall) {
@@ -359,14 +365,18 @@ public class Validator {
         // Type "checker" and calculator.
         /* As no error for type mismatching required, we'll simply panic on mismatch. */
         private SymId typeof(AstExp exp) {
-            return typeof(exp.astAddExp);
+            if (exp.type != null) return exp.type;
+            return typeof(exp.addExp);
         }
 
         private SymId typeof(AstConstExp constExp) {
+            if (constExp.type != null) return constExp.type;
             return typeof(constExp.astAddExp);
         }
 
         private SymId typeof(AstAddExp addExp) {
+            if (addExp.type != null) return addExp.type;
+
             if (addExp.mulExps.size() == 1) {
                 return typeof(addExp.mulExps.get(0));
             } else {
@@ -394,6 +404,8 @@ public class Validator {
         }
 
         private SymId typeof(AstMulExp mulExp) {
+            if (mulExp.type != null) return mulExp.type;
+
             if (mulExp.unaryExps.size() == 1) {
                 return typeof(mulExp.unaryExps.get(0));
             } else {
@@ -421,6 +433,8 @@ public class Validator {
         }
 
         private SymId typeof(AstUnaryExp unaryExp) {
+            if (unaryExp.type != null) return unaryExp.type;
+
             if (unaryExp instanceof AstUnaryExpPrimary p) {
                 return typeof(p.primaryExp);
             } else if (unaryExp instanceof AstUnaryExpUnaryOp p) {
@@ -448,31 +462,12 @@ public class Validator {
         }
 
         private SymId typeof(AstPrimaryExp primaryExp) {
+            if (primaryExp.type != null) return primaryExp.type;
+
             if (primaryExp.bracedExp != null) {
                 return typeof(primaryExp.bracedExp);
             } else if (primaryExp.lVal != null) {
-                AstLVal lVal = primaryExp.lVal;
-                Symbol s = symTbl.searchSym(lVal.ident);
-                if (lVal.exp == null) {
-                    assert !Arrays.asList(
-                            SymId.VoidFunc,
-                            SymId.IntFunc,
-                            SymId.CharFunc).contains(s.symId);
-                    return s.symId;
-                } else {
-                    assert Arrays.asList(
-                            IntArray,
-                            SymId.CharArray,
-                            SymId.ConstIntArray,
-                            SymId.ConstCharArray).contains(s.symId);
-                    return switch (s.symId) {
-                        case IntArray -> SymId.Int;
-                        case CharArray -> SymId.Char;
-                        case ConstIntArray -> SymId.ConstInt;
-                        case ConstCharArray -> SymId.ConstChar;
-                        default -> null;
-                    };
-                }
+                return typeof(primaryExp.lVal);
             } else if (primaryExp.character != null) {
                 return SymId.Char;
             } else if (primaryExp.number != null) {
@@ -480,6 +475,32 @@ public class Validator {
             } else {
                 assert false; // Invalid token!
                 return null;
+            }
+        }
+
+        private SymId typeof(AstLVal lVal) {
+            if (lVal.type != null) return lVal.type;
+
+            Symbol s = symTbl.searchSym(lVal.ident);
+            if (lVal.exp == null) {
+                assert !Arrays.asList(
+                        SymId.VoidFunc,
+                        SymId.IntFunc,
+                        SymId.CharFunc).contains(s.symId);
+                return s.symId;
+            } else {
+                assert Arrays.asList(
+                        IntArray,
+                        SymId.CharArray,
+                        SymId.ConstIntArray,
+                        SymId.ConstCharArray).contains(s.symId);
+                return switch (s.symId) {
+                    case IntArray -> SymId.Int;
+                    case CharArray -> SymId.Char;
+                    case ConstIntArray -> SymId.ConstInt;
+                    case ConstCharArray -> SymId.ConstChar;
+                    default -> null;
+                };
             }
         }
     }

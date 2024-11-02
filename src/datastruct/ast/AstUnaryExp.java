@@ -1,6 +1,10 @@
 package datastruct.ast;
 
+import datastruct.symbol.Symbol;
+
 public class AstUnaryExp extends AstNode {
+    public Symbol.SymId type = null;
+
     public AstUnaryExp() {
         super(AstNodeId.UnaryExp);
     }

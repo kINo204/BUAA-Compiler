@@ -69,7 +69,7 @@ public class Lexer {
             t = parseToken();
             currentLine = parsingLineNo;
         }
-        loggerOut.println(t);
+        loggerOut.println(t.output());
         return t;
     }
 
