@@ -95,7 +95,9 @@ public class IrMaker {
         return fromAddExp(exp.addExp, function);
     }
 
-    private void fromConstExp(AstConstExp constExp) {}
+    private Operand fromConstExp(AstConstExp constExp, Function function) {
+        return fromAddExp(constExp.addExp, function);
+    }
 
     private void fromLOrExp(AstLOrExp lOrExp) {}
 

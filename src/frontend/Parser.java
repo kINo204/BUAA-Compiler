@@ -605,7 +605,7 @@ public class Parser {
 
     private AstConstExp parseConstExp() throws IOException {
         AstConstExp constExp = new AstConstExp();
-        constExp.setAstAddExp(parseAddExp());
+        constExp.setAddExp(parseAddExp());
         loggerOut.println(constExp.output());
         return constExp;
     }

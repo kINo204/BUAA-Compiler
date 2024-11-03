@@ -256,7 +256,7 @@ public class Validator {
     }
 
     private void vConstExp(AstConstExp constExp) throws IOException {
-        vAddExp(constExp.astAddExp);
+        vAddExp(constExp.addExp);
         constExp.type = typer.typeof(constExp);
     }
 
@@ -373,7 +373,7 @@ public class Validator {
 
         private SymId typeof(AstConstExp constExp) {
             if (constExp.type != null) return constExp.type;
-            return typeof(constExp.astAddExp);
+            return typeof(constExp.addExp);
         }
 
         private SymId typeof(AstAddExp addExp) {

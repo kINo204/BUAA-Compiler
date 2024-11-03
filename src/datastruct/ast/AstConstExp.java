@@ -9,15 +9,15 @@ public class AstConstExp extends AstNode {
         super(AstNodeId.ConstExp);
     }
 
-    public AstAddExp astAddExp;
+    public AstAddExp addExp;
 
     @Override
     public String toString() {
-        return astAddExp.toString();
+        return addExp.toString();
     }
 
-    public void setAstAddExp(AstAddExp astAddExp) {
-        this.astAddExp = astAddExp;
+    public void setAddExp(AstAddExp addExp) {
+        this.addExp = addExp;
     }
 
     @Override
