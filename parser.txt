@@ -1,5 +1,8 @@
+<UnaryOp>
+<UnaryOp>
 <Number>
 <PrimaryExp>
+<UnaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
@@ -12,6 +15,7 @@
 <AddExp>
 <Exp>
 <PrimaryExp>
+<UnaryExp>
 <UnaryExp>
 <MulExp>
 <UnaryOp>

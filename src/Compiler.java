@@ -29,7 +29,7 @@ public class Compiler {
         symbolOut.addWriter("file", symbolWriter);
         symbolOut.switchLogger(true);
 
-        Writer irWriter = new FileWriter("ir.txt");
+        Writer irWriter = new FileWriter("ir.ll");
         Log irOut = new Log();
         irOut.addWriter("file", irWriter);
         irOut.switchLogger(true);

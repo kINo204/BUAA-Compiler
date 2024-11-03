@@ -154,17 +154,28 @@ public class IrMaker {
             return fromPrimaryExp(u.primaryExp, function);
         } else if (unaryExp instanceof AstUnaryExpUnaryOp u) {
             Operand operandUnaryExp = fromUnaryExp(u.unaryExp, function);
-            Reg res = new Reg();
             switch (u.unaryOp.op.tokenId) {
-                /* PLUS contains no action. */
-                case MINU -> function.appendInstr(
-                        Instr.genCalc(Instr.Operator.SUB,
-                                Symbol.SymId.Int, res, new Const(0), operandUnaryExp)
-                );
-                case NOT -> { /* TODO */ }
-                default -> { }
-            };
-            return res;
+                case MINU -> {
+                    Reg res = new Reg();
+                    function.appendInstr(
+                            Instr.genCalc(Instr.Operator.SUB,
+                                    Symbol.SymId.Int, res, new Const(0), operandUnaryExp)
+                    );
+                    return res;
+                }
+                case NOT -> {
+                    Reg res = new Reg();
+                    function.appendInstr(
+                            Instr.genCalc(Instr.Operator.EQL,
+                                    Symbol.SymId.Int, res, operandUnaryExp, new Const(0))
+                    );
+                    return res;
+                }
+                default -> {
+                    /* PLUS contains no action. */
+                    return operandUnaryExp;
+                }
+            }
         }
         return null;
     }
