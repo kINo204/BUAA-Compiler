@@ -128,6 +128,50 @@ In semantic analysis phase, an AST provided by the parser is passed to an "valid
 
 ## 6. Code gen
 
+### 6.1 Intro
+
+The code generation phase generate from the parse tree of the source program, to get the AST of the IR. This AST can be transformed into the form of *a linear instructions list*, which is handled to the MIPS generator, who generate target codes for each instruction in the list.
+
+### 6.2 IR
+
+#### 6.2.1 AST: the data structure
+
+The data structure hierarchy of IR is as follows:
+
+```
+Ir
+L Module
+	|- GlobalDecl
+	L Function
+		L BasicBlock
+			L Instr
+```
+
+The instruction structure:
+
+```
+Instr(Operator, Type, Operand, Operand, Operand)
+
+Operand
+=> Const
+=> Reg
+=> Label
+```
+
+##### 6.2.1.1 Dividing optimization and target code generation
+
+The implementation tends to achieve transparency of target code generation process in optimization phase, and vice versa. In detail, this is achieved by the following means.
+
+Firstly, a `BasicBlock` does not contains its jumping instruction, but only contains other instructions in its body. **Any jumping instruction representing the behavior of basic block is automatically generated** during the *instruction linearization phase* by analyzing the recorded jumping target of that basic block, and the sequence of basic blocks in the function. Thus, altering in sequence of basic blocks can be made without concerning code generation within optimization phase. Similarly, **any function head and tail info** is also generated in that linearization phase.
+
+Secondly, there tends to be a contract between IR and MIPS generator that, for a linear IR sequence, each instruction can be processed **individually and in that given order** to form the target code.
+
+#### 6.2.2 Generate IR from source program
+
+#### 6.2.3 IR language specifications
+
+### 6.3 Target code
+
 ## 7. Tests
 
 ### 7.1 Design principles

@@ -1,6 +1,7 @@
 package ir.datastruct;
 
 import datastruct.ast.*;
+import datastruct.symbol.Symbol;
 import datastruct.symtbl.SymTbl;
 import ir.datastruct.operand.Const;
 import ir.datastruct.operand.Operand;
@@ -127,11 +128,11 @@ public class IrMaker {
 
     private Operand fromMulExp(AstMulExp mulExp, Function function) {
         if (mulExp.unaryExps.size() == 1) {
-            return fromUnaryExp(mulExp.unaryExps.get(0));
+            return fromUnaryExp(mulExp.unaryExps.get(0), function);
         } else {
             final ArrayList<Operand> values = new ArrayList<>();
             for (AstUnaryExp unaryExp : mulExp.unaryExps) {
-                values.add(fromUnaryExp(unaryExp));
+                values.add(fromUnaryExp(unaryExp, function));
             }
             Operand totRes = values.get(0);
             for (int i = 1; i < values.size(); i++) {
@@ -148,20 +149,35 @@ public class IrMaker {
         }
     }
 
-    private Operand fromUnaryExp(AstUnaryExp unaryExp) {
+    private Operand fromUnaryExp(AstUnaryExp unaryExp, Function function) {
         if (unaryExp instanceof AstUnaryExpPrimary u) {
-            return fromPrimaryExp(u.primaryExp);
+            return fromPrimaryExp(u.primaryExp, function);
+        } else if (unaryExp instanceof AstUnaryExpUnaryOp u) {
+            Operand operandUnaryExp = fromUnaryExp(u.unaryExp, function);
+            Reg res = new Reg();
+            switch (u.unaryOp.op.tokenId) {
+                /* PLUS contains no action. */
+                case MINU -> function.appendInstr(
+                        Instr.genCalc(Instr.Operator.SUB,
+                                Symbol.SymId.Int, res, new Const(0), operandUnaryExp)
+                );
+                case NOT -> { /* TODO */ }
+                default -> { }
+            };
+            return res;
         }
         return null;
     }
 
-    private void fromUnaryOp(AstUnaryOp unaryOp) {}
-
     private void fromFuncRParams(AstFuncRParams funcRParams) {}
 
-    private Operand fromPrimaryExp(AstPrimaryExp primaryExp) {
-        if (primaryExp.number != null) {
+    private Operand fromPrimaryExp(AstPrimaryExp primaryExp, Function function) {
+        if (primaryExp.bracedExp != null) {
+            return fromExp(primaryExp.bracedExp, function);
+        } else if (primaryExp.number != null) {
             return fromNumber(primaryExp.number);
+        } else if (primaryExp.character != null) {
+            return fromCharacter(primaryExp.character);
         }
         return null; // Ast error.
     }
@@ -175,5 +191,7 @@ public class IrMaker {
     }
 
     // Return a constant operand.
-    private void fromCharacter(AstCharacter character) {}
+    private Operand fromCharacter(AstCharacter character) {
+        return new Const(character.charConst.val.character);
+    }
 }

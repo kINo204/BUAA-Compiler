@@ -32,7 +32,7 @@ public class Token {
                     val.bigInteger = new BigInteger(literal);
                 }
             }
-            case CHRCON -> val.character = literal.charAt(0);
+            case CHRCON -> val.character = literal.charAt(1);
             case STRCON -> val.string = literal.substring(1, literal.length() - 1); // Strip "" symbols
         }
     }

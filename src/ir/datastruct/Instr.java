@@ -37,9 +37,7 @@ public class Instr implements Value {
     }
 
     static Instr genReturn() {
-        return new Instr(
-                Operator.RET, null, null, null, null
-        );
+        return new Instr(Operator.RET);
     }
 
     static Instr genReturn(Operand returnExp, Symbol.SymId typeToken) {
@@ -72,7 +70,7 @@ public class Instr implements Value {
             sb.append(String.format(": %s", type.toString().toLowerCase()));
         }
         if (main != null) {
-            sb.append(String.format(" %s", main.toString().toLowerCase()));
+            sb.append(String.format("  %s", main.toString().toLowerCase()));
         }
         if (supl != null) {
             sb.append(String.format(", %s", supl.toString().toLowerCase()));
