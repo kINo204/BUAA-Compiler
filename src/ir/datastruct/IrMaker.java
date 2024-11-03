@@ -4,6 +4,7 @@ import datastruct.ast.*;
 import datastruct.symbol.Symbol;
 import datastruct.symtbl.SymTbl;
 import ir.datastruct.operand.Const;
+import ir.datastruct.operand.Label;
 import ir.datastruct.operand.Operand;
 import ir.datastruct.operand.Reg;
 
@@ -43,7 +44,6 @@ public class IrMaker {
     private void fromMainFuncDef(AstMainFuncDef mainFuncDef, Module module) {
         Function function = new Function(true);
         Reg.reset();
-        function.createBasicBlock();
         fromBlock(mainFuncDef.block, function);
         module.functions.add(function);
     }
@@ -77,19 +77,51 @@ public class IrMaker {
     private void fromInitVal(AstInitVal initVal) {}
 
     private void fromStmt(AstStmt stmt, Function function) {
-        if (stmt instanceof AstStmtReturn stmtReturn) {
+        if (stmt instanceof AstStmtBlock stmtBlock) {
+            fromBlock(stmtBlock.block, function);
+        } else if (stmt instanceof AstStmtReturn stmtReturn) {
             if (stmtReturn.exp == null) {
                 function.appendInstr(Instr.genReturn());
             } else {
                 Operand val = fromExp(stmtReturn.exp, function);
                 function.appendInstr(Instr.genReturn(val, stmtReturn.exp.type));
             }
+        } else if (stmt instanceof AstStmtIf stmtIf) {
+            if (stmtIf.elseStmt == null) {
+                Label labelEnd = new Label("if-end");
+
+                Operand cond = fromCond(stmtIf.cond, function);
+                function.appendInstr(Instr.genGoifnot(labelEnd, cond));
+                fromStmt(stmtIf.ifStmt, function);
+                function.appendInstr(Instr.genLabelDecl(labelEnd));
+            } else {
+                /*
+                gont L-else, cond
+                ... (ifStmt)
+                goto L-end
+                L-else:
+                ... (elseStmt)
+                L-end:
+                 */
+                Label labelElse = new Label("if-else");
+                Label labelEnd = new Label("if-end");
+
+                Operand cond = fromCond(stmtIf.cond, function);
+                function.appendInstr(Instr.genGoifnot(labelElse, cond));
+                fromStmt(stmtIf.ifStmt, function);
+                function.appendInstr(Instr.genGoto(labelEnd));
+                function.appendInstr(Instr.genLabelDecl(labelElse));
+                fromStmt(stmtIf.elseStmt, function);
+                function.appendInstr(Instr.genLabelDecl(labelEnd));
+            }
         }
     }
 
     private void fromForStmt(AstForStmt forStmt) {}
 
-    private void fromCond(AstCond cond) {}
+    private Operand fromCond(AstCond cond, Function function) {
+        return fromLOrExp(cond.lOrExp, function);
+    }
 
     private Operand fromExp(AstExp exp, Function function) {
         return fromAddExp(exp.addExp, function);
@@ -99,9 +131,73 @@ public class IrMaker {
         return fromAddExp(constExp.addExp, function);
     }
 
-    private void fromLOrExp(AstLOrExp lOrExp) {}
+    /* Example: if (1 || 2 || 3) { ... }
+    {goif  true, 1
+    goif  true, 2
+    goif  true, 3
+    %1 = 0
+    goto  Lend
+    true:
+    %1 = 1
+    Lend:}
 
-    private void fromLAndExp(AstLAndExp lAndExp) {}
+    {goif  Lif-body, %1
+    goto  Lif-end
+    Lif-body:
+    ...
+    Lif-end:}
+     */
+    private Operand fromLOrExp(AstLOrExp lOrExp, Function function) {
+        if (lOrExp.lAndExps.size() == 1) {
+            return fromLAndExp(lOrExp.lAndExps.get(0), function);
+        } else {
+            Label labelTrue = new Label("lorexp-true");
+            Label labelEnd = new Label("lorexp-end");
+
+            for (AstLAndExp lAndExp : lOrExp.lAndExps) {
+                Operand operand = fromLAndExp(lAndExp, function);
+                Instr instrGoif = Instr.genGoif(labelTrue, operand);
+                function.appendInstr(instrGoif);
+            }
+
+            Reg res = new Reg();
+            function.appendInstr(Instr.genMove(new Const(0), res));
+            function.appendInstr(Instr.genGoto(labelEnd));
+
+            function.appendInstr(Instr.genLabelDecl(labelTrue));
+            function.appendInstr(Instr.genMove(new Const(1), res));
+
+            function.appendInstr(Instr.genLabelDecl(labelEnd));
+
+            return res;
+        }
+    }
+
+    private Operand fromLAndExp(AstLAndExp lAndExp, Function function) {
+        if (lAndExp.eqExps.size() == 1) {
+            return fromEqExp(lAndExp.eqExps.get(0), function);
+        } else {
+            Label labelFalse = new Label("landexp-false");
+            Label labelEnd = new Label("landexp-end");
+
+            for (AstEqExp eqExp : lAndExp.eqExps) {
+                Operand operand = fromEqExp(eqExp, function);
+                Instr instrGont = Instr.genGoifnot(labelFalse, operand);
+                function.appendInstr(instrGont);
+            }
+
+            Reg res = new Reg();
+            function.appendInstr(Instr.genMove(new Const(1), res));
+            function.appendInstr(Instr.genGoto(labelEnd));
+
+            function.appendInstr(Instr.genLabelDecl(labelFalse));
+            function.appendInstr(Instr.genMove(new Const(0), res));
+
+            function.appendInstr(Instr.genLabelDecl(labelEnd));
+
+            return res;
+        }
+    }
 
     private Operand fromEqExp(AstEqExp eqExp, Function function) {
         if (eqExp.relExps.size() == 1) {

@@ -30,10 +30,36 @@ public class Instr implements Value {
         );
     }
 
+    static Instr genGoto(Label label) {
+        return new Instr(
+                Operator.GOTO, null, null, label, null
+        );
+    }
+
+    static Instr genGoif(Label label, Operand condValue) {
+        return new Instr(
+                Operator.GOIF, null, null, label, condValue
+        );
+    }
+
+    static Instr genGoifnot(Label label, Operand condValue) {
+        return new Instr(
+                Operator.GONT, null, null, label, condValue
+        );
+    }
+
     static Instr genGoif(Value target, Operand condValue) {
         return new Instr(
                 Operator.GOIF, null, null, new Label(target), condValue
         );
+    }
+
+    static Instr genLabelDecl(Label label) {
+        Instr instr = new Instr(
+                Operator.LABEL, null, label, null, null
+        );
+        label.target = instr; // Set target of the label to this instruction!!!
+        return instr;
     }
 
     static Instr genReturn() {
@@ -58,24 +84,36 @@ public class Instr implements Value {
         );
     }
 
+    static Instr genMove(Operand from, Operand to) {
+        return new Instr(
+                Operator.MOVE, null, to, from, null
+        );
+    }
+
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        if (res != null) {
-            sb.append(String.format("%s = %s", res.toString().toLowerCase(), op.toString().toLowerCase()));
+        if (op == Operator.MOVE) {
+            return res + " = " + main;
+        } else if (op == Operator.LABEL) {
+            return "label  " + res;
         } else {
-            sb.append(String.format("%s", op.toString().toLowerCase()));
+            StringBuilder sb = new StringBuilder();
+            if (res != null) {
+                sb.append(String.format("%s = %s", res.toString().toLowerCase(), op.toString().toLowerCase()));
+            } else {
+                sb.append(String.format("%s", op.toString().toLowerCase()));
+            }
+            if (type != null) {
+                sb.append(String.format(": %s", type.toString().toLowerCase()));
+            }
+            if (main != null) {
+                sb.append(String.format("  %s", main.toString().toLowerCase()));
+            }
+            if (supl != null) {
+                sb.append(String.format(", %s", supl.toString().toLowerCase()));
+            }
+            return sb.toString();
         }
-        if (type != null) {
-            sb.append(String.format(": %s", type.toString().toLowerCase()));
-        }
-        if (main != null) {
-            sb.append(String.format("  %s", main.toString().toLowerCase()));
-        }
-        if (supl != null) {
-            sb.append(String.format(", %s", supl.toString().toLowerCase()));
-        }
-        return sb.toString();
     }
 
     enum Type {
@@ -94,13 +132,18 @@ public class Instr implements Value {
         MUL,
         DIV,
         MOD,
+        OR,
+        AND,
+        MOVE,
 
         // Comparison
         LSS, LEQ, GRE, GEQ, EQL, NEQ,
 
         // Jumping
+        LABEL,
         GOTO,
         GOIF,
+        GONT,
         CALL,
         RET,
     }

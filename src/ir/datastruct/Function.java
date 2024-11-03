@@ -8,9 +8,10 @@ import java.util.ArrayList;
 class Function implements Value {
     boolean isMain = false;
     final Symbol symbol;
-    ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
+    ArrayList<Instr> instrs = new ArrayList<>();
 
-    private BasicBlock curBasicBlock = null;
+    // For optimization.
+    ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
 
     Function(Symbol symbol) {
         this.symbol = symbol;
@@ -22,19 +23,25 @@ class Function implements Value {
         symbol = null;
     }
 
-    void createBasicBlock() {
-        curBasicBlock = new BasicBlock();
-        basicBlocks.add(curBasicBlock);
-    }
-
     void appendInstr(Instr i) {
-        curBasicBlock.instructions.add(i);
+        instrs.add(i);
     }
 
+    public ArrayList<Instr> debugGetInstrs() {
+        return instrs;
+    }
+
+    // TODO Instrs -> BasicBlock
+    public void toBasicBlocks() {
+        // Construct basic blocks from `this.instrs`.
+        // Make flowing between bbs.
+    }
+
+    // TODO BasicBlock -> Instrs
     public ArrayList<Instr> genInstrs() {
         final ArrayList<Instr> instrs = new ArrayList<>();
 
-        // Add jumping instrs.
+        // Re-generate jumping instrs && labels.
         final ArrayList<Instr> jumping = new ArrayList<>(); // Index for refill.
         for (BasicBlock b : basicBlocks) {
             if (b.conditionValue == null) {
@@ -90,7 +97,7 @@ class Function implements Value {
             assert symbol != null;
             sb.append("fun ").append(symbol.literal).append(":\n");
         }
-        for (Instr i : genInstrs()) {
+        for (Instr i : debugGetInstrs()) {
             sb.append("\t").append(i.toString()).append("\n");
         }
         sb.deleteCharAt(sb.length() - 1);
