@@ -1,8 +1,11 @@
 package ir.datastruct;
 
+import datastruct.symbol.Symbol;
 import ir.datastruct.operand.Label;
 import ir.datastruct.operand.Operand;
 import ir.datastruct.operand.Reg;
+
+import static datastruct.symbol.Symbol.SymId.*;
 
 public class Instr implements Value {
     Operator op;
@@ -39,15 +42,21 @@ public class Instr implements Value {
         );
     }
 
-    static Instr genReturn(Operand returnExp) {
+    static Instr genReturn(Operand returnExp, Symbol.SymId typeToken) {
+        Type t = typeToken == Int || typeToken == ConstInt ? Type.i32 :
+                typeToken == Char || typeToken == ConstChar ? Type.i8 :
+                        null; // Error type!
         return new Instr(
-                Operator.RET, /*TODO type*/null, null, returnExp, null
+                Operator.RET, t, null, returnExp, null
         );
     }
 
-    static Instr genCalc(Operator op, Reg res, Operand main, Operand supl) {
+    static Instr genCalc(Operator op, Symbol.SymId typeToken, Reg res, Operand main, Operand supl) {
+        Type t = typeToken == Int || typeToken == ConstInt ? Type.i32 :
+                typeToken == Char || typeToken == ConstChar ? Type.i8 :
+                        null; // Error type!
         return new Instr(
-                op, /*TODO type*/null, res, main, supl
+                op, t, res, main, supl
         );
     }
 
@@ -72,7 +81,7 @@ public class Instr implements Value {
     }
 
     enum Type {
-        BYTE, WORD, VOID
+        i8, i32, VOID
     }
 
     enum Operator {

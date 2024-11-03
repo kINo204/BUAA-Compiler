@@ -81,7 +81,7 @@ public class IrMaker {
                 function.appendInstr(Instr.genReturn());
             } else {
                 Operand val = fromExp(stmtReturn.exp, function);
-                function.appendInstr(Instr.genReturn(val));
+                function.appendInstr(Instr.genReturn(val, stmtReturn.exp.type));
             }
         }
     }
@@ -106,30 +106,45 @@ public class IrMaker {
 
     private Operand fromAddExp(AstAddExp addExp, Function function) {
         if (addExp.mulExps.size() == 1) {
-            return fromMulExp(addExp.mulExps.get(0));
+            return fromMulExp(addExp.mulExps.get(0), function);
         } else {
             final ArrayList<Operand> values = new ArrayList<>();
             for (AstMulExp mulExp : addExp.mulExps) {
-                values.add(fromMulExp(mulExp));
+                values.add(fromMulExp(mulExp, function));
             }
-            Operand sum = values.get(0);
+            Operand totRes = values.get(0);
             for (int i = 1; i < values.size(); i++) {
                 final Operand next = values.get(i);
                 Reg calcRes = new Reg();
                 Instr.Operator op = addExp.operators.get(i - 1) ==
                         Token.TokenId.PLUS ? Instr.Operator.ADD : Instr.Operator.SUB;
-                function.appendInstr(Instr.genCalc(op, calcRes, sum, next));
-                sum = calcRes;
+                function.appendInstr(Instr.genCalc(op, addExp.type/* TODO: using total type here */, calcRes, totRes, next));
+                totRes = calcRes;
             }
-            return sum;
+            return totRes;
         }
     }
 
-    private Operand fromMulExp(AstMulExp mulExp) {
+    private Operand fromMulExp(AstMulExp mulExp, Function function) {
         if (mulExp.unaryExps.size() == 1) {
             return fromUnaryExp(mulExp.unaryExps.get(0));
         } else {
-            return null;
+            final ArrayList<Operand> values = new ArrayList<>();
+            for (AstUnaryExp unaryExp : mulExp.unaryExps) {
+                values.add(fromUnaryExp(unaryExp));
+            }
+            Operand totRes = values.get(0);
+            for (int i = 1; i < values.size(); i++) {
+                final Operand next = values.get(i);
+                Reg calcRes = new Reg();
+                Instr.Operator op =
+                        mulExp.operators.get(i - 1) == Token.TokenId.MULT ? Instr.Operator.MUL :
+                        mulExp.operators.get(i - 1) == Token.TokenId.DIV  ? Instr.Operator.DIV :
+                                Instr.Operator.MOD;
+                function.appendInstr(Instr.genCalc(op, mulExp.type/* TODO: using total type here */, calcRes, totRes, next));
+                totRes = calcRes;
+            }
+            return totRes;
         }
     }
 

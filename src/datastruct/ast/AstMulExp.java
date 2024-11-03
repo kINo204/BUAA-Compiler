@@ -12,6 +12,7 @@ public class AstMulExp extends AstNode{
     }
 
     public final ArrayList<AstUnaryExp> unaryExps = new ArrayList<>();
+    public final ArrayList<Token.TokenId> operators = new ArrayList<>();
 
     public void addUnaryExp(AstUnaryExp unaryExp) {
         unaryExps.add(unaryExp);
@@ -36,5 +37,9 @@ public class AstMulExp extends AstNode{
     @Override
     public String buildTreeConsole() {
         return null;
+    }
+
+    public void addOperator(Token read) {
+        operators.add(read.tokenId);
     }
 }

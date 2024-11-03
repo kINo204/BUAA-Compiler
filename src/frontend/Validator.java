@@ -233,7 +233,9 @@ public class Validator {
             if (s.exp != null && symTbl.curFuncEnv() == SymId.VoidFunc) {
                 loggerErr.error(s.returnTk.lineNo, "f");
             }
-
+            if (s.exp != null) {
+                vExp(s.exp);
+            }
         } else if (stmt instanceof AstStmtPrintf s) {
             vStmtPrintf(s);
         }

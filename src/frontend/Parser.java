@@ -679,7 +679,7 @@ public class Parser {
         while (Arrays.asList(MULT, DIV, MOD)
                 .contains(lexer.lookAhead(0).getTokenId())) {
             loggerOut.println(mulExp.output());
-            lexer.read();
+            mulExp.addOperator(lexer.read());
             mulExp.addUnaryExp(parseUnaryExp());
         }
         loggerOut.println(mulExp.output());

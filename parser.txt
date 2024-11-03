@@ -7,7 +7,6 @@
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
-<AddExp>
 <Number>
 <PrimaryExp>
 <UnaryExp>
