@@ -103,9 +103,57 @@ public class IrMaker {
 
     private void fromLAndExp(AstLAndExp lAndExp) {}
 
-    private void fromEqExp(AstEqExp eqExp) {}
+    private Operand fromEqExp(AstEqExp eqExp, Function function) {
+        if (eqExp.relExps.size() == 1) {
+            return fromRelExp(eqExp.relExps.get(0), function);
+        } else {
+            final ArrayList<Operand> values = new ArrayList<>();
+            for (AstRelExp relExp : eqExp.relExps) {
+                values.add(fromRelExp(relExp, function));
+            }
+            Operand totRes = values.get(0);
+            for (int i = 1; i < values.size(); i++) {
+                final Operand next = values.get(i);
+                Reg calcRes = new Reg();
+                Token.TokenId opToken = eqExp.operators.get(i - 1);
+                Instr.Operator op = switch (opToken) {
+                    case EQL -> Instr.Operator.EQL;
+                    case NEQ -> Instr.Operator.NEQ;
+                    default -> null; // ERROR
+                };
+                function.appendInstr(Instr.genCalc(op, Symbol.SymId.Int, calcRes, totRes, next));
+                totRes = calcRes;
+            }
+            return totRes;
+        }
+    }
 
-    private void fromRelExp(AstRelExp relExp) {}
+    private Operand fromRelExp(AstRelExp relExp, Function function) {
+        if (relExp.addExps.size() == 1) {
+            return fromAddExp(relExp.addExps.get(0), function);
+        } else {
+            final ArrayList<Operand> values = new ArrayList<>();
+            for (AstAddExp addExp : relExp.addExps) {
+                values.add(fromAddExp(addExp, function));
+            }
+            Operand totRes = values.get(0);
+            for (int i = 1; i < values.size(); i++) {
+                final Operand next = values.get(i);
+                Reg calcRes = new Reg();
+                Token.TokenId opToken = relExp.operators.get(i - 1);
+                Instr.Operator op = switch (opToken) {
+                    case GRE -> Instr.Operator.GRE;
+                    case GEQ -> Instr.Operator.GEQ;
+                    case LSS -> Instr.Operator.LSS;
+                    case LEQ -> Instr.Operator.LEQ;
+                    default -> null; // ERROR
+                };
+                function.appendInstr(Instr.genCalc(op, Symbol.SymId.Int, calcRes, totRes, next));
+                totRes = calcRes;
+            }
+            return totRes;
+        }
+    }
 
     private Operand fromAddExp(AstAddExp addExp, Function function) {
         if (addExp.mulExps.size() == 1) {

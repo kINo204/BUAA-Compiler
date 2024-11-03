@@ -640,7 +640,7 @@ public class Parser {
         while (Arrays.asList(EQL, NEQ)
                 .contains(lexer.lookAhead(0).getTokenId())) {
             loggerOut.println(eqExp.output());
-            lexer.read();
+            eqExp.addOperator(lexer.read());
             eqExp.addRelExp(parseRelExp());
         }
         loggerOut.println(eqExp.output());
@@ -653,7 +653,7 @@ public class Parser {
         while (Arrays.asList(GRE, GEQ, LSS, LEQ)
                 .contains(lexer.lookAhead(0).getTokenId())) {
             loggerOut.println(relExp.output());
-            lexer.read();
+            relExp.addOperator(lexer.read());
             relExp.addAddExp(parseAddExp());
         }
         loggerOut.println(relExp.output());

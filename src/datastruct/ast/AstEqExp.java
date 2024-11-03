@@ -8,6 +8,7 @@ public class AstEqExp extends AstNode {
     }
 
     public final ArrayList<AstRelExp> relExps = new ArrayList<>();
+    public ArrayList<Token.TokenId> operators;
 
     public void addRelExp(AstRelExp relExp) {
         relExps.add(relExp);
@@ -21,5 +22,9 @@ public class AstEqExp extends AstNode {
     @Override
     public String buildTreeConsole() {
         return null;
+    }
+
+    public void addOperator(Token read) {
+        operators.add(read.tokenId);
     }
 }
