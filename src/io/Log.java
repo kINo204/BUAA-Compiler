@@ -58,6 +58,10 @@ public class Log {
         errors.putIfAbsent(lineNo, errCode);
     }
 
+    public boolean hasError() {
+        return !errors.isEmpty();
+    }
+
     public void executePrintErrors() throws IOException {
         final Object[] lineNumberArray = errors.keySet().toArray();
         Arrays.sort(lineNumberArray);

@@ -1,4 +1,1 @@
-2 a Int
-2 b IntArray
-2 c Char
-2 d CharArray
+2 a ConstIntArray

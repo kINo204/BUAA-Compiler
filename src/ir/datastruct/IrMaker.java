@@ -3,6 +3,7 @@ package ir.datastruct;
 import datastruct.ast.*;
 import datastruct.symbol.SymConstVar;
 import datastruct.symbol.SymVar;
+import datastruct.symbol.Symbol;
 import datastruct.symtbl.SymTbl;
 import ir.datastruct.operand.*;
 
@@ -30,7 +31,8 @@ public class IrMaker {
     // Calling contract: on calling "fromXXX", parts of IR for XXX will be generated.
     private void fromCompUnit(AstCompUnit compUnit) {
         ir.module = new Module();
-        // TODO other elements: global decl & functions
+        // TODO global decl
+        // TODO function def
         fromMainFuncDef(compUnit.mainFuncDef, ir.module);
     }
 
@@ -93,10 +95,10 @@ public class IrMaker {
                 //      or fold all in Validator.
                 Operand arrayLength = fromConstExp(def.constExp, function);
                 var.arrayLength = ((Const) arrayLength).num;
-                function.appendInstr(Instr.genAlloca(var, arrayLength));
+                function.appendInstr(Instr.genAlloc(var, arrayLength));
 
                 final ArrayList<Operand> initVals = new ArrayList<>();
-                if (!def.constInitVal.constExps.isEmpty()) {
+                if (def.constInitVal.stringConst == null) {
                     for (AstConstExp constExp : def.constInitVal.constExps) {
                         initVals.add(fromConstExp(constExp, function));
                     }
@@ -124,7 +126,7 @@ public class IrMaker {
                     }
                 }
             } else {
-                function.appendInstr(Instr.genAlloca(var));
+                function.appendInstr(Instr.genAlloc(var));
 
                 Operand initVal = fromConstExp(def.constInitVal.constExp, function);
                 function.appendInstr(Instr.genStore(var, initVal));
@@ -145,44 +147,64 @@ public class IrMaker {
                 //      or fold all in Validator.
                 Operand arrayLength = fromConstExp(def.constExp, function);
                 var.arrayLength = ((Const) arrayLength).num;
-                function.appendInstr(Instr.genAlloca(var, arrayLength));
+                function.appendInstr(Instr.genAlloc(var, arrayLength));
 
-                final ArrayList<Operand> initVals = new ArrayList<>();
-                if (!def.initVal.exps.isEmpty()) {
-                    for (AstExp exp : def.initVal.exps) {
-                        initVals.add(fromExp(exp, function));
-                    }
-                    for (int i = 0; i < initVals.size(); i++) {
-                        function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
-                    }
-                } else { // string const
-                    String strInitVal = def.initVal.stringConst.val.string;
-                    for (int i = 0; i < strInitVal.length(); i++) {
-                        char ch =  strInitVal.charAt(i);
-                        initVals.add(new Const(ch));
-                    }
-                    for (int i = 0; i < var.arrayLength; i++) {
-                        if (i < initVals.size()) {
+                if (def.initVal != null) {
+                    final ArrayList<Operand> initVals = new ArrayList<>();
+                    if (def.initVal.stringConst == null) {
+                        for (AstExp exp : def.initVal.exps) {
+                            initVals.add(fromExp(exp, function));
+                        }
+                        for (int i = 0; i < initVals.size(); i++) {
                             function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
-                        } else {
-                            // For constArray, init other vals to 0.
-                            function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                        }
+                    } else { // string const
+                        String strInitVal = def.initVal.stringConst.val.string;
+                        for (int i = 0; i < strInitVal.length(); i++) {
+                            char ch =  strInitVal.charAt(i);
+                            initVals.add(new Const(ch));
+                        }
+                        for (int i = 0; i < var.arrayLength; i++) {
+                            if (i < initVals.size()) {
+                                function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                            } else {
+                                // For constArray, init other vals to 0.
+                                function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                            }
                         }
                     }
                 }
             } else {
-                function.appendInstr(Instr.genAlloca(var));
+                function.appendInstr(Instr.genAlloc(var));
 
-                Operand initVal = fromExp(def.initVal.exp, function);
-                function.appendInstr(Instr.genStore(var, initVal));
+                if (def.initVal != null) {
+                    Operand initVal = fromExp(def.initVal.exp, function);
+                    function.appendInstr(Instr.genStore(var, initVal));
+                }
             }
         }
     }
 
     private void fromStmt(AstStmt stmt, Function function) {
+        // TODO getint
+        // TODO getchar
+        // TODO printf
+        // TODO for
+        // TODO break
+        // TODO continue
         if (stmt instanceof AstStmtSingleExp stmtSingleExp) {
             // FIXME generating unused code?
             fromExp(stmtSingleExp.exp, function);
+        } else if (stmt instanceof AstStmtAssign stmtAssign) {
+            Operand value = fromExp(stmtAssign.exp, function);
+            SymVar varSym = (SymVar) symTbl.searchSym(stmtAssign.lVal.ident);
+            Var var = varSym.irVar;
+            if (var.isArray) {
+                Operand arrayIndex = fromExp(stmtAssign.lVal.exp, function);
+                function.appendInstr(Instr.genStore(var, value, arrayIndex));
+            } else {
+                function.appendInstr(Instr.genStore(var, value));
+            }
         } else if (stmt instanceof AstStmtBlock stmtBlock) {
             fromBlock(stmtBlock.block, function, true);
         } else if (stmt instanceof AstStmtReturn stmtReturn) {
@@ -197,7 +219,7 @@ public class IrMaker {
                 Label labelEnd = new Label("if-end");
 
                 Operand cond = fromCond(stmtIf.cond, function);
-                function.appendInstr(Instr.genGoifnot(labelEnd, cond));
+                function.appendInstr(Instr.genGoIfNot(labelEnd, cond));
                 fromStmt(stmtIf.ifStmt, function);
                 function.appendInstr(Instr.genLabelDecl(labelEnd));
             } else {
@@ -213,7 +235,7 @@ public class IrMaker {
                 Label labelEnd = new Label("if-end");
 
                 Operand cond = fromCond(stmtIf.cond, function);
-                function.appendInstr(Instr.genGoifnot(labelElse, cond));
+                function.appendInstr(Instr.genGoIfNot(labelElse, cond));
                 fromStmt(stmtIf.ifStmt, function);
                 function.appendInstr(Instr.genGoto(labelEnd));
                 function.appendInstr(Instr.genLabelDecl(labelElse));
@@ -223,7 +245,17 @@ public class IrMaker {
         }
     }
 
-    private void fromForStmt(AstForStmt forStmt) {}
+    private void fromForStmt(AstForStmt forStmt, Function function) {
+        Operand value = fromExp(forStmt.exp, function);
+        SymVar varSym = (SymVar) symTbl.searchSym(forStmt.lVal.ident);
+        Var var = varSym.irVar;
+        if (var.isArray) {
+            Operand arrayIndex = fromExp(forStmt.lVal.exp, function);
+            function.appendInstr(Instr.genStore(var, value, arrayIndex));
+        } else {
+            function.appendInstr(Instr.genStore(var, value));
+        }
+    }
 
     private Operand fromCond(AstCond cond, Function function) {
         return fromLOrExp(cond.lOrExp, function);
@@ -288,7 +320,7 @@ public class IrMaker {
 
             for (AstEqExp eqExp : lAndExp.eqExps) {
                 Operand operand = fromEqExp(eqExp, function);
-                Instr instrGont = Instr.genGoifnot(labelFalse, operand);
+                Instr instrGont = Instr.genGoIfNot(labelFalse, operand);
                 function.appendInstr(instrGont);
             }
 
@@ -402,6 +434,7 @@ public class IrMaker {
     }
 
     private Operand fromUnaryExp(AstUnaryExp unaryExp, Function function) {
+        // TODO function call
         if (unaryExp instanceof AstUnaryExpPrimary u) {
             return fromPrimaryExp(u.primaryExp, function);
         } else if (unaryExp instanceof AstUnaryExpUnaryOp u) {
@@ -441,8 +474,20 @@ public class IrMaker {
             return fromNumber(primaryExp.number);
         } else if (primaryExp.character != null) {
             return fromCharacter(primaryExp.character);
+        } else if (primaryExp.lVal != null) {
+            Symbol symbol = symTbl.searchSym(primaryExp.lVal.ident);
+            Var var = symbol instanceof SymVar ? ((SymVar) symbol).irVar : ((SymConstVar) symbol).irVar;
+            Reg res = new Reg(var.type);
+            if (var.isArray) {
+                Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
+                function.appendInstr(Instr.genLoad(var, res, arrayIndex));
+            } else {
+                function.appendInstr(Instr.genLoad(var, res));
+            }
+            return res;
+        } else {
+            return null; // Ast error.
         }
-        return null; // Ast error.
     }
 
     // Load LVal to a register.

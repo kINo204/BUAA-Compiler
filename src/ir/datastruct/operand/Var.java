@@ -5,6 +5,10 @@ import datastruct.symbol.Symbol;
 import static ir.datastruct.Instr.Type.i32;
 import static ir.datastruct.Instr.Type.i8;
 
+/**
+ * This class can only be operand of Decl/Load/Store instructions. Direct
+ * participation in calculation instructions or others are not allowed.
+ */
 public class Var extends Operand {
     // Backup info in Symbol object.
     public final Symbol symbol;

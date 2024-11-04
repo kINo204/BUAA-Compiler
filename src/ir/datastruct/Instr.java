@@ -22,13 +22,13 @@ public class Instr implements Value {
         supl = s;
     }
 
-    static Instr genAlloca(Var var) {
+    static Instr genAlloc(Var var) {
         return new Instr(
                 Operator.ALLOC, var.type, var, null, null
         );
     }
 
-    static Instr genAlloca(Var var, Operand arrayLength) {
+    static Instr genAlloc(Var var, Operand arrayLength) {
         return new Instr(
                 Operator.ALLOC, var.type, var, arrayLength, null
         );
@@ -77,7 +77,7 @@ public class Instr implements Value {
         );
     }
 
-    static Instr genGoifnot(Label label, Operand condValue) {
+    static Instr genGoIfNot(Label label, Operand condValue) {
         return new Instr(
                 Operator.GONT, null, null, label, condValue
         );

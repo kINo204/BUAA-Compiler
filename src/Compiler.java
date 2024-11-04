@@ -9,65 +9,90 @@ import ir.datastruct.IrMaker;
 import java.io.*;
 
 public class Compiler {
+
+    private static FileReader sourceProgram;
+    private static Log lexerOut;
+    private static Log parserOut;
+    private static Log symbolOut;
+    private static Log irOut;
+    private static Log programOut;
+    private static Log errOut;
+
     /* Compiler execution entry point. */
     public static void main(String[] args) throws IOException {
-        FileReader sourceProgram = new FileReader("testfile.txt");
+        configureIO();
 
-        // Configure loggers.
-        Writer lexerWriter = new FileWriter("lexer.txt");
-        Log lexerOut = new Log();
-        lexerOut.addWriter("file", lexerWriter);
-        lexerOut.switchLogger(true);
+        /* Frontend. */
+        Lexer lexer = new Lexer(sourceProgram, lexerOut, errOut);
 
-        Writer parserWriter = new FileWriter("parser.txt");
-        Log parserOut = new Log();
-        parserOut.addWriter("file", parserWriter);
-        parserOut.switchLogger(true);
-
-        Writer symbolWriter = new FileWriter("symbol.txt");
-        Log symbolOut = new Log();
-        symbolOut.addWriter("file", symbolWriter);
-        symbolOut.switchLogger(true);
-
-        Writer irWriter = new FileWriter("ir.ll");
-        Log irOut = new Log();
-        irOut.addWriter("file", irWriter);
-        irOut.switchLogger(true);
-
-        Writer programWriter = new FileWriter("mips.txt");
-        Log programOut = new Log();
-        programOut.addWriter("file", programWriter);
-        programOut.switchLogger(true);
-
-        Writer err = new FileWriter("error.txt");
-        Log e = new Log();
-        e.addWriter("file err", err);
-        e.switchLogger(true);
-
-        // Connect the compiler.
-        Lexer lexer = new Lexer(sourceProgram, lexerOut, e);
-
-        Parser parser = new Parser(lexer, "CompUnit", parserOut, e);
+        Parser parser = new Parser(lexer, "CompUnit", parserOut, errOut);
         AstCompUnit ast = (AstCompUnit) parser.parse();
 
-        Validator validator = new Validator(ast, e);
+        Validator validator = new Validator(ast, errOut);
         validator.validateAst();
         symbolOut.print(validator.symTbl);
 
+        // Execute printing errors.
+        if (errOut.hasError()) {
+            errOut.executePrintErrors();
+            terminate(-1);
+        }
+
+        /* Mid. */
         IrMaker irMaker = new IrMaker(ast, validator.symTbl);
         Ir ir = irMaker.make();
         irOut.print(ir);
 
-        // Execute printing errors.
-        e.executePrintErrors();
+        terminate(0);
+    }
 
+    private static void configureIO() throws IOException {
+        sourceProgram = new FileReader("testfile.txt");
+
+        // Configure loggers.
+        Writer lexerWriter = new FileWriter("lexer.txt");
+        lexerOut = new Log();
+        lexerOut.addWriter("file", lexerWriter);
+        lexerOut.switchLogger(true);
+
+        Writer parserWriter = new FileWriter("parser.txt");
+        parserOut = new Log();
+        parserOut.addWriter("file", parserWriter);
+        parserOut.switchLogger(true);
+
+        Writer symbolWriter = new FileWriter("symbol.txt");
+        symbolOut = new Log();
+        symbolOut.addWriter("file", symbolWriter);
+        symbolOut.switchLogger(true);
+
+        Writer irWriter = new FileWriter("ir.ll");
+        irOut = new Log();
+        irOut.addWriter("file", irWriter);
+        irOut.switchLogger(true);
+
+        Writer programWriter = new FileWriter("mips.txt");
+        programOut = new Log();
+        programOut.addWriter("file", programWriter);
+        programOut.switchLogger(true);
+
+        Writer errWriter = new FileWriter("error.txt");
+        errOut = new Log();
+        errOut.addWriter("file err", errWriter);
+        errOut.switchLogger(true);
+    }
+
+    private static void terminate(int status) throws IOException {
         // Closing streams.
         sourceProgram.close();
+
         lexerOut.close();
         parserOut.close();
         symbolOut.close();
         irOut.close();
         programOut.close();
-        e.close();
+        errOut.close();
+
+        System.exit(status);
     }
+
 }
