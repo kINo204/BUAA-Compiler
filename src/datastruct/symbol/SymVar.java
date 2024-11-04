@@ -3,8 +3,12 @@ package datastruct.symbol;
 import datastruct.ast.AstFuncFParam;
 import datastruct.ast.AstVarDef;
 import datastruct.ast.Token;
+import ir.datastruct.operand.Operand;
+import ir.datastruct.operand.Reg;
+import ir.datastruct.operand.Var;
 
 public class SymVar extends Symbol {
+    public Var irVar;
     public final boolean isArray;
 
     public SymVar(AstVarDef varDef) {

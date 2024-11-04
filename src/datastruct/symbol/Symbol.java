@@ -6,6 +6,7 @@ import java.util.Objects;
 
 public abstract class Symbol {
     public final SymId symId;
+    public int symtblId;
     public String literal;
     public final int lineNo;
 

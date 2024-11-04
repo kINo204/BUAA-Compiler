@@ -433,7 +433,7 @@ public class Parser {
             expectTokenId(SEMICN, "i");
         } else {
             assert lexer.lookAhead(0).getTokenId() == SEMICN;
-            lexer.read(); // TODO expect?
+            lexer.read();
         }
 
         loggerOut.println(stmtSingleExp.output());

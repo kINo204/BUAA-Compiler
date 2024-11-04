@@ -29,8 +29,8 @@ public class SymTbl {
         }
     }
 
-    public Symbol searchSym(Token token) {
-        String literal = token.literal;
+    public Symbol searchSym(Token identToken) {
+        String literal = identToken.literal;
         Scope seaching = currentScope;
         while (seaching != null) {
             Symbol res = seaching.searchSym(literal);

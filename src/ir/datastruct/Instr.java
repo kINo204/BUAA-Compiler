@@ -1,11 +1,9 @@
 package ir.datastruct;
 
-import datastruct.symbol.Symbol;
 import ir.datastruct.operand.Label;
 import ir.datastruct.operand.Operand;
 import ir.datastruct.operand.Reg;
-
-import static datastruct.symbol.Symbol.SymId.*;
+import ir.datastruct.operand.Var;
 
 public class Instr implements Value {
     Operator op;
@@ -23,6 +21,43 @@ public class Instr implements Value {
         main = m;
         supl = s;
     }
+
+    static Instr genAlloca(Var var) {
+        return new Instr(
+                Operator.ALLOC, var.type, var, null, null
+        );
+    }
+
+    static Instr genAlloca(Var var, Operand arrayLength) {
+        return new Instr(
+                Operator.ALLOC, var.type, var, arrayLength, null
+        );
+    }
+
+    static Instr genLoad(Var var, Reg reg) {
+        return new Instr(
+                Operator.LOAD, var.type, reg, var, null
+        );
+    }
+
+    static Instr genStore(Var var, Operand value) {
+        return new Instr(
+                Operator.STORE, var.type, var, value, null
+        );
+    }
+
+    static Instr genLoad(Var var, Reg reg, Operand arrayIndex) {
+        return new Instr(
+                Operator.LOAD, var.type, reg, var, arrayIndex
+        );
+    }
+
+    static Instr genStore(Var var, Operand value, Operand arrayIndex) {
+        return new Instr(
+                Operator.STORE, var.type, var, value, arrayIndex
+        );
+    }
+
 
     static Instr genGoto(Value target) {
         return new Instr(
@@ -66,36 +101,42 @@ public class Instr implements Value {
         return new Instr(Operator.RET);
     }
 
-    static Instr genReturn(Operand returnExp, Symbol.SymId typeToken) {
-        Type t = typeToken == Int || typeToken == ConstInt ? Type.i32 :
-                typeToken == Char || typeToken == ConstChar ? Type.i8 :
-                        null; // Error type!
+    static Instr genReturn(Operand returnExp) {
         return new Instr(
-                Operator.RET, t, null, returnExp, null
+                Operator.RET, returnExp.type, null, returnExp, null
         );
     }
 
-    static Instr genCalc(Operator op, Symbol.SymId typeToken, Reg res, Operand main, Operand supl) {
-        Type t = typeToken == Int || typeToken == ConstInt ? Type.i32 :
-                typeToken == Char || typeToken == ConstChar ? Type.i8 :
-                        null; // Error type!
+    static Instr genCalc(Operator op, Reg res, Operand main, Operand supl) {
         return new Instr(
-                op, t, res, main, supl
+                op, res.type, res, main, supl
         );
     }
 
     static Instr genMove(Operand from, Operand to) {
         return new Instr(
-                Operator.MOVE, null, to, from, null
+                Operator.MOVE, to.type, to, from, null
         );
     }
 
     @Override
     public String toString() {
         if (op == Operator.MOVE) {
-            return res + " = " + main;
+            return res + ": " + type + " = " + main;
         } else if (op == Operator.LABEL) {
             return "label  " + res;
+        } else if (op == Operator.LOAD) {
+            String str = String.format("%s: %s = %s", res, type, main);
+            if (supl != null) {
+                str += String.format("[%s]", supl);
+            }
+            return str;
+        } else if (op == Operator.STORE) {
+            if (supl != null) {
+                return String.format("%s[%s]: %s = %s", res, supl, type, main);
+            } else {
+                return String.format("%s: %s = %s", res, type, main);
+            }
         } else {
             StringBuilder sb = new StringBuilder();
             if (res != null) {
@@ -116,15 +157,15 @@ public class Instr implements Value {
         }
     }
 
-    enum Type {
+    public enum Type {
         i8, i32, VOID
     }
 
     enum Operator {
         // Memory
-        ALLOCA,
-        LOD,
-        STO,
+        ALLOC,
+        LOAD,
+        STORE,
 
         // Arithmetic
         ADD,

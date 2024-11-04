@@ -1,14 +1,14 @@
 package ir.datastruct;
 
 import datastruct.ast.*;
-import datastruct.symbol.Symbol;
+import datastruct.symbol.SymConstVar;
+import datastruct.symbol.SymVar;
 import datastruct.symtbl.SymTbl;
-import ir.datastruct.operand.Const;
-import ir.datastruct.operand.Label;
-import ir.datastruct.operand.Operand;
-import ir.datastruct.operand.Reg;
+import ir.datastruct.operand.*;
 
 import java.util.ArrayList;
+
+import static ir.datastruct.Instr.Type.*;
 
 public class IrMaker {
     private final AstCompUnit tree;
@@ -18,6 +18,7 @@ public class IrMaker {
     public IrMaker(AstCompUnit tree, SymTbl symTbl) {
         this.tree = tree;
         this.symTbl = symTbl;
+        symTbl.initVisits();
     }
 
     public Ir make() {
@@ -29,7 +30,7 @@ public class IrMaker {
     // Calling contract: on calling "fromXXX", parts of IR for XXX will be generated.
     private void fromCompUnit(AstCompUnit compUnit) {
         ir.module = new Module();
-        // TODO other elements
+        // TODO other elements: global decl & functions
         fromMainFuncDef(compUnit.mainFuncDef, ir.module);
     }
 
@@ -44,14 +45,22 @@ public class IrMaker {
     private void fromMainFuncDef(AstMainFuncDef mainFuncDef, Module module) {
         Function function = new Function(true);
         Reg.reset();
-        fromBlock(mainFuncDef.block, function);
+        symTbl.enterScope();
+
+        fromBlock(mainFuncDef.block, function, false);
+
+        symTbl.exitScope();
         module.functions.add(function);
     }
 
-    private void fromBlock(AstBlock block, Function function) {
+    private void fromBlock(AstBlock block, Function function, boolean enterScope) {
+        if (enterScope) symTbl.enterScope();
+
         for (AstBlockItem blockItem : block.blockItems) {
             fromBlockItem(blockItem, function);
         }
+
+        if (enterScope) symTbl.exitScope();
     }
 
     private void fromBlockItem(AstBlockItem blockItem, Function function) {
@@ -62,29 +71,126 @@ public class IrMaker {
         }
     }
 
-    private void fromDecl(AstDecl decl, Function function) {}
+    private void fromDecl(AstDecl decl, Function function) {
+        if (decl.content instanceof AstVarDecl varDecl) {
+            fromVarDecl(varDecl, function);
+        } else {
+            AstConstDecl constDecl = (AstConstDecl) decl.content;
+            fromConstDecl(constDecl, function);
+        }
+    }
 
-    private void fromConstDecl(AstConstDecl constDecl) {}
+    private void fromConstDecl(AstConstDecl constDecl, Function function) {
+        for (AstConstDef def : constDecl.constDefs) {
+            SymConstVar varSymbol = (SymConstVar) symTbl.searchSym(def.ident);
+            Var var = new Var(varSymbol);
+            varSymbol.irVar = var;
 
-    private void fromConstDef(AstConstDef constDef) {}
+            if (var.isArray) {
+                // TODO We must fold this `constExp` at compile time! Then the
+                //      operand will be just a `Const` type.
+                //      `def.constExp = Calculator.calc(def.constExp);`
+                //      or fold all in Validator.
+                Operand arrayLength = fromConstExp(def.constExp, function);
+                var.arrayLength = ((Const) arrayLength).num;
+                function.appendInstr(Instr.genAlloca(var, arrayLength));
 
-    private void fromConstInitVal(AstConstInitVal constInitVal) {}
+                final ArrayList<Operand> initVals = new ArrayList<>();
+                if (!def.constInitVal.constExps.isEmpty()) {
+                    for (AstConstExp constExp : def.constInitVal.constExps) {
+                        initVals.add(fromConstExp(constExp, function));
+                    }
+                    for (int i = 0; i < var.arrayLength; i++) {
+                        if (i < initVals.size()) {
+                            function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                        } else {
+                            // For constArray, init other vals to 0.
+                            function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                        }
+                    }
+                } else { // string const
+                    String strInitVal = def.constInitVal.stringConst.val.string;
+                    for (int i = 0; i < strInitVal.length(); i++) {
+                        char ch =  strInitVal.charAt(i);
+                        initVals.add(new Const(ch));
+                    }
+                    for (int i = 0; i < var.arrayLength; i++) {
+                        if (i < initVals.size()) {
+                            function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                        } else {
+                            // For constArray, init other vals to 0.
+                            function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                        }
+                    }
+                }
+            } else {
+                function.appendInstr(Instr.genAlloca(var));
 
-    private void fromVarDecl(AstVarDecl varDecl) {}
+                Operand initVal = fromConstExp(def.constInitVal.constExp, function);
+                function.appendInstr(Instr.genStore(var, initVal));
+            }
+        }
+    }
 
-    private void fromVarDef(AstVarDef varDef) {}
+    private void fromVarDecl(AstVarDecl varDecl, Function function) {
+        for (AstVarDef def : varDecl.varDefs) {
+            SymVar varSymbol = (SymVar) symTbl.searchSym(def.ident);
+            Var var = new Var(varSymbol);
+            varSymbol.irVar = var;
 
-    private void fromInitVal(AstInitVal initVal) {}
+            if (var.isArray) {
+                // TODO We must fold this `constExp` at compile time! Then the
+                //      operand will be just a `Const` type.
+                //      `def.constExp = Calculator.calc(def.constExp);`
+                //      or fold all in Validator.
+                Operand arrayLength = fromConstExp(def.constExp, function);
+                var.arrayLength = ((Const) arrayLength).num;
+                function.appendInstr(Instr.genAlloca(var, arrayLength));
+
+                final ArrayList<Operand> initVals = new ArrayList<>();
+                if (!def.initVal.exps.isEmpty()) {
+                    for (AstExp exp : def.initVal.exps) {
+                        initVals.add(fromExp(exp, function));
+                    }
+                    for (int i = 0; i < initVals.size(); i++) {
+                        function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                    }
+                } else { // string const
+                    String strInitVal = def.initVal.stringConst.val.string;
+                    for (int i = 0; i < strInitVal.length(); i++) {
+                        char ch =  strInitVal.charAt(i);
+                        initVals.add(new Const(ch));
+                    }
+                    for (int i = 0; i < var.arrayLength; i++) {
+                        if (i < initVals.size()) {
+                            function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                        } else {
+                            // For constArray, init other vals to 0.
+                            function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                        }
+                    }
+                }
+            } else {
+                function.appendInstr(Instr.genAlloca(var));
+
+                Operand initVal = fromExp(def.initVal.exp, function);
+                function.appendInstr(Instr.genStore(var, initVal));
+            }
+        }
+    }
 
     private void fromStmt(AstStmt stmt, Function function) {
-        if (stmt instanceof AstStmtBlock stmtBlock) {
-            fromBlock(stmtBlock.block, function);
+        if (stmt instanceof AstStmtSingleExp stmtSingleExp) {
+            // FIXME generating unused code?
+            fromExp(stmtSingleExp.exp, function);
+        } else if (stmt instanceof AstStmtBlock stmtBlock) {
+            fromBlock(stmtBlock.block, function, true);
         } else if (stmt instanceof AstStmtReturn stmtReturn) {
             if (stmtReturn.exp == null) {
                 function.appendInstr(Instr.genReturn());
             } else {
                 Operand val = fromExp(stmtReturn.exp, function);
-                function.appendInstr(Instr.genReturn(val, stmtReturn.exp.type));
+                function.appendInstr(Instr.genReturn(val));
             }
         } else if (stmt instanceof AstStmtIf stmtIf) {
             if (stmtIf.elseStmt == null) {
@@ -160,7 +266,7 @@ public class IrMaker {
                 function.appendInstr(instrGoif);
             }
 
-            Reg res = new Reg();
+            Reg res = new Reg(i32);
             function.appendInstr(Instr.genMove(new Const(0), res));
             function.appendInstr(Instr.genGoto(labelEnd));
 
@@ -186,7 +292,7 @@ public class IrMaker {
                 function.appendInstr(instrGont);
             }
 
-            Reg res = new Reg();
+            Reg res = new Reg(i32);
             function.appendInstr(Instr.genMove(new Const(1), res));
             function.appendInstr(Instr.genGoto(labelEnd));
 
@@ -210,14 +316,14 @@ public class IrMaker {
             Operand totRes = values.get(0);
             for (int i = 1; i < values.size(); i++) {
                 final Operand next = values.get(i);
-                Reg calcRes = new Reg();
+                Reg calcRes = new Reg(i32);
                 Token.TokenId opToken = eqExp.operators.get(i - 1);
                 Instr.Operator op = switch (opToken) {
                     case EQL -> Instr.Operator.EQL;
                     case NEQ -> Instr.Operator.NEQ;
                     default -> null; // ERROR
                 };
-                function.appendInstr(Instr.genCalc(op, Symbol.SymId.Int, calcRes, totRes, next));
+                function.appendInstr(Instr.genCalc(op, calcRes, totRes, next));
                 totRes = calcRes;
             }
             return totRes;
@@ -235,7 +341,7 @@ public class IrMaker {
             Operand totRes = values.get(0);
             for (int i = 1; i < values.size(); i++) {
                 final Operand next = values.get(i);
-                Reg calcRes = new Reg();
+                Reg calcRes = new Reg(i32);
                 Token.TokenId opToken = relExp.operators.get(i - 1);
                 Instr.Operator op = switch (opToken) {
                     case GRE -> Instr.Operator.GRE;
@@ -244,7 +350,7 @@ public class IrMaker {
                     case LEQ -> Instr.Operator.LEQ;
                     default -> null; // ERROR
                 };
-                function.appendInstr(Instr.genCalc(op, Symbol.SymId.Int, calcRes, totRes, next));
+                function.appendInstr(Instr.genCalc(op, calcRes, totRes, next));
                 totRes = calcRes;
             }
             return totRes;
@@ -262,10 +368,10 @@ public class IrMaker {
             Operand totRes = values.get(0);
             for (int i = 1; i < values.size(); i++) {
                 final Operand next = values.get(i);
-                Reg calcRes = new Reg();
+                Reg calcRes = new Reg(i32);
                 Instr.Operator op = addExp.operators.get(i - 1) ==
                         Token.TokenId.PLUS ? Instr.Operator.ADD : Instr.Operator.SUB;
-                function.appendInstr(Instr.genCalc(op, addExp.type/* TODO: using total type here */, calcRes, totRes, next));
+                function.appendInstr(Instr.genCalc(op, calcRes, totRes, next));
                 totRes = calcRes;
             }
             return totRes;
@@ -283,12 +389,12 @@ public class IrMaker {
             Operand totRes = values.get(0);
             for (int i = 1; i < values.size(); i++) {
                 final Operand next = values.get(i);
-                Reg calcRes = new Reg();
+                Reg calcRes = new Reg(i32);
                 Instr.Operator op =
                         mulExp.operators.get(i - 1) == Token.TokenId.MULT ? Instr.Operator.MUL :
                         mulExp.operators.get(i - 1) == Token.TokenId.DIV  ? Instr.Operator.DIV :
                                 Instr.Operator.MOD;
-                function.appendInstr(Instr.genCalc(op, mulExp.type/* TODO: using total type here */, calcRes, totRes, next));
+                function.appendInstr(Instr.genCalc(op, calcRes, totRes, next));
                 totRes = calcRes;
             }
             return totRes;
@@ -302,18 +408,18 @@ public class IrMaker {
             Operand operandUnaryExp = fromUnaryExp(u.unaryExp, function);
             switch (u.unaryOp.op.tokenId) {
                 case MINU -> {
-                    Reg res = new Reg();
+                    Reg res = new Reg(i32);
                     function.appendInstr(
                             Instr.genCalc(Instr.Operator.SUB,
-                                    Symbol.SymId.Int, res, new Const(0), operandUnaryExp)
+                                    res, new Const(0), operandUnaryExp)
                     );
                     return res;
                 }
                 case NOT -> {
-                    Reg res = new Reg();
+                    Reg res = new Reg(i32);
                     function.appendInstr(
                             Instr.genCalc(Instr.Operator.EQL,
-                                    Symbol.SymId.Int, res, operandUnaryExp, new Const(0))
+                                    res, operandUnaryExp, new Const(0))
                     );
                     return res;
                 }

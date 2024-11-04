@@ -1,4 +1,7 @@
 package ir.datastruct.operand;
 
-public interface Operand {
+import ir.datastruct.Instr;
+
+public abstract class Operand {
+    public Instr.Type type = null;
 }

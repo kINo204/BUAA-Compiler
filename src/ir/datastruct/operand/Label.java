@@ -2,14 +2,14 @@ package ir.datastruct.operand;
 
 import ir.datastruct.Value;
 
-public class Label implements Operand {
+public class Label extends Operand {
     private static int index = 0;
     private final String name;
 
     public Value target = null;
 
     public Label(String text) {
-        name = "_" + index + ":" + text;
+        name = "_" + index + "_" + text;
         index++;
     }
 

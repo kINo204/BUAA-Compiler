@@ -1,6 +1,8 @@
 package ir.datastruct.operand;
 
-public class Reg implements Operand {
+import ir.datastruct.Instr;
+
+public class Reg extends Operand {
     private static int index = 1;
 
     public static void reset() {
@@ -9,9 +11,10 @@ public class Reg implements Operand {
 
     public final int number;
 
-    public Reg() {
+    public Reg(Instr.Type type) {
         number = index;
         index += 1;
+        super.type = type;
     }
 
     @Override

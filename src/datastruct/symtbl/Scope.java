@@ -37,6 +37,7 @@ class Scope {
     void addSym(Symbol symbol) {
         symbolMap.put(symbol.literal, symbol);
         symbolArray.add(symbol);
+        symbol.symtblId = this.id;
     }
 
     @Override

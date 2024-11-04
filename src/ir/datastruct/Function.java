@@ -27,7 +27,7 @@ class Function implements Value {
         instrs.add(i);
     }
 
-    public ArrayList<Instr> debugGetInstrs() {
+    public ArrayList<Instr> genInstrs() {
         return instrs;
     }
 
@@ -38,55 +38,55 @@ class Function implements Value {
     }
 
     // TODO BasicBlock -> Instrs
-    public ArrayList<Instr> genInstrs() {
-        final ArrayList<Instr> instrs = new ArrayList<>();
-
-        // Re-generate jumping instrs && labels.
-        final ArrayList<Instr> jumping = new ArrayList<>(); // Index for refill.
-        for (BasicBlock b : basicBlocks) {
-            if (b.conditionValue == null) {
-                BasicBlock tar = b.nextDefault;
-                if (tar != null // an exit of the function
-                        && basicBlocks.indexOf(b) < basicBlocks.size() - 1 // not at last
-                        && tar != basicBlocks.get(basicBlocks.indexOf(b) + 1) // not going to following
-                ) {
-                    Instr j = Instr.genGoto(tar);
-                    b.instructions.add(j); // Add to tail of instrs of the block.
-                    jumping.add(j); // Add to to-refill index.
-                }
-            } else {
-                BasicBlock tar = b.nextTrue;
-                if (tar != null // an exit of the function
-                        && basicBlocks.indexOf(b) < basicBlocks.size() - 1 // not at last
-                        && tar != basicBlocks.get(basicBlocks.indexOf(b) + 1) // not going to following
-                ) {
-                    Instr j = Instr.genGoif(tar, b.conditionValue);
-                    b.instructions.add(j);
-                    jumping.add(j);
-                }
-
-                tar = b.nextFalse;
-                if (tar != null // an exit of the function
-                        && basicBlocks.indexOf(b) < basicBlocks.size() - 1 // not at last
-                        && tar != basicBlocks.get(basicBlocks.indexOf(b) + 1) // not going to following
-                ) {
-                    Instr j = Instr.genGoto(tar);
-                    b.instructions.add(j);
-                    jumping.add(j);
-                }
-            }
-        }
-        // Do refill: replace Block target by Instr target.
-        for (Instr j : jumping) {
-            Instr tar = ((BasicBlock) j.main).getEntry();
-            j.main = new Label(tar);
-        }
-
-        for (BasicBlock b : basicBlocks) {
-            instrs.addAll(b.genInstrs());
-        }
-        return instrs;
-    }
+//    public ArrayList<Instr> toInstrs() {
+//        final ArrayList<Instr> instrs = new ArrayList<>();
+//
+//        // Re-generate jumping instrs && labels.
+//        final ArrayList<Instr> jumping = new ArrayList<>(); // Index for refill.
+//        for (BasicBlock b : basicBlocks) {
+//            if (b.conditionValue == null) {
+//                BasicBlock tar = b.nextDefault;
+//                if (tar != null // an exit of the function
+//                        && basicBlocks.indexOf(b) < basicBlocks.size() - 1 // not at last
+//                        && tar != basicBlocks.get(basicBlocks.indexOf(b) + 1) // not going to following
+//                ) {
+//                    Instr j = Instr.genGoto(tar);
+//                    b.instructions.add(j); // Add to tail of instrs of the block.
+//                    jumping.add(j); // Add to to-refill index.
+//                }
+//            } else {
+//                BasicBlock tar = b.nextTrue;
+//                if (tar != null // an exit of the function
+//                        && basicBlocks.indexOf(b) < basicBlocks.size() - 1 // not at last
+//                        && tar != basicBlocks.get(basicBlocks.indexOf(b) + 1) // not going to following
+//                ) {
+//                    Instr j = Instr.genGoif(tar, b.conditionValue);
+//                    b.instructions.add(j);
+//                    jumping.add(j);
+//                }
+//
+//                tar = b.nextFalse;
+//                if (tar != null // an exit of the function
+//                        && basicBlocks.indexOf(b) < basicBlocks.size() - 1 // not at last
+//                        && tar != basicBlocks.get(basicBlocks.indexOf(b) + 1) // not going to following
+//                ) {
+//                    Instr j = Instr.genGoto(tar);
+//                    b.instructions.add(j);
+//                    jumping.add(j);
+//                }
+//            }
+//        }
+//        // Do refill: replace Block target by Instr target.
+//        for (Instr j : jumping) {
+//            Instr tar = ((BasicBlock) j.main).getEntry();
+//            j.main = new Label(tar);
+//        }
+//
+//        for (BasicBlock b : basicBlocks) {
+//            instrs.addAll(b.genInstrs());
+//        }
+//        return instrs;
+//    }
 
     @Override
     public String toString() {
@@ -97,7 +97,7 @@ class Function implements Value {
             assert symbol != null;
             sb.append("fun ").append(symbol.literal).append(":\n");
         }
-        for (Instr i : debugGetInstrs()) {
+        for (Instr i : genInstrs()) {
             sb.append("\t").append(i.toString()).append("\n");
         }
         sb.deleteCharAt(sb.length() - 1);
