@@ -189,7 +189,6 @@ public class IrMaker {
         // TODO getint
         // TODO getchar
         // TODO printf
-        // TODO for
         // TODO break
         // TODO continue
         if (stmt instanceof AstStmtSingleExp stmtSingleExp) {
@@ -242,6 +241,16 @@ public class IrMaker {
                 fromStmt(stmtIf.elseStmt, function);
                 function.appendInstr(Instr.genLabelDecl(labelEnd));
             }
+        } else if (stmt instanceof AstStmtFor stmtFor) {
+            Label forStart = new Label("for-start"), forEnd = new Label("for-end");
+            fromForStmt(stmtFor.firstForStmt, function);
+            function.appendInstr(Instr.genLabelDecl(forStart));
+            Operand cond = fromCond(stmtFor.cond, function);
+            function.appendInstr(Instr.genGoIfNot(forEnd, cond));
+            fromStmt(stmtFor.stmt, function);
+            fromForStmt(stmtFor.thirdForStmt, function);
+            function.appendInstr(Instr.genGoto(forStart));
+            function.appendInstr(Instr.genLabelDecl(forEnd));
         }
     }
 
