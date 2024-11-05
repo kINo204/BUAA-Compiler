@@ -122,27 +122,27 @@ public class Instr implements Value {
     @Override
     public String toString() {
         if (op == Operator.MOVE) {
-            return res + ": " + type + " = " + main;
+            return "\t" + res + ": " + type + " = " + main;
         } else if (op == Operator.LABEL) {
-            return "label  " + res;
+            return "\n" + res + ":";
         } else if (op == Operator.LOAD) {
-            String str = String.format("%s: %s = %s", res, type, main);
+            String str = String.format("\t%s: %s = %s", res, type, main);
             if (supl != null) {
                 str += String.format("[%s]", supl);
             }
             return str;
         } else if (op == Operator.STORE) {
             if (supl != null) {
-                return String.format("%s[%s]: %s = %s", res, supl, type, main);
+                return String.format("\t%s[%s]: %s = %s", res, supl, type, main);
             } else {
-                return String.format("%s: %s = %s", res, type, main);
+                return String.format("\t%s: %s = %s", res, type, main);
             }
         } else {
             StringBuilder sb = new StringBuilder();
             if (res != null) {
-                sb.append(String.format("%s = %s", res.toString().toLowerCase(), op.toString().toLowerCase()));
+                sb.append(String.format("\t%s = %s", res.toString().toLowerCase(), op.toString().toLowerCase()));
             } else {
-                sb.append(String.format("%s", op.toString().toLowerCase()));
+                sb.append(String.format("\t%s", op.toString().toLowerCase()));
             }
             if (type != null) {
                 sb.append(String.format(": %s", type.toString().toLowerCase()));

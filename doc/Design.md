@@ -155,6 +155,7 @@ Instr(Operator, Type, Operand, Operand, Operand)
 Operand
 => Const
 => Reg
+=> Var
 => Label
 ```
 
@@ -171,6 +172,13 @@ Secondly, there tends to be a contract between IR and MIPS generator that, for a
 #### 6.2.3 IR language specifications
 
 ### 6.3 Target code
+
+Targe code generation goals:
+
+- Pretty use of memory hierarchy;
+- Minimizing pipeline stalls;
+
+
 
 ## 7. Tests
 

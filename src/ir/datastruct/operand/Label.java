@@ -9,7 +9,7 @@ public class Label extends Operand {
     public Value target = null;
 
     public Label(String text) {
-        name = "_" + index + "_" + text;
+        name = "$" + index + "_" + text;
         index++;
     }
 
