@@ -3,6 +3,7 @@ package datastruct.symtbl;
 import datastruct.ast.Token;
 import datastruct.symbol.Symbol;
 import io.Log;
+import ir.datastruct.operand.Label;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -69,6 +70,18 @@ public class SymTbl {
         scopes.add(newScope);
         // Enter that new scope:
         currentScope = newScope;
+    }
+
+    public void setLoopLabels(Label forStart, Label forEnd) {
+        currentScope.setLoopLabels(forStart, forEnd, true);
+    }
+
+    public Label getCurLoopStart() {
+        return currentScope.forStart;
+    }
+
+    public Label getCurLoopEnd() {
+        return currentScope.forEnd;
     }
 
     public void enterScope() {

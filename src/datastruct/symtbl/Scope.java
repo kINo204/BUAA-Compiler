@@ -2,6 +2,7 @@ package datastruct.symtbl;
 
 import datastruct.ast.Token;
 import datastruct.symbol.Symbol;
+import ir.datastruct.operand.Label;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,8 @@ class Scope {
     final ArrayList<Scope> subScopes = new ArrayList<>();
 
     final boolean inLoop;
+    Label forStart;
+    Label forEnd;
     final Symbol.SymId functionEnv;
 
     int subScopeVisitingIndex = 0;
@@ -38,6 +41,16 @@ class Scope {
         symbolMap.put(symbol.literal, symbol);
         symbolArray.add(symbol);
         symbol.symtblId = this.id;
+    }
+
+    void setLoopLabels(Label forStart, Label forEnd, boolean rootCall) {
+        if (!rootCall) {
+            this.forStart = forStart;
+            this.forEnd = forEnd;
+        }
+        for (Scope scope : subScopes) {
+            scope.setLoopLabels(forStart, forEnd, false);
+        }
     }
 
     @Override
