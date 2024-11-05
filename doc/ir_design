@@ -14,3 +14,9 @@ Thoughts
 
 - "Compiling" design
 	- If we impl A->B, then we can use A to design.
+
+- Function para: push&pop ?
+
+- Return design?
+	- locally / jumping?
+

@@ -98,7 +98,7 @@ class Function implements Value {
             sb.append("fun ").append(symbol.literal).append(":\n");
         }
         for (Instr i : genInstrs()) {
-            sb.append("\t").append(i.toString()).append("\n");
+            sb.append(i.toString()).append("\n");
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
