@@ -189,8 +189,6 @@ public class IrMaker {
         // TODO getint
         // TODO getchar
         // TODO printf
-        // TODO break
-        // TODO continue
         if (stmt instanceof AstStmtSingleExp stmtSingleExp) {
             // FIXME generating unused code?
             fromExp(stmtSingleExp.exp, function);
@@ -243,6 +241,7 @@ public class IrMaker {
             }
         } else if (stmt instanceof AstStmtFor stmtFor) {
             Label forStart = new Label("for-start"), forEnd = new Label("for-end");
+            symTbl.setLoopLabels(forStart, forEnd);
             fromForStmt(stmtFor.firstForStmt, function);
             function.appendInstr(Instr.genLabelDecl(forStart));
             Operand cond = fromCond(stmtFor.cond, function);
@@ -251,6 +250,12 @@ public class IrMaker {
             fromForStmt(stmtFor.thirdForStmt, function);
             function.appendInstr(Instr.genGoto(forStart));
             function.appendInstr(Instr.genLabelDecl(forEnd));
+        } else if (stmt instanceof AstStmtBreak) {
+            Label forEnd = symTbl.getCurLoopEnd();
+            function.appendInstr(Instr.genGoto(forEnd));
+        } else if (stmt instanceof AstStmtContinue) {
+            Label forStart = symTbl.getCurLoopStart();
+            function.appendInstr(Instr.genGoto(forStart));
         }
     }
 
