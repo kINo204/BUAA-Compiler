@@ -59,33 +59,21 @@ public class Instr implements Value {
     }
 
 
-    static Instr genGoto(Value target) {
-        return new Instr(
-                Operator.GOTO, null, null, new Label(target), null
-        );
-    }
-
     static Instr genGoto(Label label) {
         return new Instr(
-                Operator.GOTO, null, null, label, null
+                Operator.GOTO, null, label, null, null
         );
     }
 
     static Instr genGoif(Label label, Operand condValue) {
         return new Instr(
-                Operator.GOIF, null, null, label, condValue
+                Operator.GOIF, null, label, condValue, null
         );
     }
 
     static Instr genGoIfNot(Label label, Operand condValue) {
         return new Instr(
-                Operator.GONT, null, null, label, condValue
-        );
-    }
-
-    static Instr genGoif(Value target, Operand condValue) {
-        return new Instr(
-                Operator.GOIF, null, null, new Label(target), condValue
+                Operator.GONT, null, label, condValue, null
         );
     }
 
@@ -137,6 +125,8 @@ public class Instr implements Value {
             } else {
                 return String.format("\t%s: %s = %s", res, type, main);
             }
+        } else if (op == Operator.GOTO) {
+            return "\tgoto  " + res;
         } else if (op == Operator.GOIF || op == Operator.GONT) {
             String str;
             if (op == Operator.GOIF) {
@@ -144,7 +134,7 @@ public class Instr implements Value {
             } else {
                 str = "\tif not ";
             }
-            str += String.format("%s goto %s", supl, main);
+            str += String.format("%s goto  %s", main, res);
             return str;
         } else {
             StringBuilder sb = new StringBuilder();
