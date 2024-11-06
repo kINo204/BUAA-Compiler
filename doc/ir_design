@@ -20,3 +20,5 @@ Thoughts
 - Return design?
 	- locally / jumping?
 
+- Target code gen
+	- If no var on stack mem: no $sp operations

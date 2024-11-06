@@ -137,6 +137,15 @@ public class Instr implements Value {
             } else {
                 return String.format("\t%s: %s = %s", res, type, main);
             }
+        } else if (op == Operator.GOIF || op == Operator.GONT) {
+            String str;
+            if (op == Operator.GOIF) {
+                str = "\tif ";
+            } else {
+                str = "\tif not ";
+            }
+            str += String.format("%s goto %s", supl, main);
+            return str;
         } else {
             StringBuilder sb = new StringBuilder();
             if (res != null) {

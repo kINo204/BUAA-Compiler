@@ -12,6 +12,7 @@ class Function implements Value {
 
     // For optimization.
     ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
+    boolean containsCall; // If no braced call, $ra may not be saved.
 
     Function(Symbol symbol) {
         this.symbol = symbol;
