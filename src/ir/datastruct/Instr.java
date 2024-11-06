@@ -2,7 +2,7 @@ package ir.datastruct;
 
 import ir.datastruct.operand.*;
 
-public class Instr implements Value {
+public class Instr {
     Operator op;
     Type type = null;
     Operand res = null, main = null, supl = null;
