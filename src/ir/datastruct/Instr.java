@@ -25,74 +25,74 @@ public class Instr implements Value {
         );
     }
 
-    static Instr genParam(Operand param) {
+    public static Instr genParam(Operand param) {
         return new Instr(
                 Operator.PARAM, null, null, param, null
         );
     }
 
-    static Instr genFuncCall(Operand res, FuncRef funcRef) {
+    public static Instr genFuncCall(Operand res, FuncRef funcRef) {
         return new Instr(
                 Operator.CALL, res.type, res, funcRef, null
         );
     }
 
-    static Instr genAlloc(Var var) {
+    public static Instr genAlloc(Var var) {
         return new Instr(
                 Operator.ALLOC, var.type, var, null, null
         );
     }
 
-    static Instr genAlloc(Var var, Operand arrayLength) {
+    public static Instr genAlloc(Var var, Operand arrayLength) {
         return new Instr(
                 Operator.ALLOC, var.type, var, arrayLength, null
         );
     }
 
-    static Instr genLoad(Var var, Reg reg) {
+    public static Instr genLoad(Var var, Reg reg) {
         return new Instr(
                 Operator.LOAD, var.type, reg, var, null
         );
     }
 
-    static Instr genStore(Var var, Operand value) {
+    public static Instr genStore(Var var, Operand value) {
         return new Instr(
                 Operator.STORE, var.type, var, value, null
         );
     }
 
-    static Instr genLoad(Var var, Reg reg, Operand arrayIndex) {
+    public static Instr genLoad(Var var, Reg reg, Operand arrayIndex) {
         return new Instr(
                 Operator.LOAD, var.type, reg, var, arrayIndex
         );
     }
 
-    static Instr genStore(Var var, Operand value, Operand arrayIndex) {
+    public static Instr genStore(Var var, Operand value, Operand arrayIndex) {
         return new Instr(
                 Operator.STORE, var.type, var, value, arrayIndex
         );
     }
 
 
-    static Instr genGoto(Label label) {
+    public static Instr genGoto(Label label) {
         return new Instr(
                 Operator.GOTO, null, label, null, null
         );
     }
 
-    static Instr genGoif(Label label, Operand condValue) {
+    public static Instr genGoif(Label label, Operand condValue) {
         return new Instr(
                 Operator.GOIF, null, label, condValue, null
         );
     }
 
-    static Instr genGoIfNot(Label label, Operand condValue) {
+    public static Instr genGoIfNot(Label label, Operand condValue) {
         return new Instr(
                 Operator.GONT, null, label, condValue, null
         );
     }
 
-    static Instr genLabelDecl(Label label) {
+    public static Instr genLabelDecl(Label label) {
         Instr instr = new Instr(
                 Operator.LABEL, null, label, null, null
         );
@@ -100,23 +100,23 @@ public class Instr implements Value {
         return instr;
     }
 
-    static Instr genReturn() {
+    public static Instr genReturn() {
         return new Instr(Operator.RET);
     }
 
-    static Instr genReturn(Operand returnExp) {
+    public static Instr genReturn(Operand returnExp) {
         return new Instr(
                 Operator.RET, returnExp.type, null, returnExp, null
         );
     }
 
-    static Instr genCalc(Operator op, Reg res, Operand main, Operand supl) {
+    public static Instr genCalc(Operator op, Reg res, Operand main, Operand supl) {
         return new Instr(
                 op, res.type, res, main, supl
         );
     }
 
-    static Instr genMove(Operand from, Operand to) {
+    public static Instr genMove(Operand from, Operand to) {
         return new Instr(
                 Operator.MOVE, to.type, to, from, null
         );
@@ -177,7 +177,7 @@ public class Instr implements Value {
         i8, i32, VOID
     }
 
-    enum Operator {
+    public enum Operator {
         // Memory
         ALLOC,
         LOAD,

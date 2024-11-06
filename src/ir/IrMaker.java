@@ -1,4 +1,4 @@
-package ir.datastruct;
+package ir;
 
 import datastruct.ast.*;
 import datastruct.symbol.SymConstVar;
@@ -6,6 +6,9 @@ import datastruct.symbol.SymFunc;
 import datastruct.symbol.SymVar;
 import datastruct.symbol.Symbol;
 import datastruct.symtbl.SymTbl;
+import ir.datastruct.Function;
+import ir.datastruct.Instr;
+import ir.datastruct.Ir;
 import ir.datastruct.operand.*;
 
 import java.util.ArrayList;
@@ -31,7 +34,7 @@ public class IrMaker {
 
     // Calling contract: on calling "fromXXX", parts of IR for XXX will be generated.
     private void fromCompUnit(AstCompUnit compUnit) {
-        ir.module = new Module();
+        ir.module = new ir.datastruct.Module();
         // TODO global decl
         for (AstFuncDef funcDef : compUnit.funcDefs) {
             fromFuncDef(funcDef, ir.module);
@@ -39,7 +42,7 @@ public class IrMaker {
         fromMainFuncDef(compUnit.mainFuncDef, ir.module);
     }
 
-    private void fromFuncDef(AstFuncDef funcDef, Module module) {
+    private void fromFuncDef(AstFuncDef funcDef, ir.datastruct.Module module) {
         Function function = new Function((SymFunc) symTbl.searchSym(funcDef.ident));
         Reg.reset();
         symTbl.enterScope();
@@ -56,7 +59,7 @@ public class IrMaker {
 
     private void fromFuncFParam(AstFuncFParam funcFParam) {}
 
-    private void fromMainFuncDef(AstMainFuncDef mainFuncDef, Module module) {
+    private void fromMainFuncDef(AstMainFuncDef mainFuncDef, ir.datastruct.Module module) {
         Function function = new Function(true);
         Reg.reset();
         symTbl.enterScope();

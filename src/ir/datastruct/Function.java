@@ -7,7 +7,7 @@ import ir.datastruct.operand.Label;
 
 import java.util.ArrayList;
 
-class Function implements Value {
+public class Function implements Value {
     boolean isMain = false;
     final Symbol symbol;
     ArrayList<Instr> instrs = new ArrayList<>();
@@ -16,21 +16,21 @@ class Function implements Value {
     ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
     boolean containsCall; // If no braced call, $ra may not be saved.
 
-    Function(SymFunc symbol) {
+    public Function(SymFunc symbol) {
         this.symbol = symbol;
         FuncRef funcRef = new FuncRef(symbol);
         symbol.funcRef = funcRef;
         appendInstr(Instr.genFuncDef(funcRef));
     }
 
-    Function(boolean isMain) {
+    public Function(boolean isMain) {
         assert isMain;
         this.isMain = true;
         symbol = null;
         appendInstr(Instr.genFuncDef(new FuncRef(true)));
     }
 
-    void appendInstr(Instr i) {
+    public void appendInstr(Instr i) {
         instrs.add(i);
     }
 

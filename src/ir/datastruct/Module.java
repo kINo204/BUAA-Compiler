@@ -2,9 +2,9 @@ package ir.datastruct;
 
 import java.util.ArrayList;
 
-class Module implements Value {
+public class Module implements Value {
     // TODO Other elements in Module
-    ArrayList<Function> functions = new ArrayList<>();
+    public ArrayList<Function> functions = new ArrayList<>();
 
     @Override
     public String toString() {

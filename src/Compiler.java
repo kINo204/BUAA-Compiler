@@ -4,7 +4,7 @@ import frontend.Parser;
 import frontend.Validator;
 import io.Log;
 import ir.datastruct.Ir;
-import ir.datastruct.IrMaker;
+import ir.IrMaker;
 
 import java.io.*;
 
