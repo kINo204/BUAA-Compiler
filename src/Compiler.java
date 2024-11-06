@@ -5,10 +5,14 @@ import frontend.Validator;
 import io.Log;
 import ir.datastruct.Ir;
 import ir.IrMaker;
+import mips.MipsMinimalTranslator;
+import mips.MipsTranslator;
+import mips.datastruct.MipsProgram;
 
 import java.io.*;
 
 public class Compiler {
+    private static final boolean debugInfo = true;
 
     private static FileReader sourceProgram;
     private static Log lexerOut;
@@ -43,6 +47,11 @@ public class Compiler {
         Ir ir = irMaker.make();
         irOut.print(ir);
 
+        /* Backend. */
+        MipsTranslator translator = new MipsMinimalTranslator(ir);
+        MipsProgram program = translator.translate();
+        programOut.print(program);
+
         terminate(0);
     }
 
@@ -53,22 +62,22 @@ public class Compiler {
         Writer lexerWriter = new FileWriter("lexer.txt");
         lexerOut = new Log();
         lexerOut.addWriter("file", lexerWriter);
-        lexerOut.switchLogger(true);
+        lexerOut.switchLogger(debugInfo);
 
         Writer parserWriter = new FileWriter("parser.txt");
         parserOut = new Log();
         parserOut.addWriter("file", parserWriter);
-        parserOut.switchLogger(true);
+        parserOut.switchLogger(debugInfo);
 
         Writer symbolWriter = new FileWriter("symbol.txt");
         symbolOut = new Log();
         symbolOut.addWriter("file", symbolWriter);
-        symbolOut.switchLogger(true);
+        symbolOut.switchLogger(debugInfo);
 
         Writer irWriter = new FileWriter("ir.ll");
         irOut = new Log();
         irOut.addWriter("file", irWriter);
-        irOut.switchLogger(true);
+        irOut.switchLogger(debugInfo);
 
         Writer programWriter = new FileWriter("mips.txt");
         programOut = new Log();

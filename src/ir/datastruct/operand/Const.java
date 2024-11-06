@@ -1,9 +1,11 @@
 package ir.datastruct.operand;
 
+import mips.datastruct.MipsOperand;
+
 import static ir.datastruct.Instr.Type.i32;
 import static ir.datastruct.Instr.Type.i8;
 
-public class Const extends Operand {
+public class Const extends Operand implements MipsOperand {
     public Character ch = null;
     public Integer num = null;
 

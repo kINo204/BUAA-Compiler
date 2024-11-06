@@ -3,9 +3,9 @@ package ir.datastruct;
 import ir.datastruct.operand.*;
 
 public class Instr {
-    Operator op;
-    Type type = null;
-    Operand res = null, main = null, supl = null;
+    private final Operator op;
+    public Type type = null;
+    public Operand res = null, main = null, supl = null;
 
     Instr(Operator op) {
         this.op = op;
@@ -171,6 +171,10 @@ public class Instr {
             }
             return sb.toString();
         }
+    }
+
+    public Operator getOperator() {
+        return op;
     }
 
     public enum Type {

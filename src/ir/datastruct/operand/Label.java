@@ -1,9 +1,9 @@
 package ir.datastruct.operand;
 
 import ir.datastruct.Instr;
-import ir.datastruct.IrStruct;
+import mips.datastruct.MipsOperand;
 
-public class Label extends Operand {
+public class Label extends Operand implements MipsOperand {
     private static int index = 0;
     private final String name;
 
@@ -15,7 +15,7 @@ public class Label extends Operand {
     }
 
     public Label(Instr target) {
-        name = "_" + index;
+        name = "$L" + index;
         index++;
         this.target = target;
     }

@@ -1,14 +1,15 @@
 package ir.datastruct.operand;
 
 import datastruct.symbol.SymFunc;
+import mips.datastruct.MipsOperand;
 
 import static ir.datastruct.Instr.Type.*;
 
-public class FuncRef extends Operand {
+public class FuncRef extends Operand implements MipsOperand {
     // Backup info in symbol.
     private final SymFunc symbol;
 
-    private final String funcName;
+    public final String funcName;
     private final int symtblId;
 
     // TODO Params info:
