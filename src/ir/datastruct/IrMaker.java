@@ -2,6 +2,7 @@ package ir.datastruct;
 
 import datastruct.ast.*;
 import datastruct.symbol.SymConstVar;
+import datastruct.symbol.SymFunc;
 import datastruct.symbol.SymVar;
 import datastruct.symbol.Symbol;
 import datastruct.symtbl.SymTbl;
@@ -32,11 +33,22 @@ public class IrMaker {
     private void fromCompUnit(AstCompUnit compUnit) {
         ir.module = new Module();
         // TODO global decl
-        // TODO function def
+        for (AstFuncDef funcDef : compUnit.funcDefs) {
+            fromFuncDef(funcDef, ir.module);
+        }
         fromMainFuncDef(compUnit.mainFuncDef, ir.module);
     }
 
-    private void fromFuncDef(AstFuncDef funcDef) {}
+    private void fromFuncDef(AstFuncDef funcDef, Module module) {
+        Function function = new Function((SymFunc) symTbl.searchSym(funcDef.ident));
+        Reg.reset();
+        symTbl.enterScope();
+
+        fromBlock(funcDef.block, function, false);
+
+        symTbl.exitScope();
+        module.functions.add(function);
+    }
 
     private void fromFuncType(AstFuncType funcType) {}
 
@@ -448,7 +460,6 @@ public class IrMaker {
     }
 
     private Operand fromUnaryExp(AstUnaryExp unaryExp, Function function) {
-        // TODO function call
         if (unaryExp instanceof AstUnaryExpPrimary u) {
             return fromPrimaryExp(u.primaryExp, function);
         } else if (unaryExp instanceof AstUnaryExpUnaryOp u) {
@@ -475,11 +486,20 @@ public class IrMaker {
                     return operandUnaryExp;
                 }
             }
+        } else if (unaryExp instanceof AstUnaryExpFuncCall funcCall) {
+            if (funcCall.funcRParams != null) {
+                for (AstExp rParamExp : funcCall.funcRParams.exps) {
+                    Operand rParam = fromExp(rParamExp, function);
+                    function.appendInstr(Instr.genParam(rParam));
+                }
+            }
+            FuncRef funcRef = ((SymFunc) symTbl.searchSym(funcCall.funcIdent)).funcRef;
+            Reg res = new Reg(funcRef.type);
+            function.appendInstr(Instr.genFuncCall(res, funcRef));
+            return res;
         }
         return null;
     }
-
-    private void fromFuncRParams(AstFuncRParams funcRParams) {}
 
     private Operand fromPrimaryExp(AstPrimaryExp primaryExp, Function function) {
         if (primaryExp.bracedExp != null) {

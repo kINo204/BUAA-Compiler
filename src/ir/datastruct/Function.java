@@ -1,6 +1,8 @@
 package ir.datastruct;
 
+import datastruct.symbol.SymFunc;
 import datastruct.symbol.Symbol;
+import ir.datastruct.operand.FuncRef;
 import ir.datastruct.operand.Label;
 
 import java.util.ArrayList;
@@ -14,14 +16,18 @@ class Function implements Value {
     ArrayList<BasicBlock> basicBlocks = new ArrayList<>();
     boolean containsCall; // If no braced call, $ra may not be saved.
 
-    Function(Symbol symbol) {
+    Function(SymFunc symbol) {
         this.symbol = symbol;
+        FuncRef funcRef = new FuncRef(symbol);
+        symbol.funcRef = funcRef;
+        appendInstr(Instr.genFuncDef(funcRef));
     }
 
     Function(boolean isMain) {
         assert isMain;
         this.isMain = true;
         symbol = null;
+        appendInstr(Instr.genFuncDef(new FuncRef(true)));
     }
 
     void appendInstr(Instr i) {
@@ -92,12 +98,6 @@ class Function implements Value {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (isMain) {
-            sb.append("fun main:\n");
-        } else {
-            assert symbol != null;
-            sb.append("fun ").append(symbol.literal).append(":\n");
-        }
         for (Instr i : genInstrs()) {
             sb.append(i.toString()).append("\n");
         }

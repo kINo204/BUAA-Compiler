@@ -442,16 +442,17 @@ public class Validator {
             } else if (unaryExp instanceof AstUnaryExpUnaryOp p) {
                 SymId symId = typeof(p.unaryExp);
                 assert Arrays.asList(
-                        SymId.Int,
-                        SymId.Char,
-                        SymId.ConstInt,
-                        SymId.ConstChar).contains(symId);
+                        Int,
+                        Char,
+                        ConstInt,
+                        ConstChar).contains(symId);
                 return symId;
             } else if (unaryExp instanceof AstUnaryExpFuncCall p) {
                 Symbol s = symTbl.searchSym(p.funcIdent);
                 assert Arrays.asList(
-                        SymId.IntFunc,
-                        SymId.CharFunc).contains(s.symId);
+                        IntFunc,
+                        CharFunc,
+                        VoidFunc).contains(s.symId);
                 return switch (s.symId) {
                     case IntFunc -> SymId.Int;
                     case CharFunc -> SymId.Char;

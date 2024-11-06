@@ -3,6 +3,7 @@ package datastruct.symbol;
 import datastruct.ast.AstFuncDef;
 import datastruct.ast.AstFuncFParam;
 import datastruct.ast.Token;
+import ir.datastruct.operand.FuncRef;
 
 import java.util.ArrayList;
 
@@ -11,6 +12,7 @@ import static datastruct.ast.Token.TokenId.INTTK;
 
 public class SymFunc extends Symbol {
     public final ArrayList<SymId> types = new ArrayList<>();
+    public FuncRef funcRef;
 
     public SymFunc(AstFuncDef n) {
         super(

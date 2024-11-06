@@ -1,9 +1,6 @@
 package ir.datastruct;
 
-import ir.datastruct.operand.Label;
-import ir.datastruct.operand.Operand;
-import ir.datastruct.operand.Reg;
-import ir.datastruct.operand.Var;
+import ir.datastruct.operand.*;
 
 public class Instr implements Value {
     Operator op;
@@ -14,12 +11,30 @@ public class Instr implements Value {
         this.op = op;
     }
 
-    Instr(Operator op, Type t, Operand r, Operand m, Operand s) {
-        this.op = op;
-        type = t;
-        res = r;
-        main = m;
-        supl = s;
+    Instr(Operator operator, Type type, Operand res, Operand main, Operand supl) {
+        this.op = operator;
+        this.type = type;
+        this.res = res;
+        this.main = main;
+        this.supl = supl;
+    }
+
+    static Instr genFuncDef(FuncRef funcRef) {
+        return new Instr(
+                Operator.FUNC, funcRef.type, funcRef, null, null
+        );
+    }
+
+    static Instr genParam(Operand param) {
+        return new Instr(
+                Operator.PARAM, null, null, param, null
+        );
+    }
+
+    static Instr genFuncCall(Operand res, FuncRef funcRef) {
+        return new Instr(
+                Operator.CALL, res.type, res, funcRef, null
+        );
     }
 
     static Instr genAlloc(Var var) {
@@ -109,7 +124,9 @@ public class Instr implements Value {
 
     @Override
     public String toString() {
-        if (op == Operator.MOVE) {
+        if (op == Operator.FUNC) {
+            return "fun " + res + ":";
+        } else if (op == Operator.MOVE) {
             return "\t" + res + ": " + type + " = " + main;
         } else if (op == Operator.LABEL) {
             return "\n" + res + ":";
@@ -184,6 +201,10 @@ public class Instr implements Value {
         GOTO,
         GOIF,
         GONT,
+
+        // Procedural
+        FUNC, // function def
+        PARAM, // push param
         CALL,
         RET,
     }

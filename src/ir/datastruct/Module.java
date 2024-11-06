@@ -10,9 +10,12 @@ class Module implements Value {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Function f : functions) {
-            sb.append(f.toString()).append("\n");
+            sb.append(f.toString()).append("\n\n");
         }
+
         sb.deleteCharAt(sb.length() - 1);
+        sb.deleteCharAt(sb.length() - 1);
+
         return sb.toString();
     }
 }

@@ -1,1 +1,6 @@
-2 i Int
+1 int_func IntFunc
+1 char_func CharFunc
+1 void_func VoidFunc
+2 p Int
+3 p Int
+4 p Int
