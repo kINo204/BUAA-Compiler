@@ -1,2 +1,3 @@
 fun @1.main:
-	ret: i32  6
+	%1 = add: i32  1, 2
+	ret: i32  %1

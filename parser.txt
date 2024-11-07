@@ -3,6 +3,11 @@
 <UnaryExp>
 <MulExp>
 <AddExp>
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
 <Exp>
 <Stmt>
 <Block>

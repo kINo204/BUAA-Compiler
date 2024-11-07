@@ -1,6 +1,6 @@
 package mips;
 
-public class MipsUtils {
+public final class MipsUtils {
     /* OS utils. */
     public static final String osWrapper = """
             # [compiler-generated](os-wrapper)

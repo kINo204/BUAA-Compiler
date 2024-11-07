@@ -4,6 +4,16 @@
         li      $v0, 17
         syscall
 
+.text
 main:
-	li	$v0, 6
+	sw	$fp, 0($sp)
+	move	$fp, $sp
+	addi	$sp, $sp, -4
+	li	$v0, 1
+	addi	$v0, $v0, 2
+	addi	$sp, $sp, -4
+	sw	$v0, -4($fp)
+	lw	$v0, -4($fp)
+	move	$sp, $fp
+	lw	$fp, 0($sp)
 	jr	$ra

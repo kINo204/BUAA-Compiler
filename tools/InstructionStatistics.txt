@@ -1,6 +1,0 @@
-Division (50.0): 0
-Multiply (3.0): 0
-Jump/Branch (3.0): 1
-Memory (4.0): 0
-Others (1.0): 1
-Final Cycle: 4.0
