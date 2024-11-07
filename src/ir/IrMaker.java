@@ -527,8 +527,12 @@ public class IrMaker {
             Var var = symbol instanceof SymVar ? ((SymVar) symbol).irVar : ((SymConstVar) symbol).irVar;
             Reg res = new Reg(var.type);
             if (var.isArray) {
-                Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
-                function.appendInstr(Instr.genLoad(res, var, arrayIndex));
+                if (primaryExp.lVal.exp == null) { // Use array base address
+                    function.appendInstr(Instr.genGetAddr(res, var));
+                } else { // Dereference of array
+                    Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
+                    function.appendInstr(Instr.genLoad(res, var, arrayIndex));
+                }
             } else {
                 function.appendInstr(Instr.genLoad(res, var));
             }

@@ -125,7 +125,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         assert operand instanceof Var;
         Var var = (Var) operand;
         assert var.isArray;
-        assert index < var.arrayLength;
+        assert var.arrayLength < 0 || index < var.arrayLength;
 
         int ofs = offset(var).num - index * var.type.size();
         program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(FP), new Const(ofs)));

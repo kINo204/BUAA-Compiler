@@ -122,6 +122,12 @@ public class Instr {
         );
     }
 
+    public static Instr genGetAddr(Operand res, Var var) {
+        return new Instr(
+                Operator.ADDR, var.type, res, var, null
+        );
+    }
+
     @Override
     public String toString() {
         if (op == Operator.FUNC) {
@@ -142,6 +148,8 @@ public class Instr {
             } else {
                 return String.format("\t%s: %s = %s", res, type, main);
             }
+        } else if (op == Operator.ADDR) {
+            return String.format("\t%s: &%s = &[%s]", res, type, main);
         } else if (op == Operator.GOTO) {
             return "\tgoto  " + res;
         } else if (op == Operator.GOIF || op == Operator.GONT) {
@@ -196,6 +204,7 @@ public class Instr {
         ALLOC,
         LOAD,
         STORE,
+        ADDR,
 
         // Arithmetic
         ADD,

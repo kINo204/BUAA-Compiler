@@ -3,12 +3,17 @@ setlocal
 
 cd ..
 
-echo Compiling ...
+echo compiling ...
 java -jar target/compiler.jar
+if %errorlevel% neq 0 (
+	echo Compile error.
+	cat error.txt
+	exit /B
+)
 
-echo Running ...
+echo running ...
 java -jar marsc.jar ic mips.txt>NUL
-echo Program exits with return value %errorlevel%.
+echo exit value %errorlevel%.
 
 mv InstructionStatistics.txt target/statistics.txt
 

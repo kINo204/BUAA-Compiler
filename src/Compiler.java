@@ -31,28 +31,36 @@ public class Compiler {
 
         Parser parser = new Parser(lexer, "CompUnit", parserOut, errOut);
         AstCompUnit ast = (AstCompUnit) parser.parse();
+        sourceProgram.close();
+        lexerOut.close();
+        parserOut.close();
 
         Validator validator = new Validator(ast, errOut);
         validator.validateAst();
         symbolOut.print(validator.symTbl);
+        symbolOut.close();
 
         // Execute printing errors.
         if (errOut.hasError()) {
             errOut.executePrintErrors();
-            terminate(-1);
+            errOut.close();
+            System.exit(-1);
         }
 
         /* Mid. */
         IrMaker irMaker = new IrMaker(ast, validator.symTbl);
         Ir ir = irMaker.make();
         irOut.print(ir);
+        irOut.close();
 
         /* Backend. */
         MipsTranslator translator = new MipsMinimalTranslator(ir);
         MipsProgram program = translator.translate();
         programOut.print(program);
+        programOut.close();
 
-        terminate(0);
+        errOut.close();
+        System.exit(0);
     }
 
     private static void configureIO() throws IOException {
@@ -89,19 +97,4 @@ public class Compiler {
         errOut.addWriter("file err", errWriter);
         errOut.switchLogger(true);
     }
-
-    private static void terminate(int status) throws IOException {
-        // Closing streams.
-        sourceProgram.close();
-
-        lexerOut.close();
-        parserOut.close();
-        symbolOut.close();
-        irOut.close();
-        programOut.close();
-        errOut.close();
-
-        System.exit(status);
-    }
-
 }

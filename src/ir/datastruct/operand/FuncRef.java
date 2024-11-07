@@ -35,6 +35,7 @@ public class FuncRef extends Operand implements MipsOperand {
             Var varParam = new Var(param);
             params.add(varParam);
             ((SymVar) param).irVar = varParam;
+            varParam.arrayLength = -1; // This is infinity.
         }
     }
 
