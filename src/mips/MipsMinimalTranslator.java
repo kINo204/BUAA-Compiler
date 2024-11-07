@@ -175,13 +175,24 @@ public class MipsMinimalTranslator implements MipsTranslator {
 
     private void fromIrNeq(Instr irNeq) {}
 
-    private void fromIrLabel(Instr irLabel) {}
+    // Label decl
+    private void fromIrLabel(Instr irLabel) {
+        program.append(MipsInstr.genLabel((Label) irLabel.res));
+    }
 
-    private void fromIrGoto(Instr irGoto) {}
+    private void fromIrGoto(Instr irGoto) {
+        program.append(MipsInstr.genJump((Label) irGoto.res));
+    }
 
-    private void fromIrGoif(Instr irGoif) {}
+    private void fromIrGoif(Instr irGoif) {
+        load(irGoif.main, r(V0));
+        program.append(MipsInstr.genBne(r(V0), r(ZERO), (Label) irGoif.res));
+    }
 
-    private void fromIrGont(Instr irGont) {}
+    private void fromIrGont(Instr irGont) {
+        load(irGont.main, r(V0));
+        program.append(MipsInstr.genBeq(r(V0), r(ZERO), (Label) irGont.res));
+    }
 
     private void fromIrFunc(Instr irFunc) {
         frameReset();

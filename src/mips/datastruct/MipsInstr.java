@@ -2,6 +2,7 @@ package mips.datastruct;
 
 import ir.datastruct.operand.Const;
 import ir.datastruct.operand.FuncRef;
+import ir.datastruct.operand.Label;
 
 import static mips.datastruct.MipsInstr.MipsType.*;
 
@@ -19,7 +20,6 @@ public class MipsInstr {
         this.type = type;
     }
 
-    // Constructor for calculation instructions.
     public MipsInstr(MipsType type, MipsOperator op, MipsOperand res, MipsOperand first, MipsOperand second) {
         this.type = type;
         this.operator = op;
@@ -28,7 +28,6 @@ public class MipsInstr {
         this.second = second;
     }
 
-    // Common constructor.
     public MipsInstr(MipsType type, MipsOperand res, MipsOperand first, MipsOperand second) {
         this.type = type;
         this.operator = null;
@@ -61,6 +60,24 @@ public class MipsInstr {
         return new MipsInstr(MipsType.JR, null, reg, null);
     }
 
+    private static MipsInstr genBranch(MipsOperator jumpOp, MipsReg first, MipsReg second, Label label) {
+        MipsInstr instr = new MipsInstr(BR, label, first, second);
+        instr.operator = jumpOp;
+        return instr;
+    }
+
+    public static MipsInstr genJump(Label label) {
+        return genBranch(MipsOperator.J, null, null, label);
+    }
+
+    public static MipsInstr genBeq(MipsReg first, MipsReg second, Label label) {
+        return genBranch(MipsOperator.BEQ, first, second, label);
+    }
+
+    public static MipsInstr genBne(MipsReg first, MipsReg second, Label label) {
+        return genBranch(MipsOperator.BNE, first, second, label);
+    }
+
     public static MipsInstr genTextSeg() {
         return new MipsInstr(DOT_TEXT);
     }
@@ -70,8 +87,14 @@ public class MipsInstr {
     }
 
     public static MipsInstr genLabel(FuncRef funcRef) {
-        MipsInstr instr = new MipsInstr(MipsType.LABEL);
+        MipsInstr instr = new MipsInstr(LABEL);
         instr.labelString = funcRef.funcName;
+        return instr;
+    }
+
+    public static MipsInstr genLabel(Label label) {
+        MipsInstr instr = new MipsInstr(LABEL);
+        instr.labelString = label.name;
         return instr;
     }
 
@@ -96,20 +119,29 @@ public class MipsInstr {
                 sb.append(", ").append(second);
             }
             return sb.toString().toLowerCase();
-        } else if (type == MipsType.MEM) {
+        } else if (type == BR) {
             StringBuilder sb = new StringBuilder();
-            sb
-                    .append("\t")
-                    .append(operator)
-                    .append("\t")
-                    .append(res).append(", ")
-                    .append(second).append("(")
-                    .append(first).append(")");
+            sb.append("\t").append(operator).append("\t");
+            if (first != null) {
+                sb.append(first).append(", ");
+            }
+            if (second != null) {
+                sb.append(second).append(", ");
+            }
+            sb.append(res);
             return sb.toString().toLowerCase();
+        } else if (type == MipsType.MEM) {
+            String sb = "\t" +
+                    operator +
+                    "\t" +
+                    res + ", " +
+                    second + "(" +
+                    first + ")";
+            return sb.toLowerCase();
         } else if (type == MipsType.JR) {
             return String.format("\tjr\t%s", first);
         } else if (type == MipsType.LABEL) {
-            return labelString + ":";
+            return "\n" + labelString + ":";
         }
         return "\tERR_INSTRUCTION";
     }
@@ -119,13 +151,14 @@ public class MipsInstr {
         DOT_TEXT,
         DOT_DATA,
         LABEL,
+
+        /* Common operations */
         CALC,
         MEM,
 
-        // TODO Branches
-        J,
-        JR,
-        JAL,
+        /* Procedural calls */
+        BR,
+        JR, JAL,
     }
 
     public enum MipsOperator {
@@ -134,5 +167,8 @@ public class MipsInstr {
         MFHI, MFLO,
         LI, LA,
         LW, LB, SW, SB,
+
+        /* Branches */
+        J, BNE, BEQ,
     }
 }

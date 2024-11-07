@@ -228,7 +228,7 @@ public class IrMaker {
             }
         } else if (stmt instanceof AstStmtIf stmtIf) {
             if (stmtIf.elseStmt == null) {
-                Label labelEnd = new Label("if-end");
+                Label labelEnd = new Label("if_end");
 
                 Operand cond = fromCond(stmtIf.cond, function);
                 function.appendInstr(Instr.genGoIfNot(labelEnd, cond));
@@ -243,8 +243,8 @@ public class IrMaker {
                 ... (elseStmt)
                 L-end:
                  */
-                Label labelElse = new Label("if-else");
-                Label labelEnd = new Label("if-end");
+                Label labelElse = new Label("if_else");
+                Label labelEnd = new Label("if_end");
 
                 Operand cond = fromCond(stmtIf.cond, function);
                 function.appendInstr(Instr.genGoIfNot(labelElse, cond));
@@ -255,7 +255,7 @@ public class IrMaker {
                 function.appendInstr(Instr.genLabelDecl(labelEnd));
             }
         } else if (stmt instanceof AstStmtFor stmtFor) {
-            Label forStart = new Label("for-start"), forEnd = new Label("for-end");
+            Label forStart = new Label("for_start"), forEnd = new Label("for_end");
             symTbl.setLoopLabels(forStart, forEnd);
             fromForStmt(stmtFor.firstForStmt, function);
             function.appendInstr(Instr.genLabelDecl(forStart));
@@ -318,8 +318,8 @@ public class IrMaker {
         if (lOrExp.lAndExps.size() == 1) {
             return fromLAndExp(lOrExp.lAndExps.get(0), function);
         } else {
-            Label labelTrue = new Label("lorexp-true");
-            Label labelEnd = new Label("lorexp-end");
+            Label labelTrue = new Label("lorexp_true");
+            Label labelEnd = new Label("lorexp_end");
 
             for (AstLAndExp lAndExp : lOrExp.lAndExps) {
                 Operand operand = fromLAndExp(lAndExp, function);
@@ -344,8 +344,8 @@ public class IrMaker {
         if (lAndExp.eqExps.size() == 1) {
             return fromEqExp(lAndExp.eqExps.get(0), function);
         } else {
-            Label labelFalse = new Label("landexp-false");
-            Label labelEnd = new Label("landexp-end");
+            Label labelFalse = new Label("landexp_false");
+            Label labelEnd = new Label("landexp_end");
 
             for (AstEqExp eqExp : lAndExp.eqExps) {
                 Operand operand = fromEqExp(eqExp, function);

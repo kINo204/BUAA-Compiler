@@ -5,12 +5,12 @@ import mips.datastruct.MipsOperand;
 
 public class Label extends Operand implements MipsOperand {
     private static int index = 0;
-    private final String name;
+    public final String name;
 
     public Instr target = null;
 
     public Label(String text) {
-        name = "$L" + index + "_" + text;
+        name = "$l" + index + "_" + text;
         index++;
     }
 
