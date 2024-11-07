@@ -1,5 +1,7 @@
 package ir.datastruct.operand;
 
+import datastruct.symbol.SymConstVar;
+import datastruct.symbol.SymVar;
 import datastruct.symbol.Symbol;
 
 import static ir.datastruct.Instr.Type.i32;
@@ -15,6 +17,7 @@ public class Var extends Operand {
 
     // All info used for IR and code-gen should be here.
     public final String name;
+    public final boolean isReference;
     public final boolean isConstant;
     public final boolean isArray;
     public int arrayLength;
@@ -26,52 +29,36 @@ public class Var extends Operand {
 
         name = "@" + symbol.symtblId + "." + symbol.literal;
 
+
+        if (symbol instanceof SymConstVar var) {
+            isReference = false;
+            isArray = var.isArray;
+        } else {
+            isReference = ((SymVar) symbol).isReference;
+            isArray = ((SymVar) symbol).isArray;
+        }
+
         switch (symbol.symId) {
-            case Int -> {
+            case Int, IntArray -> {
                 type = i32;
                 isConstant = false;
-                isArray = false;
             }
-            case ConstInt -> {
+            case ConstInt, ConstIntArray -> {
                 type = i32;
                 isConstant = true;
-                isArray = false;
             }
-            case Char -> {
+            case Char, CharArray -> {
                 type = i8;
                 isConstant = false;
-                isArray = false;
             }
-            case ConstChar -> {
+            case ConstChar, ConstCharArray -> {
                 type = i8;
                 isConstant = true;
-                isArray = false;
-            }
-            case IntArray -> {
-                type = i32;
-                isConstant = false;
-                isArray = true;
-            }
-            case ConstIntArray -> {
-                type = i32;
-                isConstant = true;
-                isArray = true;
-            }
-            case CharArray -> {
-                type = i8;
-                isConstant = false;
-                isArray = true;
-            }
-            case ConstCharArray -> {
-                type = i8;
-                isConstant = true;
-                isArray = true;
             }
             default -> {
                 assert false;
                 type = null;
                 isConstant = false;
-                isArray = false;
             }
         }
     }

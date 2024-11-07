@@ -12,13 +12,14 @@ test:
 	move	$fp, $sp
 	addi	$sp, $sp, -4
 
-	# %1: i32 = @2.p1
-	lw	$v0, 4($fp)
-	addi	$sp, $sp, -4
-	sw	$v0, -8($fp)
+	# %1: i8 = *(@2.p1)[1]
+	lw	$a0, 4($fp)
+	lb	$v0, 1($a0)
+	addi	$sp, $sp, -1
+	sb	$v0, -5($fp)
 
-	# ret: i32  %1
-	lw	$v0, -8($fp)
+	# ret: i8  %1
+	lb	$v0, -5($fp)
 	move	$sp, $fp
 	lw	$fp, -4($sp)
 	jr	$ra
@@ -30,38 +31,38 @@ main:
 	move	$fp, $sp
 	addi	$sp, $sp, -4
 
-	# @3.arr = alloc: i32  2
+	# @3.arr = alloc: i8  2
 
-	# @3.arr[0]: i32 = 3
-	li	$v0, 3
-	addi	$sp, $sp, -8
+	# @3.arr[0]: i8 = 'A'
+	li	$v0, 'A'
+	addi	$sp, $sp, -2
+	sb	$v0, -6($fp)
+
+	# @3.arr[1]: i8 = 'C'
+	li	$v0, 'C'
+	sb	$v0, -5($fp)
+
+	# %2: &i32 = &(@3.arr)
+	addi	$v0, $fp, -6
+	addi	$sp, $sp, -6
 	sw	$v0, -12($fp)
 
-	# @3.arr[1]: i32 = 4
-	li	$v0, 4
-	sw	$v0, -16($fp)
-
-	# %1: i32 = @3.arr[0]
-	lw	$v0, -12($fp)
+	# param  %2
+	lw	$a0, -12($fp)
 	addi	$sp, $sp, -4
-	sw	$v0, -16($fp)
+	sw	$a0, -16($fp)
 
-	# param  %1
-	lw	$a0, -16($fp)
-	addi	$sp, $sp, -4
-	sw	$a0, -20($fp)
-
-	# %2 = call: i32  test
+	# %3 = call: i8  test
 	addi	$sp, $sp, -4
 	sw	$ra, 0($sp)
 	jal	test
 
 	lw	$ra, 0($sp)
-	addi	$sp, $sp, -4
-	sw	$v0, -28($fp)
+	addi	$sp, $sp, -1
+	sb	$v0, -21($fp)
 
-	# ret: i32  %2
-	lw	$v0, -28($fp)
+	# ret: i8  %3
+	lb	$v0, -21($fp)
 	move	$sp, $fp
 	lw	$fp, -4($sp)
 	jr	$ra

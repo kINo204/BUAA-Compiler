@@ -1,12 +1,12 @@
 fun test:
-	%1: i32 = @2.p1
-	ret: i32  %1
+	%1: i8 = *(@2.p1)[1]
+	ret: i8  %1
 
 fun main:
-	@3.arr = alloc: i32  2
-	@3.arr[0]: i32 = 3
-	@3.arr[1]: i32 = 4
-	%1: i32 = @3.arr[0]
-	param  %1
-	%2 = call: i32  test
-	ret: i32  %2
+	@3.arr = alloc: i8  2
+	@3.arr[0]: i8 = 'A'
+	@3.arr[1]: i8 = 'C'
+	%2: &i32 = &(@3.arr)
+	param  %2
+	%3 = call: i8  test
+	ret: i8  %3

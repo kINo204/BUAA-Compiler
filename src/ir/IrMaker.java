@@ -525,13 +525,23 @@ public class IrMaker {
         } else if (primaryExp.lVal != null) {
             Symbol symbol = symTbl.searchSym(primaryExp.lVal.ident);
             Var var = symbol instanceof SymVar ? ((SymVar) symbol).irVar : ((SymConstVar) symbol).irVar;
+
             Reg res = new Reg(var.type);
             if (var.isArray) {
                 if (primaryExp.lVal.exp == null) { // Use array base address
-                    function.appendInstr(Instr.genGetAddr(res, var));
-                } else { // Dereference of array
+                    Reg addr = new Reg(i32);
+                    function.appendInstr(Instr.genGetAddr(addr, var));
+                    return addr;
+                } else { // Load of array
                     Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
                     function.appendInstr(Instr.genLoad(res, var, arrayIndex));
+                }
+            } else if (var.isReference) {
+                if (primaryExp.lVal.exp == null) { // No such grammar
+                    assert false;
+                } else { // Dereference of array base addr
+                    Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
+                    function.appendInstr(Instr.genDeref(res, var, arrayIndex));
                 }
             } else {
                 function.appendInstr(Instr.genLoad(res, var));

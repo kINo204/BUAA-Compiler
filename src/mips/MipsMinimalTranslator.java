@@ -7,10 +7,13 @@ import mips.datastruct.MipsInstr;
 import mips.datastruct.MipsProgram;
 import mips.datastruct.MipsReg;
 
+import javax.imageio.plugins.tiff.TIFFImageReadParam;
+import javax.print.attribute.standard.Finishings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static ir.datastruct.Instr.Type.i32;
 import static ir.datastruct.Instr.Type.i8;
 import static mips.datastruct.MipsInstr.MipsOperator.*;
 import static mips.datastruct.MipsReg.RegId.*;
@@ -69,10 +72,10 @@ public class MipsMinimalTranslator implements MipsTranslator {
     private Const allocMem(Reg reg, boolean genSpInstr) {
         int initialMem = nextMem;
 
-        alignMem(reg.type.size());
         int memRequired = reg.type.size();
+        alignMem(memRequired);
         nextMem -= memRequired;
-        Const addr = new Const(nextMem);
+        Const addr = new Const(nextMem); // Base addr is after stack push!
         tmpRegAddr.put(reg, addr);
 
         if (genSpInstr)
@@ -83,10 +86,10 @@ public class MipsMinimalTranslator implements MipsTranslator {
     private Const allocMem(Var var, boolean genSpInstr) {
         int initialMem = nextMem;
 
-        alignMem(var.type.size());
-
-        int memRequired = var.type.size();
+        int memRequired = var.isReference ? 4 : var.type.size();
+        alignMem(memRequired);
         if (var.isArray) {
+            assert !var.isReference;
             memRequired *= var.arrayLength;
         }
         nextMem -= memRequired;
@@ -111,7 +114,11 @@ public class MipsMinimalTranslator implements MipsTranslator {
         if (operand instanceof Var var) {
             // Load from corresponding memory location.
             assert !var.isArray;
-            program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(FP), offset(var)));
+            if (var.isReference) {
+                program.append(MipsInstr.genMem(lw, reg, r(FP), offset(var)));
+            } else {
+                program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(FP), offset(var)));
+            }
         } else if (operand instanceof Reg) {
             // Load from corresponding memory location.
             program.append(MipsInstr.genMem(operand.type == i8 ? lb : lw, reg, r(FP), offset((Reg) operand)));
@@ -127,7 +134,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         assert var.isArray;
         assert var.arrayLength < 0 || index < var.arrayLength;
 
-        int ofs = offset(var).num - index * var.type.size();
+        int ofs = offset(var).num + index * var.type.size();
         program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(FP), new Const(ofs)));
     }
 
@@ -140,11 +147,12 @@ public class MipsMinimalTranslator implements MipsTranslator {
             }
         } else if (to instanceof Var var) {
             assert !var.isArray;
+            Instr.Type type = var.isReference ? i32 : to.type;
             if (varAddr.containsKey(var)) {
-                program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), offset(var)));
+                program.append(MipsInstr.genMem(type == i8 ? sb : sw, from, r(FP), offset(var)));
             } else {
                 // Allocate memory.
-                program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), allocMem(var, true)));
+                program.append(MipsInstr.genMem(type == i8 ? sb : sw, from, r(FP), allocMem(var, true)));
             }
         } else {
             assert false;
@@ -159,10 +167,10 @@ public class MipsMinimalTranslator implements MipsTranslator {
 
         int ofs;
         if (varAddr.containsKey(var)) {
-            ofs = offset(var).num - index * var.type.size();
+            ofs = offset(var).num + index * var.type.size();
         } else {
             // Allocate memory.
-            ofs = allocMem(var, true).num - index * var.type.size();
+            ofs = allocMem(var, true).num + index * var.type.size();
         }
         program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), new Const(ofs)));
     }
@@ -176,8 +184,10 @@ public class MipsMinimalTranslator implements MipsTranslator {
             }
             switch (irInstr.getOperator()) {
                 case ALLOC -> fromIrAlloc(irInstr);
-                case LOAD -> fromIrLoad(irInstr);
-                case STORE -> fromIrStore(irInstr);
+                case LOAD -> fromIrLoadArr(irInstr);
+                case STORE -> fromIrStoreArr(irInstr);
+                case ADDR -> fromIrGetAddress(irInstr);
+                case DEREF -> fromIrDerefAndIndex(irInstr);
                 case ADD -> fromIrAdd(irInstr);
                 case SUB -> fromIrSub(irInstr);
                 case MUL -> fromIrMul(irInstr);
@@ -207,7 +217,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         // Do nothing yet.
     }
 
-    private void fromIrLoad(Instr irLoad) {
+    private void fromIrLoadArr(Instr irLoad) {
         assert irLoad.main instanceof Var;
         Var varMain = (Var) irLoad.main;
         if (varMain.isArray) {
@@ -225,7 +235,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         store(irLoad.res, r(V0));
     }
 
-    private void fromIrStore(Instr irStore) {
+    private void fromIrStoreArr(Instr irStore) {
         if (irStore.main instanceof Var varMain) {
             if (varMain.isArray) {
                 if (irStore.supl == null) {
@@ -253,6 +263,19 @@ public class MipsMinimalTranslator implements MipsTranslator {
             assert irStore.supl == null;
             store(irStore.res, r(V0));
         }
+    }
+
+    private void fromIrGetAddress(Instr irGetAddr) {
+        assert irGetAddr.main instanceof Var;
+        program.append(MipsInstr.genCalc(addi, r(V0), r(FP), varAddr.get((Var) irGetAddr.main)));
+        store(irGetAddr.res, r(V0));
+    }
+
+    private void fromIrDerefAndIndex(Instr irDeref) {
+        load(irDeref.main, r(A0)); // Address to deref.
+        int ofs = ((Const) irDeref.supl).num * irDeref.type.size();
+        program.append(MipsInstr.genMem(irDeref.type == i8 ? lb : lw, r(V0), r(A0), new Const(ofs)));
+        store(irDeref.res, r(V0));
     }
 
     private void fromIrAdd(Instr irAdd) {
@@ -347,9 +370,9 @@ public class MipsMinimalTranslator implements MipsTranslator {
             allocMem(varParam, false);
         }
         allocMem(4, false); // simulate memory for $ra
-        int alter = -nextMem;
+        int translateAmount = -nextMem;
         for (Map.Entry<Var, Const> entry : varAddr.entrySet()) {
-            entry.setValue(new Const(entry.getValue().num + alter));
+            entry.setValue(new Const(entry.getValue().num + translateAmount));
         }
         // Now we have param entries, just reset nextMem again.
         nextMem = 0;

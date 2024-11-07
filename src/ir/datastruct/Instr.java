@@ -124,7 +124,13 @@ public class Instr {
 
     public static Instr genGetAddr(Operand res, Var var) {
         return new Instr(
-                Operator.ADDR, var.type, res, var, null
+                Operator.ADDR, Type.i32, res, var, null
+        );
+    }
+
+    public static Instr genDeref(Reg res, Var var, Operand arrayIndex) {
+        return new Instr(
+                Operator.DEREF, var.type, res, var, arrayIndex
         );
     }
 
@@ -149,7 +155,9 @@ public class Instr {
                 return String.format("\t%s: %s = %s", res, type, main);
             }
         } else if (op == Operator.ADDR) {
-            return String.format("\t%s: &%s = &[%s]", res, type, main);
+            return String.format("\t%s: &%s = &(%s)", res, type, main);
+        } else if (op == Operator.DEREF) {
+            return String.format("\t%s: %s = *(%s)[%s]", res, type, main, supl);
         } else if (op == Operator.GOTO) {
             return "\tgoto  " + res;
         } else if (op == Operator.GOIF || op == Operator.GONT) {
@@ -205,6 +213,7 @@ public class Instr {
         LOAD,
         STORE,
         ADDR,
+        DEREF,
 
         // Arithmetic
         ADD,

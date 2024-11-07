@@ -4,6 +4,10 @@ out
 target
 testfile.txt
 lexer.txt
+parser.txt
+symbol.txt
+mips.txt
+ir.ll
 error.txt
 
 # Compiled class file

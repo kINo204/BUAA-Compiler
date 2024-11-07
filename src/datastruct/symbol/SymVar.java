@@ -10,6 +10,7 @@ import ir.datastruct.operand.Var;
 public class SymVar extends Symbol {
     public Var irVar;
     public final boolean isArray;
+    public final boolean isReference;
 
     public SymVar(AstVarDef varDef) {
         super(
@@ -20,6 +21,7 @@ public class SymVar extends Symbol {
                         ),
                 varDef.ident
         );
+        isReference = false; // We have no ref-operator in our grammar.
         isArray = varDef.constExp != null;
     }
 
@@ -31,6 +33,7 @@ public class SymVar extends Symbol {
                                 param.type.tokenId == Token.TokenId.INTTK ? SymId.IntArray : SymId.CharArray
                         ),
         param.ident);
-        isArray = param.isArray;
+        isReference = param.isArray;
+        isArray = false;
     }
 }

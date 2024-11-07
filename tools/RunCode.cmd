@@ -12,8 +12,12 @@ if %errorlevel% neq 0 (
 )
 
 echo running ...
-java -jar marsc.jar ic mips.txt>NUL
+java -jar marsc.jar ic mips.txt
 echo exit value %errorlevel%.
+
+echo.
+echo statistics:
+cat target/statistics.txt
 
 mv InstructionStatistics.txt target/statistics.txt
 
