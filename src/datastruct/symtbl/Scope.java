@@ -1,6 +1,5 @@
 package datastruct.symtbl;
 
-import datastruct.ast.Token;
 import datastruct.symbol.Symbol;
 import ir.datastruct.operand.Label;
 
@@ -14,7 +13,7 @@ class Scope {
     final ArrayList<Scope> subScopes = new ArrayList<>();
 
     final boolean inLoop;
-    Label forStart;
+    Label forMotion;
     Label forEnd;
     final Symbol.SymId functionEnv;
 
@@ -43,13 +42,13 @@ class Scope {
         symbol.symtblId = this.id;
     }
 
-    void setLoopLabels(Label forStart, Label forEnd, boolean rootCall) {
+    void setLoopLabels(Label forMotion, Label forEnd, boolean rootCall) {
         if (!rootCall) {
-            this.forStart = forStart;
+            this.forMotion = forMotion;
             this.forEnd = forEnd;
         }
         for (Scope scope : subScopes) {
-            scope.setLoopLabels(forStart, forEnd, false);
+            scope.setLoopLabels(forMotion, forEnd, false);
         }
     }
 

@@ -186,6 +186,7 @@ public class MipsInstr {
         mfhi, mflo,
         li, la,
         lw, lb, sw, sb,
+        slt, sle, sgt, sge, seq, sne,
 
         /* Branches */
         j, jal, bne, beq,

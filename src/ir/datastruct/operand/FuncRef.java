@@ -1,5 +1,7 @@
 package ir.datastruct.operand;
 
+import datastruct.ast.AstFuncFParam;
+import datastruct.ast.Token;
 import datastruct.symbol.SymFunc;
 import datastruct.symbol.SymVar;
 import datastruct.symbol.Symbol;
@@ -12,10 +14,10 @@ import static ir.datastruct.Instr.Type.*;
 
 public class FuncRef extends Operand implements MipsOperand {
     // Backup info in symbol.
-    private final SymFunc symbol;
+    private SymFunc symbol;
 
-    public final String funcName;
-    private final int symtblId;
+    public String funcName;
+    private int symtblId;
 
     public final ArrayList<Var> params = new ArrayList<>();
 
@@ -37,6 +39,58 @@ public class FuncRef extends Operand implements MipsOperand {
             ((SymVar) param).irVar = varParam;
             varParam.arrayLength = -1; // This is infinity.
         }
+    }
+
+    private FuncRef() { }
+
+    public static FuncRef frGetint() {
+        FuncRef funcRef = new FuncRef();
+        funcRef.symbol = null;
+        funcRef.funcName = "getint";
+        funcRef.symtblId = 1;
+        return funcRef;
+    }
+
+    public static FuncRef frGetchar() {
+        FuncRef funcRef = new FuncRef();
+        funcRef.symbol = null;
+        funcRef.funcName = "getchar";
+        funcRef.symtblId = 1;
+        return funcRef;
+    }
+
+    public static FuncRef frPutchar() {
+        FuncRef funcRef = new FuncRef();
+        funcRef.symbol = null;
+        funcRef.funcName = "putchar";
+        funcRef.symtblId = 1;
+
+        AstFuncFParam funcFParam = new AstFuncFParam();
+        funcFParam.type = new Token(Token.TokenId.CHARTK, "char", -1);
+        funcFParam.ident = new Token(Token.TokenId.IDENFR, "ch", -1);
+        funcFParam.isArray = false;
+
+        funcRef.params.add(new Var(
+                new SymVar(funcFParam)
+        ));
+        return funcRef;
+    }
+
+    public static FuncRef frPutint() {
+        FuncRef funcRef = new FuncRef();
+        funcRef.symbol = null;
+        funcRef.funcName = "putint";
+        funcRef.symtblId = 1;
+
+        AstFuncFParam funcFParam = new AstFuncFParam();
+        funcFParam.type = new Token(Token.TokenId.INTTK, "int", -1);
+        funcFParam.ident = new Token(Token.TokenId.IDENFR, "n", -1);
+        funcFParam.isArray = false;
+
+        funcRef.params.add(new Var(
+                new SymVar(funcFParam)
+        ));
+        return funcRef;
     }
 
     public FuncRef(boolean isMain) {

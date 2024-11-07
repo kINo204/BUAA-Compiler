@@ -16,9 +16,10 @@ java -jar marsc.jar ic mips.txt
 echo exit value %errorlevel%.
 
 echo.
+
+mv InstructionStatistics.txt target/statistics.txt
 echo statistics:
 cat target/statistics.txt
 
-mv InstructionStatistics.txt target/statistics.txt
 
 endlocal

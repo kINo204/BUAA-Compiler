@@ -1,3 +1,5 @@
-1 test CharFunc
-2 p1 CharArray
-3 arr CharArray
+1 count IntFunc
+2 max Int
+2 res Int
+2 i Int
+6 sum Int

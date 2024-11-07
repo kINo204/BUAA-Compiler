@@ -271,7 +271,18 @@ public class Lexer {
                 do {
                     ch = (char) input.read();
                     str.append(ch);
-                } while (ch != '"');
+                    if (escape) {
+                        assert Arrays.asList( // Escaping characters supported in Char.
+                                'a', 'b', 't', 'n', 'v', 'f', '"', '\'', '\\', '0'
+                        ).contains(ch);
+                        escape = false; // Consume escape env.
+                    } else {
+                        if (ch == '\\') // Enter escaping mode.
+                            escape = true;
+                        if (ch == '\"') // Exit.
+                            break;
+                    }
+                } while (true);
                 yield new Token(STRCON, String.valueOf(str), parsingLineNo);
             }
             default -> null;

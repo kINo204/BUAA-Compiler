@@ -72,12 +72,12 @@ public class SymTbl {
         currentScope = newScope;
     }
 
-    public void setLoopLabels(Label forStart, Label forEnd) {
-        currentScope.setLoopLabels(forStart, forEnd, true);
+    public void setLoopLabels(Label forMotion, Label forEnd) {
+        currentScope.setLoopLabels(forMotion, forEnd, true);
     }
 
-    public Label getCurLoopStart() {
-        return currentScope.forStart;
+    public Label getCurLoopMotion() {
+        return currentScope.forMotion;
     }
 
     public Label getCurLoopEnd() {

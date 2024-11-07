@@ -37,6 +37,12 @@ public class Instr {
         );
     }
 
+    public static Instr genFuncCall(FuncRef funcRef) {
+        return new Instr(
+                Operator.CALL, Type.VOID, null, funcRef, null
+        );
+    }
+
     public static Instr genAlloc(Var var) {
         return new Instr(
                 Operator.ALLOC, var.type, var, null, null

@@ -1,5 +1,6 @@
 package ir.datastruct.operand;
 
+import ir.datastruct.Instr;
 import mips.datastruct.MipsOperand;
 
 import java.util.Objects;
@@ -23,8 +24,8 @@ public class Const extends Operand implements MipsOperand {
 
     @Override
     public String toString() {
-        if (ch != null) {
-            return "'" + ch + "'";
+        if (super.type == i8) {
+            return String.valueOf((int) ch);
         } else {
             return num.toString();
         }

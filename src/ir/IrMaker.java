@@ -9,9 +9,11 @@ import datastruct.symtbl.SymTbl;
 import ir.datastruct.Function;
 import ir.datastruct.Instr;
 import ir.datastruct.Ir;
+import ir.datastruct.Module;
 import ir.datastruct.operand.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static ir.datastruct.Instr.Type.*;
 
@@ -34,7 +36,7 @@ public class IrMaker {
 
     // Calling contract: on calling "fromXXX", parts of IR for XXX will be generated.
     private void fromCompUnit(AstCompUnit compUnit) {
-        ir.module = new ir.datastruct.Module();
+        ir.module = new Module();
         // TODO global decl
         for (AstFuncDef funcDef : compUnit.funcDefs) {
             fromFuncDef(funcDef, ir.module);
@@ -42,7 +44,7 @@ public class IrMaker {
         fromMainFuncDef(compUnit.mainFuncDef, ir.module);
     }
 
-    private void fromFuncDef(AstFuncDef funcDef, ir.datastruct.Module module) {
+    private void fromFuncDef(AstFuncDef funcDef, Module module) {
         Function function = new Function((SymFunc) symTbl.searchSym(funcDef.ident));
         Reg.reset();
         symTbl.enterScope();
@@ -53,13 +55,7 @@ public class IrMaker {
         module.functions.add(function);
     }
 
-    private void fromFuncType(AstFuncType funcType) {}
-
-    private void fromFuncFParams(AstFuncFParams funcFParams) {}
-
-    private void fromFuncFParam(AstFuncFParam funcFParam) {}
-
-    private void fromMainFuncDef(AstMainFuncDef mainFuncDef, ir.datastruct.Module module) {
+    private void fromMainFuncDef(AstMainFuncDef mainFuncDef, Module module) {
         Function function = new Function(true);
         Reg.reset();
         symTbl.enterScope();
@@ -97,6 +93,42 @@ public class IrMaker {
         }
     }
 
+    private ArrayList<Const> getStringConstPieces(String str) {
+        ArrayList<Const> pieces = new ArrayList<>();
+
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (ch == '\\') {
+                char next = str.charAt(i + 1);
+                assert Arrays.asList('a', 'b', 't', 'n', 'v', 'f', '\"', '\'', '\\', '0')
+                        .contains(next);
+                Const charConst = new Const(switch (next) {
+                    case 'a' -> 7;
+                    case 'b' -> 8;
+                    case 't' -> 9;
+                    case 'n' -> 10;
+                    case 'v' -> 11;
+                    case 'f' -> 12;
+                    case '\"' -> 34;
+                    case '\'' -> 39;
+                    case '\\' -> 92;
+                    case '0' -> 0;
+                    default -> throw new IllegalStateException(
+                            "Unexpected escaping char: " + str.charAt(i + 1));
+                });
+                i++;
+                pieces.add(charConst);
+            } else {
+                pieces.add(new Const(ch));
+            }
+        }
+
+        // The "\0".
+        pieces.add(new Const('\0'));
+
+        return pieces;
+    }
+
     private void fromConstDecl(AstConstDecl constDecl, Function function) {
         for (AstConstDef def : constDecl.constDefs) {
             SymConstVar varSymbol = (SymConstVar) symTbl.searchSym(def.ident);
@@ -127,10 +159,8 @@ public class IrMaker {
                     }
                 } else { // string const
                     String strInitVal = def.constInitVal.stringConst.val.string;
-                    for (int i = 0; i < strInitVal.length(); i++) {
-                        char ch =  strInitVal.charAt(i);
-                        initVals.add(new Const(ch));
-                    }
+                    ArrayList<Const> charConsts = getStringConstPieces(strInitVal);
+                    initVals.addAll(charConsts);
                     for (int i = 0; i < var.arrayLength; i++) {
                         if (i < initVals.size()) {
                             function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
@@ -175,10 +205,8 @@ public class IrMaker {
                         }
                     } else { // string const
                         String strInitVal = def.initVal.stringConst.val.string;
-                        for (int i = 0; i < strInitVal.length(); i++) {
-                            char ch =  strInitVal.charAt(i);
-                            initVals.add(new Const(ch));
-                        }
+                        ArrayList<Const> charConsts = getStringConstPieces(strInitVal);
+                        initVals.addAll(charConsts);
                         for (int i = 0; i < var.arrayLength; i++) {
                             if (i < initVals.size()) {
                                 function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
@@ -203,9 +231,7 @@ public class IrMaker {
     private void fromStmt(AstStmt stmt, Function function) {
         // TODO getint
         // TODO getchar
-        // TODO printf
         if (stmt instanceof AstStmtSingleExp stmtSingleExp) {
-            // FIXME generating unused code?
             fromExp(stmtSingleExp.exp, function);
         } else if (stmt instanceof AstStmtAssign stmtAssign) {
             Operand value = fromExp(stmtAssign.exp, function);
@@ -255,34 +281,78 @@ public class IrMaker {
                 function.appendInstr(Instr.genLabelDecl(labelEnd));
             }
         } else if (stmt instanceof AstStmtFor stmtFor) {
-            Label forStart = new Label("for_start"), forEnd = new Label("for_end");
-            symTbl.setLoopLabels(forStart, forEnd);
+            Label forCond = new Label("for_cond"),
+                    forMotion = new Label("for_motion"),
+                    forEnd = new Label("for_end");
+            symTbl.setLoopLabels(forMotion, forEnd);
 
             if (stmtFor.firstForStmt != null) {
                 fromForStmt(stmtFor.firstForStmt, function);
-                function.appendInstr(Instr.genLabelDecl(forStart));
             }
+
+            function.appendInstr(Instr.genLabelDecl(forCond));
 
             if (stmtFor.cond != null) {
                 Operand cond = fromCond(stmtFor.cond, function);
                 function.appendInstr(Instr.genGoIfNot(forEnd, cond));
             }
 
+
             fromStmt(stmtFor.stmt, function);
+
+            function.appendInstr(Instr.genLabelDecl(forMotion));
 
             if (stmtFor.thirdForStmt != null) {
                 fromForStmt(stmtFor.thirdForStmt, function);
             }
 
-            function.appendInstr(Instr.genGoto(forStart));
+            function.appendInstr(Instr.genGoto(forCond));
             function.appendInstr(Instr.genLabelDecl(forEnd));
         } else if (stmt instanceof AstStmtBreak) {
             Label forEnd = symTbl.getCurLoopEnd();
             function.appendInstr(Instr.genGoto(forEnd));
         } else if (stmt instanceof AstStmtContinue) {
-            Label forStart = symTbl.getCurLoopStart();
+            Label forStart = symTbl.getCurLoopMotion();
             function.appendInstr(Instr.genGoto(forStart));
+        } else if (stmt instanceof AstStmtPrintf funcCall) {
+            String formatStr = funcCall.stringConst.val.string;
+            int expInd = 0;
+            for (int i = 0; i < formatStr.length(); i++) {
+                char ch = formatStr.charAt(i);
+                if (ch == '\\') {
+                    assert formatStr.charAt(i + 1) == 'n';
+                    genPutchar(new Const('\n'), function);
+                    i++;
+                } else if (ch != '%') {
+                    genPutchar(new Const(ch), function);
+                } else {
+                    if (i + 1 >= formatStr.length() || (
+                            formatStr.charAt(i + 1) != 'd'
+                            && formatStr.charAt(i + 1) != 'c')
+                    ) {
+                        genPutchar(new Const(ch), function);
+                    } else {
+                        Operand operand = fromExp(funcCall.exps.get(expInd), function);
+                        if (formatStr.charAt(i + 1) == 'c') {
+                            genPutchar(operand, function);
+                        } else {
+                            genPutint(operand, function);
+                        }
+                        expInd++; i++;
+                    }
+                }
+            }
         }
+    }
+
+    private void genPutchar(Operand param, Function function) {
+        function.appendInstr(Instr.genParam(param));
+        function.appendInstr(Instr.genFuncCall(FuncRef.frPutchar()));
+    }
+
+    private void genPutint(Operand param, Function function) {
+        function.appendInstr(Instr.genParam(param));
+        function.appendInstr(Instr.genFuncCall(FuncRef.frPutint()));
     }
 
     private void fromForStmt(AstForStmt forStmt, Function function) {
@@ -508,9 +578,13 @@ public class IrMaker {
                 }
             }
             FuncRef funcRef = ((SymFunc) symTbl.searchSym(funcCall.funcIdent)).funcRef;
-            Reg res = new Reg(funcRef.type);
-            function.appendInstr(Instr.genFuncCall(res, funcRef));
-            return res;
+            if (funcRef.type == VOID) {
+                function.appendInstr(Instr.genFuncCall(funcRef));
+            } else {
+                Reg res = new Reg(funcRef.type);
+                function.appendInstr(Instr.genFuncCall(res, funcRef));
+                return res;
+            }
         }
         return null;
     }
@@ -551,9 +625,6 @@ public class IrMaker {
             return null; // Ast error.
         }
     }
-
-    // Load LVal to a register.
-    private void fromLVal(AstLVal lVal) {}
 
     // Return a constant operand.
     private Operand fromNumber(AstNumber number) {

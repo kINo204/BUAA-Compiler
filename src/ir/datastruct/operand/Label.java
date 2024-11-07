@@ -10,7 +10,7 @@ public class Label extends Operand implements MipsOperand {
     public Instr target = null;
 
     public Label(String text) {
-        name = "$l" + index + "_" + text;
+        name = "$L" + index + "_" + text;
         index++;
     }
 
