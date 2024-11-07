@@ -37,7 +37,7 @@ public class MipsInstr {
     }
 
     public static MipsInstr genLi(MipsReg reg, Const val) {
-        return genCalc(MipsOperator.LI, reg, null, val);
+        return genCalc(MipsOperator.li, reg, null, val);
     }
 
     public static MipsInstr genMem(MipsOperator op, MipsReg reg, MipsReg base, MipsOperand offset) {
@@ -45,7 +45,7 @@ public class MipsInstr {
     }
 
     public static MipsInstr genMove(MipsReg to, MipsReg from) {
-        return genCalc(MipsOperator.MOVE, to, from, null);
+        return genCalc(MipsOperator.move, to, from, null);
     }
 
     public static MipsInstr genMoveFrom(MipsOperator op, MipsReg to) {
@@ -67,15 +67,15 @@ public class MipsInstr {
     }
 
     public static MipsInstr genJump(Label label) {
-        return genBranch(MipsOperator.J, null, null, label);
+        return genBranch(MipsOperator.j, null, null, label);
     }
 
     public static MipsInstr genBeq(MipsReg first, MipsReg second, Label label) {
-        return genBranch(MipsOperator.BEQ, first, second, label);
+        return genBranch(MipsOperator.beq, first, second, label);
     }
 
     public static MipsInstr genBne(MipsReg first, MipsReg second, Label label) {
-        return genBranch(MipsOperator.BNE, first, second, label);
+        return genBranch(MipsOperator.bne, first, second, label);
     }
 
     public static MipsInstr genTextSeg() {
@@ -118,7 +118,7 @@ public class MipsInstr {
             if (second != null) {
                 sb.append(", ").append(second);
             }
-            return sb.toString().toLowerCase();
+            return sb.toString();
         } else if (type == BR) {
             StringBuilder sb = new StringBuilder();
             sb.append("\t").append(operator).append("\t");
@@ -129,15 +129,14 @@ public class MipsInstr {
                 sb.append(second).append(", ");
             }
             sb.append(res);
-            return sb.toString().toLowerCase();
+            return sb.toString();
         } else if (type == MipsType.MEM) {
-            String sb = "\t" +
+            return "\t" +
                     operator +
                     "\t" +
                     res + ", " +
                     second + "(" +
                     first + ")";
-            return sb.toLowerCase();
         } else if (type == MipsType.JR) {
             return String.format("\tjr\t%s", first);
         } else if (type == MipsType.LABEL) {
@@ -162,13 +161,13 @@ public class MipsInstr {
     }
 
     public enum MipsOperator {
-        MOVE,
-        ADDU, ADDI, SUBU, SUBI, MUL, DIVU,
-        MFHI, MFLO,
-        LI, LA,
-        LW, LB, SW, SB,
+        move,
+        addu, addi, subu, subi, mul, divu,
+        mfhi, mflo,
+        li, la,
+        lw, lb, sw, sb,
 
         /* Branches */
-        J, BNE, BEQ,
+        j, bne, beq,
     }
 }

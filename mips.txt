@@ -10,39 +10,43 @@ main:
 	sw	$fp, 0($sp)
 	move	$fp, $sp
 	addi	$sp, $sp, -4
-	li	$v0, 1
-	addi	$v0, $v0, 3
-	addi	$sp, $sp, -4
-	sw	$v0, -4($fp)
-	lw	$v0, -4($fp)
-	beq	$v0, $zero, $l0_if_else
-	li	$v0, 2
-	li	$v1, 2
-	mul	$v0, $v0, $v1
+	li	$v0, 0
 	addi	$sp, $sp, -4
 	sw	$v0, -8($fp)
-	lw	$v0, -8($fp)
-	addi	$v0, $v0, 8
+	li	$v0, 1
 	addi	$sp, $sp, -4
 	sw	$v0, -12($fp)
-	lw	$v0, -12($fp)
-	move	$sp, $fp
-	lw	$fp, 0($sp)
-	jr	$ra
-	j	$l1_if_end
 
-$l0_if_else:
-	li	$v0, 0
-	subi	$v0, $v0, 0
+$l0_for_start:
+	lw	$v0, -8($fp)
 	addi	$sp, $sp, -4
 	sw	$v0, -16($fp)
+	lw	$v0, -12($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -20($fp)
 	lw	$v0, -16($fp)
-	move	$sp, $fp
-	lw	$fp, 0($sp)
-	jr	$ra
+	lw	$v1, -20($fp)
+	addu	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -24($fp)
+	lw	$v0, -24($fp)
+	sw	$v0, -8($fp)
+	lw	$v0, -12($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -28($fp)
+	lw	$v0, -28($fp)
+	addi	$v0, $v0, 1
+	addi	$sp, $sp, -4
+	sw	$v0, -32($fp)
+	lw	$v0, -32($fp)
+	sw	$v0, -12($fp)
+	j	$l0_for_start
 
-$l1_if_end:
-	li	$v0, 0
+$l1_for_end:
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -36($fp)
+	lw	$v0, -36($fp)
 	move	$sp, $fp
 	lw	$fp, 0($sp)
 	jr	$ra

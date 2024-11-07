@@ -1,14 +1,19 @@
 fun @1.main:
-	%1 = add: i32  1, 3
-	if not %1 goto  $l0_if_else
-	%2 = mul: i32  2, 2
-	%3 = add: i32  %2, 8
-	ret: i32  %3
-	goto  $l1_if_end
+	@2.i = alloc: i32
+	@2.res = alloc: i32
+	@2.res: i32 = 0
+	@2.i: i32 = 1
 
-$l0_if_else:
-	%4 = sub: i32  0, 0
-	ret: i32  %4
+$l0_for_start:
+	%1: i32 = @2.res
+	%2: i32 = @2.i
+	%3 = add: i32  %1, %2
+	@2.res: i32 = %3
+	%4: i32 = @2.i
+	%5 = add: i32  %4, 1
+	@2.i: i32 = %5
+	goto  $l0_for_start
 
-$l1_if_end:
-	ret: i32  0
+$l1_for_end:
+	%6: i32 = @2.res
+	ret: i32  %6

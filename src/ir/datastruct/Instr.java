@@ -49,9 +49,9 @@ public class Instr {
         );
     }
 
-    public static Instr genLoad(Var var, Reg reg) {
+    public static Instr genLoad(Reg reg, Var var) {
         return new Instr(
-                Operator.LOAD, var.type, reg, var, null
+                Operator.LOAD, reg.type, reg, var, null
         );
     }
 
@@ -61,9 +61,9 @@ public class Instr {
         );
     }
 
-    public static Instr genLoad(Var var, Reg reg, Operand arrayIndex) {
+    public static Instr genLoad(Reg reg, Var var, Operand arrayIndex) {
         return new Instr(
-                Operator.LOAD, var.type, reg, var, arrayIndex
+                Operator.LOAD, reg.type, reg, var, arrayIndex
         );
     }
 
@@ -178,7 +178,17 @@ public class Instr {
     }
 
     public enum Type {
-        i8, i32, VOID
+        i8(1), i32(4), VOID(0);
+
+        private final int size;
+
+        Type(int size) {
+            this.size = size;
+        }
+
+        public int size() {
+            return size;
+        }
     }
 
     public enum Operator {

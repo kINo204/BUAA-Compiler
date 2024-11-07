@@ -257,12 +257,23 @@ public class IrMaker {
         } else if (stmt instanceof AstStmtFor stmtFor) {
             Label forStart = new Label("for_start"), forEnd = new Label("for_end");
             symTbl.setLoopLabels(forStart, forEnd);
-            fromForStmt(stmtFor.firstForStmt, function);
-            function.appendInstr(Instr.genLabelDecl(forStart));
-            Operand cond = fromCond(stmtFor.cond, function);
-            function.appendInstr(Instr.genGoIfNot(forEnd, cond));
+
+            if (stmtFor.firstForStmt != null) {
+                fromForStmt(stmtFor.firstForStmt, function);
+                function.appendInstr(Instr.genLabelDecl(forStart));
+            }
+
+            if (stmtFor.cond != null) {
+                Operand cond = fromCond(stmtFor.cond, function);
+                function.appendInstr(Instr.genGoIfNot(forEnd, cond));
+            }
+
             fromStmt(stmtFor.stmt, function);
-            fromForStmt(stmtFor.thirdForStmt, function);
+
+            if (stmtFor.thirdForStmt != null) {
+                fromForStmt(stmtFor.thirdForStmt, function);
+            }
+
             function.appendInstr(Instr.genGoto(forStart));
             function.appendInstr(Instr.genLabelDecl(forEnd));
         } else if (stmt instanceof AstStmtBreak) {
@@ -517,9 +528,9 @@ public class IrMaker {
             Reg res = new Reg(var.type);
             if (var.isArray) {
                 Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
-                function.appendInstr(Instr.genLoad(var, res, arrayIndex));
+                function.appendInstr(Instr.genLoad(res, var, arrayIndex));
             } else {
-                function.appendInstr(Instr.genLoad(var, res));
+                function.appendInstr(Instr.genLoad(res, var));
             }
             return res;
         } else {
