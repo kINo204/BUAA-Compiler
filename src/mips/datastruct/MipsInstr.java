@@ -14,6 +14,7 @@ public class MipsInstr {
 
     // Supl fields.
     private String labelString = null;
+    private String comment = null;
 
     // Minimal constructor.
     public MipsInstr(MipsType type) {
@@ -34,6 +35,12 @@ public class MipsInstr {
         this.res = res;
         this.first = first;
         this.second = second;
+    }
+
+    public static MipsInstr genComment(String comment) {
+        MipsInstr instr = new MipsInstr(COMMENT);
+        instr.comment = comment;
+        return instr;
     }
 
     public static MipsInstr genLi(MipsReg reg, Const val) {
@@ -66,8 +73,18 @@ public class MipsInstr {
         return instr;
     }
 
+    private static MipsInstr genBranch(MipsOperator jumpOp, MipsReg first, MipsReg second, FuncRef funcRef) {
+        MipsInstr instr = new MipsInstr(BR, funcRef, first, second);
+        instr.operator = jumpOp;
+        return instr;
+    }
+
     public static MipsInstr genJump(Label label) {
         return genBranch(MipsOperator.j, null, null, label);
+    }
+
+    public static MipsInstr genJal(FuncRef funcRef) {
+        return genBranch(MipsOperator.jal, null, null, funcRef);
     }
 
     public static MipsInstr genBeq(MipsReg first, MipsReg second, Label label) {
@@ -100,7 +117,9 @@ public class MipsInstr {
 
     @Override
     public String toString() {
-        if (type == DOT_TEXT) {
+        if (type == COMMENT) {
+            return "\n\t# " + comment.strip();
+        } else if (type == DOT_TEXT) {
             return ".text";
         } else if (type == DOT_DATA) {
             return ".data";
@@ -128,7 +147,7 @@ public class MipsInstr {
             if (second != null) {
                 sb.append(second).append(", ");
             }
-            sb.append(res);
+            sb.append(res).append("\n");
             return sb.toString();
         } else if (type == MipsType.MEM) {
             return "\t" +
@@ -138,14 +157,15 @@ public class MipsInstr {
                     second + "(" +
                     first + ")";
         } else if (type == MipsType.JR) {
-            return String.format("\tjr\t%s", first);
+            return String.format("\tjr\t%s\n", first);
         } else if (type == MipsType.LABEL) {
-            return "\n" + labelString + ":";
+            return labelString + ":";
         }
         return "\tERR_INSTRUCTION";
     }
 
     public enum MipsType {
+        COMMENT,
         DOT_GLOB,
         DOT_TEXT,
         DOT_DATA,
@@ -157,7 +177,7 @@ public class MipsInstr {
 
         /* Procedural calls */
         BR,
-        JR, JAL,
+        JR,
     }
 
     public enum MipsOperator {
@@ -168,6 +188,6 @@ public class MipsInstr {
         lw, lb, sw, sb,
 
         /* Branches */
-        j, bne, beq,
+        j, jal, bne, beq,
     }
 }

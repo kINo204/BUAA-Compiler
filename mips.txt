@@ -4,49 +4,83 @@
         li      $v0, 17
         syscall
 
-.text
 
-main:
-	sw	$fp, 0($sp)
+	# fun test:
+.text
+test:
+	sw	$fp, -4($sp)
 	move	$fp, $sp
 	addi	$sp, $sp, -4
-	li	$v0, 0
+
+	# %1: i32 = @2.p1
+	lw	$v0, 8($fp)
 	addi	$sp, $sp, -4
 	sw	$v0, -8($fp)
-	li	$v0, 1
-	addi	$sp, $sp, -4
-	sw	$v0, -12($fp)
 
-$l0_for_start:
+	# %2: i8 = @2.p2
+	lb	$v0, 7($fp)
+	addi	$sp, $sp, -1
+	sb	$v0, -9($fp)
+
+	# %3: i8 = @2.p3
+	lb	$v0, 6($fp)
+	addi	$sp, $sp, -1
+	sb	$v0, -10($fp)
+
+	# %4 = add: i32  %1, %2
 	lw	$v0, -8($fp)
-	addi	$sp, $sp, -4
+	lb	$v1, -9($fp)
+	addu	$v0, $v0, $v1
+	addi	$sp, $sp, -6
 	sw	$v0, -16($fp)
-	lw	$v0, -12($fp)
-	addi	$sp, $sp, -4
-	sw	$v0, -20($fp)
+
+	# %5 = add: i32  %4, %3
 	lw	$v0, -16($fp)
-	lw	$v1, -20($fp)
+	lb	$v1, -10($fp)
 	addu	$v0, $v0, $v1
 	addi	$sp, $sp, -4
-	sw	$v0, -24($fp)
-	lw	$v0, -24($fp)
-	sw	$v0, -8($fp)
-	lw	$v0, -12($fp)
-	addi	$sp, $sp, -4
-	sw	$v0, -28($fp)
-	lw	$v0, -28($fp)
-	addi	$v0, $v0, 1
-	addi	$sp, $sp, -4
-	sw	$v0, -32($fp)
-	lw	$v0, -32($fp)
-	sw	$v0, -12($fp)
-	j	$l0_for_start
+	sw	$v0, -20($fp)
 
-$l1_for_end:
-	lw	$v0, -8($fp)
-	addi	$sp, $sp, -4
-	sw	$v0, -36($fp)
-	lw	$v0, -36($fp)
+	# ret: i32  %5
+	lw	$v0, -20($fp)
 	move	$sp, $fp
-	lw	$fp, 0($sp)
+	lw	$fp, -4($sp)
 	jr	$ra
+
+
+	# fun main:
+main:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+	addi	$sp, $sp, -4
+
+	# param  1
+	li	$a0, 1
+	addi	$sp, $sp, -4
+	sw	$a0, -8($fp)
+
+	# param  'a'
+	li	$a0, 'A'
+	addi	$sp, $sp, -1
+	sb	$a0, -9($fp)
+
+	# param  'a'
+	li	$a0, 'A'
+	addi	$sp, $sp, -1
+	sb	$a0, -10($fp)
+
+	# %1 = call: i32  test
+	addi	$sp, $sp, -6
+	sw	$ra, 0($sp)
+	jal	test
+
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, -4
+	sw	$v0, -20($fp)
+
+	# ret: i32  %1
+	lw	$v0, -20($fp)
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+

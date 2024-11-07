@@ -48,7 +48,7 @@ public class Validator {
 
     private void vFuncDef(AstFuncDef funcDef) throws IOException {
         // Ident DEF
-        Symbol functionSym = Symbol.from(funcDef);
+        SymFunc functionSym = (SymFunc) Symbol.from(funcDef);
         symTbl.addSymbol(functionSym);
 
         // Enter function scope.
@@ -56,8 +56,11 @@ public class Validator {
 
         // ( [ FuncFParams ] ) DEF
         if (funcDef.funcFParams != null) {
-            for (AstFuncFParam param : funcDef.funcFParams.funcFParams)
-                symTbl.addSymbol(Symbol.from(param));
+            for (AstFuncFParam param : funcDef.funcFParams.funcFParams) {
+                Symbol symParam = Symbol.from(param);
+                symTbl.addSymbol(symParam);
+                functionSym.addParamSym(symParam);
+            }
         }
 
         // Block
@@ -298,7 +301,7 @@ public class Validator {
             // Validating params types.
             SymFunc sym = (SymFunc) symTbl.searchSym(s.funcIdent);
             if (sym != null) {
-                final ArrayList<SymId> fParams = sym.types;
+                final ArrayList<SymId> fParams = sym.paramTypes;
                 if (s.funcRParams == null) {
                     if (!fParams.isEmpty()) {
                         loggerErr.error(s.funcIdent.lineNo, "d");

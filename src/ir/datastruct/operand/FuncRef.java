@@ -1,7 +1,12 @@
 package ir.datastruct.operand;
 
 import datastruct.symbol.SymFunc;
+import datastruct.symbol.SymVar;
+import datastruct.symbol.Symbol;
+import ir.datastruct.Instr;
 import mips.datastruct.MipsOperand;
+
+import java.util.ArrayList;
 
 import static ir.datastruct.Instr.Type.*;
 
@@ -12,7 +17,7 @@ public class FuncRef extends Operand implements MipsOperand {
     public final String funcName;
     private final int symtblId;
 
-    // TODO Params info:
+    public final ArrayList<Var> params = new ArrayList<>();
 
     public FuncRef(SymFunc symbol) {
         this.symbol = symbol;
@@ -26,7 +31,11 @@ public class FuncRef extends Operand implements MipsOperand {
             default -> null;
         };
 
-        // TODO Create Vars for params.
+        for (Symbol param : symbol.params) {
+            Var varParam = new Var(param);
+            params.add(varParam);
+            ((SymVar) param).irVar = varParam;
+        }
     }
 
     public FuncRef(boolean isMain) {
@@ -39,6 +48,6 @@ public class FuncRef extends Operand implements MipsOperand {
 
     @Override
     public String toString() {
-        return String.format("@%s.%s", symtblId, funcName);
+        return funcName;
     }
 }

@@ -9,6 +9,7 @@ import mips.datastruct.MipsReg;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static ir.datastruct.Instr.Type.i8;
 import static mips.datastruct.MipsInstr.MipsOperator.*;
@@ -16,6 +17,8 @@ import static mips.datastruct.MipsReg.RegId.*;
 import static mips.datastruct.MipsReg.r;
 
 public class MipsMinimalTranslator implements MipsTranslator {
+    private final boolean withIr = true;
+
     // From:
     private final ArrayList<Instr> irInstrs;
     // To:
@@ -34,9 +37,15 @@ public class MipsMinimalTranslator implements MipsTranslator {
         irInstrs = ir.genInstrs();
     }
 
+    private boolean firstParam;
+    private int ofsCall;
     private void frameReset() {
         tmpRegAddr.clear();
         varAddr.clear();
+
+        firstParam = true;
+        ofsCall = 0;
+
         nextMem = 0;
     }
 
@@ -45,36 +54,48 @@ public class MipsMinimalTranslator implements MipsTranslator {
         nextMem -= prominent == 0 ? 0 : align - prominent;
     }
 
-    private void allocWord() {
-        alignMem(4);
-        nextMem -= 4;
-        program.append(MipsInstr.genCalc(addi, r(SP), r(SP), new Const(-4)));
+    private Const allocMem(int size, boolean genSpInstr) {
+        int initialMem = nextMem;
+
+        alignMem(size);
+        nextMem -= size;
+        Const addr = new Const(nextMem);
+
+        if (genSpInstr)
+            program.append(MipsInstr.genCalc(addi, r(SP), r(SP), new Const(nextMem - initialMem)));
+        return addr;
     }
 
-    private Const allocMem(Reg reg) {
+    private Const allocMem(Reg reg, boolean genSpInstr) {
+        int initialMem = nextMem;
+
         alignMem(reg.type.size());
         int memRequired = reg.type.size();
         nextMem -= memRequired;
         Const addr = new Const(nextMem);
         tmpRegAddr.put(reg, addr);
 
-        program.append(MipsInstr.genCalc(addi, r(SP), r(SP), new Const(-memRequired)));
+        if (genSpInstr)
+            program.append(MipsInstr.genCalc(addi, r(SP), r(SP), new Const(nextMem - initialMem)));
         return addr;
     }
 
-    private Const allocMem(Var var) {
+    private Const allocMem(Var var, boolean genSpInstr) {
+        int initialMem = nextMem;
+
         alignMem(var.type.size());
 
         int memRequired = var.type.size();
         if (var.isArray) {
             memRequired *= var.arrayLength;
         }
-
         nextMem -= memRequired;
+
         Const addr = new Const(nextMem);
         varAddr.put(var, addr);
 
-        program.append(MipsInstr.genCalc(addi, r(SP), r(SP), new Const(-memRequired)));
+        if (genSpInstr)
+            program.append(MipsInstr.genCalc(addi, r(SP), r(SP), new Const(nextMem - initialMem)));
         return addr;
     }
 
@@ -115,7 +136,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
             if (tmpRegAddr.containsKey(tmpReg)) {
                 program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), offset(tmpReg)));
             } else {
-                program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), allocMem(tmpReg)));
+                program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), allocMem(tmpReg, true)));
             }
         } else if (to instanceof Var var) {
             assert !var.isArray;
@@ -123,7 +144,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
                 program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), offset(var)));
             } else {
                 // Allocate memory.
-                program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), allocMem(var)));
+                program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), allocMem(var, true)));
             }
         } else {
             assert false;
@@ -141,7 +162,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
             ofs = offset(var).num - index * var.type.size();
         } else {
             // Allocate memory.
-            ofs = allocMem(var).num - index * var.type.size();
+            ofs = allocMem(var, true).num - index * var.type.size();
         }
         program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(FP), new Const(ofs)));
     }
@@ -150,6 +171,9 @@ public class MipsMinimalTranslator implements MipsTranslator {
     @Override
     public MipsProgram translate() {
         for (Instr irInstr : irInstrs) {
+            if (withIr) {
+                program.append(MipsInstr.genComment(irInstr.toString()));
+            }
             switch (irInstr.getOperator()) {
                 case ALLOC -> fromIrAlloc(irInstr);
                 case LOAD -> fromIrLoad(irInstr);
@@ -283,6 +307,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         store(irMove.res, r(V0));
     }
 
+    // TODO comparison instrs
     private void fromIrLss(Instr irLss) {}
 
     private void fromIrLeq(Instr irLeq) {}
@@ -315,7 +340,19 @@ public class MipsMinimalTranslator implements MipsTranslator {
     }
 
     private void fromIrFunc(Instr irFunc) {
-        frameReset();
+        frameReset(); // nextMem = 0
+
+        // Prepare param entries.
+        for (Var varParam : ((FuncRef) irFunc.res).params) {
+            allocMem(varParam, false);
+        }
+        allocMem(4, false); // simulate memory for $ra
+        int alter = -nextMem;
+        for (Map.Entry<Var, Const> entry : varAddr.entrySet()) {
+            entry.setValue(new Const(entry.getValue().num + alter));
+        }
+        // Now we have param entries, just reset nextMem again.
+        nextMem = 0;
 
         if (!enteredTextSeg) {
             enteredTextSeg = true;
@@ -324,25 +361,54 @@ public class MipsMinimalTranslator implements MipsTranslator {
         program.append(MipsInstr.genLabel((FuncRef) irFunc.res));
 
         // Generate function head.
-        program.append(MipsInstr.genMem(sw, r(FP), r(SP), new Const(0)));
+        program.append(MipsInstr.genMem(sw, r(FP), r(SP), new Const(-4)));
         program.append(MipsInstr.genMove(r(FP), r(SP)));
-        allocWord();
+        allocMem(4, true);
     }
     private void fromIrParam(Instr irParam) {
-        // TODO
+        if (firstParam) {
+            firstParam = false;
+            ofsCall = nextMem;
+
+            alignMem(4); // To ensure same memory layout in caller & callee.
+        }
+
+        // Push param.
+        load(irParam.main, r(A0));
+        // Use "new Reg()" to force allocate new stack memory for parameter.
+        // Reference is thrown away for there's no future use of real parameter.
+        // For now, push all params on stack.
+        store(new Reg(irParam.main.type), r(A0)); // No one will remember you since, ever.
     }
 
     private void fromIrCall(Instr irCall) {
-        // TODO
+        if (firstParam) { // If no param, falls here.
+            firstParam = false;
+            ofsCall = nextMem;
+
+            alignMem(4); // To ensure same memory layout in caller & callee.
+        }
+
+        allocMem(4, true);
+        program.append(MipsInstr.genMem(sw, r(RA), r(SP), new Const(0)));
+        program.append(MipsInstr.genJal((FuncRef) irCall.main));
+        program.append(MipsInstr.genMem(lw, r(RA), r(SP), new Const(0)));
+
+        store(irCall.res, r(V0));
+
+        // Recover param status.
+        firstParam = true;
+        nextMem = ofsCall;
     }
 
     private void fromIrRet(Instr irRet) {
         if (irRet.main != null) {
             load(irRet.main, r(V0));
         }
+
         // Generate function tail.
         program.append(MipsInstr.genMove(r(SP), r(FP)));
-        program.append(MipsInstr.genMem(lw, r(FP), r(SP), new Const(0)));
+        program.append(MipsInstr.genMem(lw, r(FP), r(SP), new Const(-4)));
         program.append(MipsInstr.genJumpReg(r(RA)));
     }
 }
