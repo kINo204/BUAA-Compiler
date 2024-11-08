@@ -1,9 +1,9 @@
 package mips.datastruct;
 
-import ir.datastruct.operand.Const;
-import ir.datastruct.operand.FuncRef;
-import ir.datastruct.operand.Label;
+import ir.datastruct.Instr;
+import ir.datastruct.operand.*;
 
+import static ir.datastruct.Instr.Type.i8;
 import static mips.datastruct.MipsInstr.MipsType.*;
 
 public class MipsInstr {
@@ -45,6 +45,11 @@ public class MipsInstr {
 
     public static MipsInstr genLi(MipsReg reg, Const val) {
         return genCalc(MipsOperator.li, reg, null, val);
+    }
+
+    public static MipsInstr genLa(MipsReg to, Var var) {
+        assert var.isGlobal;
+        return genCalc(MipsOperator.la, to,null, var);
     }
 
     public static MipsInstr genMem(MipsOperator op, MipsReg reg, MipsReg base, MipsOperand offset) {
@@ -99,8 +104,18 @@ public class MipsInstr {
         return new MipsInstr(DOT_TEXT);
     }
 
+    public static MipsInstr genDataSeg() {
+        return new MipsInstr(DOT_DATA);
+    }
+
     public static MipsInstr genGlobl() {
         return new MipsInstr(MipsType.DOT_GLOB);
+    }
+
+    public static MipsInstr genGlobDecl(Var var, Instr.Type type, GlobInitVals initVals) {
+        return new MipsInstr(
+                GLOB, var, initVals, null
+        );
     }
 
     public static MipsInstr genLabel(FuncRef funcRef) {
@@ -123,9 +138,14 @@ public class MipsInstr {
             return ".text";
         } else if (type == DOT_DATA) {
             return ".data";
-        } else if (type == MipsType.DOT_GLOB) {
+        } else if (type == DOT_GLOB) {
             return ".globl";
-        } else if (type == MipsType.CALC) {
+        } else if (type == GLOB) {
+            return String.format("\t%s: %s %s",
+                    res,
+                    ((Var) res).type == i8 ? ".byte" : ".word",
+                    first);
+        } else if (type == CALC) {
             StringBuilder sb = new StringBuilder();
             sb.append("\t").append(operator).append("\t");
             if (res != null) {
@@ -149,16 +169,16 @@ public class MipsInstr {
             }
             sb.append(res).append("\n");
             return sb.toString();
-        } else if (type == MipsType.MEM) {
+        } else if (type == MEM) {
             return "\t" +
                     operator +
                     "\t" +
                     res + ", " +
                     second + "(" +
                     first + ")";
-        } else if (type == MipsType.JR) {
+        } else if (type == JR) {
             return String.format("\tjr\t%s\n", first);
-        } else if (type == MipsType.LABEL) {
+        } else if (type == LABEL) {
             return labelString + ":";
         }
         return "\tERR_INSTRUCTION";
@@ -170,6 +190,7 @@ public class MipsInstr {
         DOT_TEXT,
         DOT_DATA,
         LABEL,
+        GLOB,
 
         /* Common operations */
         CALC,

@@ -3,6 +3,7 @@ package ir.datastruct.operand;
 import frontend.datastruct.symbol.SymConstVar;
 import frontend.datastruct.symbol.SymVar;
 import frontend.datastruct.symbol.Symbol;
+import mips.datastruct.MipsOperand;
 
 import static ir.datastruct.Instr.Type.i32;
 import static ir.datastruct.Instr.Type.i8;
@@ -11,7 +12,9 @@ import static ir.datastruct.Instr.Type.i8;
  * This class can only be operand of Decl/Load/Store instructions. Direct
  * participation in calculation instructions or others are not allowed.
  */
-public class Var extends Operand {
+public class Var extends Operand
+        implements MipsOperand/* Only used for var name in global decl */
+{
     // Backup info in Symbol object.
     public final Symbol symbol;
 
@@ -19,15 +22,14 @@ public class Var extends Operand {
     public final String name;
     public final boolean isReference;
     public final boolean isConstant;
+    public boolean isGlobal = false;
     public final boolean isArray;
-    public int arrayLength;
-
-    public int frameOfs;
+    public int arrayLength = 0;
 
     public Var(Symbol symbol) {
         this.symbol = symbol;
 
-        name = "@" + symbol.symtblId + "." + symbol.literal;
+        name = symbol.literal + "_" + symbol.symtblId;
 
 
         if (symbol instanceof SymConstVar var) {

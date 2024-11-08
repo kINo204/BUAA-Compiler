@@ -38,10 +38,144 @@ public class IrMaker {
     private void fromCompUnit(AstCompUnit compUnit) {
         ir.module = new Module();
         // TODO global decl
+        for (AstDecl decl : compUnit.decls) {
+            fromGlobDecl(decl, ir.module);
+        }
         for (AstFuncDef funcDef : compUnit.funcDefs) {
             fromFuncDef(funcDef, ir.module);
         }
         fromMainFuncDef(compUnit.mainFuncDef, ir.module);
+    }
+
+    private void fromGlobDecl(AstDecl decl, Module module) {
+        if (decl.content instanceof AstConstDecl) {
+            fromGlobConstDecl((AstConstDecl) decl.content, module);
+        } else {
+            fromGlobVarDecl((AstVarDecl) decl.content, module);
+        }
+    }
+
+    private void fromGlobConstDecl(AstConstDecl decl, Module module) {
+        for (AstConstDef def : decl.constDefs) {
+            // Init Var obj.
+            SymConstVar symbol = (SymConstVar) symTbl.searchSym(def.ident);
+            Var var = new Var(symbol);
+            var.isGlobal = true;
+            symbol.irVar = var;
+
+            // Fill array length.
+            if (def.constExp != null) {
+                Operand arrayLength = fromConstExp(def.constExp, null);
+                var.arrayLength = ((Const) arrayLength).num;
+            }
+
+            // Prepare init values.
+            GlobInitVals initVals = fromGlobConstInitVals(var, def.constInitVal);
+
+            module.addGlobal(Instr.genGlobDecl(var, initVals));
+        }
+    }
+
+    private GlobInitVals fromGlobConstInitVals(Var var, AstConstInitVal constInitVal) {
+        GlobInitVals initVals = new GlobInitVals();
+
+        if (!var.isArray) {
+            assert constInitVal.constExp != null;
+            Const c = (Const) fromConstExp(constInitVal.constExp, null);
+            initVals.addVal(c);
+        } else {
+            assert constInitVal.constExp == null;
+            Const zero = new Const(0);
+
+            if (constInitVal.stringConst == null) {
+                for (int i = 0; i < var.arrayLength; i++) {
+                    if (i < constInitVal.constExps.size()) {
+                        Const c = (Const) fromConstExp(constInitVal.constExps.get(i), null);
+                        initVals.addVal(c);
+                    } else { // set to zero
+                        initVals.addVal(zero);
+                    }
+                }
+            } else { // StringConst
+                String strInitVal = constInitVal.stringConst.val.string;
+                ArrayList<Const> charConsts = getStringConstPieces(strInitVal);
+
+                while (charConsts.size() < var.arrayLength) {
+                    charConsts.add(zero);
+                }
+
+                initVals.initVals.addAll(charConsts);
+            }
+        }
+
+        return initVals;
+    }
+
+    private void fromGlobVarDecl(AstVarDecl decl, Module module) {
+        for (AstVarDef def : decl.varDefs) {
+            // Init Var obj.
+            SymVar symbol = (SymVar) symTbl.searchSym(def.ident);
+            Var var = new Var(symbol);
+            var.isGlobal = true;
+            symbol.irVar = var;
+
+            // Fill array length.
+            if (def.constExp != null) {
+                Operand arrayLength = fromConstExp(def.constExp, null);
+                var.arrayLength = ((Const) arrayLength).num;
+            }
+
+            // Prepare init values.
+            GlobInitVals initVals = fromGlobVarInitVals(var, def.initVal);
+
+            module.addGlobal(Instr.genGlobDecl(var, initVals));
+        }
+    }
+
+    private GlobInitVals fromGlobVarInitVals(Var var, AstInitVal initVal) {
+        GlobInitVals initVals = new GlobInitVals();
+        Const zero = new Const(0);
+
+        if (initVal == null) {
+            if (!var.isArray) {
+                initVals.addVal(zero);
+            } else {
+                for (int i = 0; i < var.arrayLength; i++) {
+                    initVals.addVal(zero);
+                }
+            }
+            return initVals;
+        }
+
+        if (!var.isArray) {
+            assert initVal.exp != null;
+            Const c = (Const) fromExp(initVal.exp, null);
+            initVals.addVal(c);
+        } else {
+            assert initVal.exp == null;
+
+            if (initVal.stringConst == null) {
+                for (int i = 0; i < var.arrayLength; i++) {
+                    if (i < initVal.exps.size()) {
+                        Const c = (Const) fromExp(initVal.exps.get(i), null);
+                        initVals.addVal(c);
+                    } else { // set to zero (This is global, so also set zero here)
+                        initVals.addVal(zero);
+                    }
+                }
+            } else { // StringConst
+                String strInitVal = initVal.stringConst.val.string;
+                ArrayList<Const> charConsts = getStringConstPieces(strInitVal);
+
+                while (charConsts.size() < var.arrayLength) {
+                    charConsts.add(zero);
+                }
+
+                initVals.initVals.addAll(charConsts);
+            }
+        }
+
+        return initVals;
     }
 
     private void fromFuncDef(AstFuncDef funcDef, Module module) {
@@ -142,7 +276,7 @@ public class IrMaker {
                 //      or fold all in Validator.
                 Operand arrayLength = fromConstExp(def.constExp, function);
                 var.arrayLength = ((Const) arrayLength).num;
-                function.appendInstr(Instr.genAlloc(var, arrayLength));
+                function.appendInstr(Instr.genAlloc(var));
 
                 final ArrayList<Operand> initVals = new ArrayList<>();
                 if (def.constInitVal.stringConst == null) {
@@ -192,7 +326,7 @@ public class IrMaker {
                 //      or fold all in Validator.
                 Operand arrayLength = fromConstExp(def.constExp, function);
                 var.arrayLength = ((Const) arrayLength).num;
-                function.appendInstr(Instr.genAlloc(var, arrayLength));
+                function.appendInstr(Instr.genAlloc(var));
 
                 if (def.initVal != null) {
                     final ArrayList<Operand> initVals = new ArrayList<>();

@@ -60,17 +60,46 @@ getint:
         jr  $ra
 
 
+	# global a_1: i32 = 1
+.data
+	a_1: .word 1
+
+	# global b_1[2]: i32 = 2, 3
+	b_1: .word 2, 3
+
+	# global c_1: i8 = 65
+	c_1: .byte 65
+
+	# global d_1[3]: i8 = 66, 67, 0
+	d_1: .byte 66, 67, 0
+
+	# global a1_1: i32 = 0
+	a1_1: .word 0
+
+	# global b1_1[2]: i32 = 0, 0
+	b1_1: .word 0, 0
+
+	# global c1_1: i8 = 0
+	c1_1: .byte 0
+
+	# global d1_1[3]: i8 = 0, 0, 0
+	d1_1: .byte 0, 0, 0
+
 	# fun main:
-	addi	$sp, $sp, 0
 .text
 main:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
-	addi	$sp, $sp, 0
 	addi	$sp, $sp, -4
 
-	# ret: i32  0
-	li	$v0, 0
+	# %1: i8 = d_1[2]
+	la	$gp, d_1
+	lb	$v0, 2($gp)
+	addi	$sp, $sp, -1
+	sb	$v0, -5($fp)
+
+	# ret: i8  %1
+	lb	$v0, -5($fp)
 	move	$sp, $fp
 	lw	$fp, -4($sp)
 	jr	$ra

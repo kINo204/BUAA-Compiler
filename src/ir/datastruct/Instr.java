@@ -19,7 +19,15 @@ public class Instr {
         this.supl = supl;
     }
 
-    static Instr genFuncDef(FuncRef funcRef) {
+    public static Instr genGlobDecl(Var var, GlobInitVals initVals) {
+        return new Instr(
+                Operator.GLOB, var.type, var,
+                var.arrayLength == 0 ? null : new Const(var.arrayLength),
+                initVals
+        );
+    }
+
+    public static Instr genFuncDef(FuncRef funcRef) {
         return new Instr(
                 Operator.FUNC, funcRef.type, funcRef, null, null
         );
@@ -44,15 +52,11 @@ public class Instr {
     }
 
     public static Instr genAlloc(Var var) {
-        return new Instr(
-                Operator.ALLOC, var.type, var, null, null
-        );
-    }
-
-    public static Instr genAlloc(Var var, Operand arrayLength) {
-        return new Instr(
-                Operator.ALLOC, var.type, var, arrayLength, null
-        );
+        if (var.isArray) {
+            return new Instr( Operator.ALLOC, var.type, var, new Const(var.arrayLength), null );
+        } else {
+            return new Instr( Operator.ALLOC, var.type, var, null, null );
+        }
     }
 
     public static Instr genLoad(Reg reg, Var var) {
@@ -142,7 +146,15 @@ public class Instr {
 
     @Override
     public String toString() {
-        if (op == Operator.FUNC) {
+        if (op == Operator.GLOB) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("global %s", res));
+            if (main != null) {
+                sb.append("[").append(main).append("]");
+            }
+            sb.append(String.format(": %s = %s", type, supl));
+            return sb.toString();
+        } else if (op == Operator.FUNC) {
             return "fun " + res + ":";
         } else if (op == Operator.MOVE) {
             return "\t" + res + ": " + type + " = " + main;
@@ -215,6 +227,7 @@ public class Instr {
 
     public enum Operator {
         // Memory
+        GLOB,
         ALLOC,
         LOAD,
         STORE,
