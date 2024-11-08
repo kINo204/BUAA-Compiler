@@ -159,7 +159,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
             if (!var.isGlobal) {
                 loadIrOperand(index, r(t9)); // Compiler reserved register.
                 if (var.type == i32) {
-                    program.append(MipsInstr.genCalc(sla, r(t9), r(t9), new Const(2)));
+                    program.append(MipsInstr.genCalc(sll, r(t9), r(t9), new Const(2)));
                 }
                 program.append(MipsInstr.genCalc(addu, r(t9), r(fp), r(t9)));
                 program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(t9),
@@ -170,7 +170,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
                 // Load data from address.
                 loadIrOperand(index, r(t9)); // Compiler reserved register.
                 if (var.type == i32) {
-                    program.append(MipsInstr.genCalc(sla, r(t9), r(t9), new Const(2)));
+                    program.append(MipsInstr.genCalc(sll, r(t9), r(t9), new Const(2)));
                 }
                 program.append(MipsInstr.genCalc(addu, r(gp), r(gp), r(t9)));
                 program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(gp),
@@ -239,7 +239,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
             if (!var.isGlobal) {
                 loadIrOperand(index, r(t9)); // Compiler reserved register.
                 if (var.type == i32) {
-                    program.append(MipsInstr.genCalc(sla, r(t9), r(t9), new Const(2)));
+                    program.append(MipsInstr.genCalc(sll, r(t9), r(t9), new Const(2)));
                 }
                 program.append(MipsInstr.genCalc(addu, r(t9), r(fp), r(t9)));
                 program.append(MipsInstr.genMem(var.type == i8 ? sb : sw, from, r(t9),
@@ -250,7 +250,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
                 // Load data from address.
                 loadIrOperand(index, r(t9)); // Compiler reserved register.
                 if (var.type == i32) {
-                    program.append(MipsInstr.genCalc(sla, r(t9), r(t9), new Const(2)));
+                    program.append(MipsInstr.genCalc(sll, r(t9), r(t9), new Const(2)));
                 }
                 program.append(MipsInstr.genCalc(addu, r(gp), r(gp), r(t9)));
                 program.append(MipsInstr.genMem(var.type == i8 ? sb : sw, from, r(gp),
@@ -273,6 +273,8 @@ public class MipsMinimalTranslator implements MipsTranslator {
                 case STORE -> fromIrStoreArr(irInstr);
                 case ADDR -> fromIrGetAddress(irInstr);
                 case DEREF -> fromIrDerefAndIndex(irInstr);
+                case REM_STACK -> fromIrRemStack();
+                case LOD_STACK -> fromIrLoadStack();
                 case ADD -> fromIrAdd(irInstr);
                 case SUB -> fromIrSub(irInstr);
                 case MUL -> fromIrMul(irInstr);
@@ -546,14 +548,24 @@ public class MipsMinimalTranslator implements MipsTranslator {
         program.append(MipsInstr.genJal((FuncRef) irCall.main));
         program.append(MipsInstr.genMem(lw, r(ra), r(sp), new Const(0)));
 
-        if (irCall.res != null) {
-            writeIrOperand(irCall.res, r(v0));
-        }
-
         // Recover param status.
         program.append(MipsInstr.genCalc(addi, r(sp), r(fp), new Const(ofsCall)));
         firstParam = true;
         nextMem = ofsCall;
+
+        if (irCall.res != null) {
+            writeIrOperand(irCall.res, r(v0));
+        }
+    }
+
+    private int ofsStackPos;
+    private void fromIrRemStack() {
+        ofsStackPos = nextMem;
+    }
+
+    private void fromIrLoadStack() {
+        nextMem = ofsStackPos;
+        program.append(MipsInstr.genCalc(addi, r(sp), r(fp), new Const(ofsStackPos)));
     }
 
     private void fromIrRet(Instr irRet) {

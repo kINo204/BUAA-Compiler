@@ -60,31 +60,992 @@ getint:
         jr  $ra
 
 
-	# define fun main:
+	# global ci_1: i32 = 1
+.data
+	ci_1: .word 1
+
+	# global ciexp_1: i32 = 0
+	ciexp_1: .word 0
+
+	# global ca_1: i32 = 1
+	ca_1: .word 1
+
+	# global cb_1: i32 = 2
+	cb_1: .word 2
+
+	# global i_1: i32 = 1
+	i_1: .word 1
+
+	# global iexp_1: i32 = 0
+	iexp_1: .word 0
+
+	# global a_1: i32 = 1
+	a_1: .word 1
+
+	# global b_1: i32 = 2
+	b_1: .word 2
+
+	# define fun funv:
 .text
+funv:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+	addi	$sp, $sp, -4
+
+	# param  102
+	li	$a0, 102
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param  117
+	li	$a0, 117
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param  110
+	li	$a0, 110
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param  118
+	li	$a0, 118
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# ret
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun funi:
+funi:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+	addi	$sp, $sp, -4
+
+	# param  102
+	li	$a0, 102
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param  117
+	li	$a0, 117
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param  110
+	li	$a0, 110
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param  105
+	li	$a0, 105
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# ret: i32  0
+	li	$v0, 0
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun funvnop:
+funvnop:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+	addi	$sp, $sp, -4
+
+	# ret: i32  0
+	li	$v0, 0
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun main:
 main:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
 	addi	$sp, $sp, -4
 
-	# a_2 = alloc: i32
+	# ma1_6 = alloc: i32
 	addi	$sp, $sp, -4
 
-	# if false 1 goto  $L0_if_end
-	li	$v0, 1
-	beq	$v0, $zero, $L0_if_end
+	# ma2_6 = alloc: i32
+	addi	$sp, $sp, -4
 
+	# ma3_6 = alloc: i32
+	addi	$sp, $sp, -4
 
-	# a_2: i32 = 1
+	# ma4_6 = alloc: i32
+	addi	$sp, $sp, -4
+
+	# ma1_6: i32 = 1
 	li	$v0, 1
 	sw	$v0, -8($fp)
 
-	# $L0_if_end:
-$L0_if_end:
-
-	# a_2: i32 = 2
+	# ma2_6: i32 = 2
 	li	$v0, 2
-	sw	$v0, -8($fp)
+	sw	$v0, -12($fp)
+
+	# ma3_6: i32 = 1
+	li	$v0, 1
+	sw	$v0, -16($fp)
+
+	# ma4_6: i32 = 1
+	li	$v0, 1
+	sw	$v0, -20($fp)
+
+	# %1: i32 = ma1_6
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -24($fp)
+
+	# %2: i32 = ma2_6
+	lw	$v0, -12($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -28($fp)
+
+	# %3 = neq: i32  %1, %2
+	lw	$v0, -24($fp)
+	lw	$v1, -28($fp)
+	sne	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -32($fp)
+
+	# if false %3 goto  $L0_if_else
+	lw	$v0, -32($fp)
+	beq	$v0, $zero, $L0_if_else
+
+
+	# mif1_7 = alloc: i32
+	addi	$sp, $sp, -4
+
+	# mif1_7: i32 = 1
+	li	$v0, 1
+	sw	$v0, -36($fp)
+
+	# %4: i32 = mif1_7
+	lw	$v0, -36($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -40($fp)
+
+	# param  %4
+	lw	$a0, -40($fp)
+	addi	$sp, $sp, -4
+	sw	$a0, -44($fp)
+
+	# call: void  putint
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	jal	putint
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -40
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -41($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -40
+
+	# goto  $L1_if_end
+	j	$L1_if_end
+
+
+	# $L0_if_else:
+$L0_if_else:
+
+	# ret: i32  0
+	li	$v0, 0
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# $L1_if_end:
+$L1_if_end:
+
+	# %5: i32 = ma1_6
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -44($fp)
+
+	# %6: i32 = ma3_6
+	lw	$v0, -16($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -48($fp)
+
+	# %7 = eql: i32  %5, %6
+	lw	$v0, -44($fp)
+	lw	$v1, -48($fp)
+	seq	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -52($fp)
+
+	# if false %7 goto  $L2_if_end
+	lw	$v0, -52($fp)
+	beq	$v0, $zero, $L2_if_end
+
+
+	# %8: i32 = ma1_6
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -56($fp)
+
+	# param  %8
+	lw	$a0, -56($fp)
+	addi	$sp, $sp, -4
+	sw	$a0, -60($fp)
+
+	# %9 = call: i32  funi
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	jal	funi
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -56
+	addi	$sp, $sp, -4
+	sw	$v0, -60($fp)
+
+	# $L2_if_end:
+$L2_if_end:
+
+	# %10: i32 = ma1_6
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -64($fp)
+
+	# %11: i32 = ma3_6
+	lw	$v0, -16($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -68($fp)
+
+	# %12 = neq: i32  %10, %11
+	lw	$v0, -64($fp)
+	lw	$v1, -68($fp)
+	sne	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -72($fp)
+
+	# if false %12 goto  $L3_if_end
+	lw	$v0, -72($fp)
+	beq	$v0, $zero, $L3_if_end
+
+
+	# %13 = call: i32  funvnop
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	jal	funvnop
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -72
+	addi	$sp, $sp, -4
+	sw	$v0, -76($fp)
+
+	# $L3_if_end:
+$L3_if_end:
+
+	# %14: i32 = ma1_6
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -80($fp)
+
+	# %15: i32 = ma3_6
+	lw	$v0, -16($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -84($fp)
+
+	# %16 = geq: i32  %14, %15
+	lw	$v0, -80($fp)
+	lw	$v1, -84($fp)
+	sge	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -88($fp)
+
+	# if false %16 goto  $L4_if_end
+	lw	$v0, -88($fp)
+	beq	$v0, $zero, $L4_if_end
+
+
+	# $L4_if_end:
+$L4_if_end:
+
+	# %17: i32 = ma2_6
+	lw	$v0, -12($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -92($fp)
+
+	# %18: i32 = ma3_6
+	lw	$v0, -16($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -96($fp)
+
+	# %19 = leq: i32  %17, %18
+	lw	$v0, -92($fp)
+	lw	$v1, -96($fp)
+	sle	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -100($fp)
+
+	# if false %19 goto  $L5_if_end
+	lw	$v0, -100($fp)
+	beq	$v0, $zero, $L5_if_end
+
+
+	# %20 = call: i32  funvnop
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	jal	funvnop
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -100
+	addi	$sp, $sp, -4
+	sw	$v0, -104($fp)
+
+	# $L5_if_end:
+$L5_if_end:
+
+	# %21: i32 = ma1_6
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -108($fp)
+
+	# %22: i32 = ma3_6
+	lw	$v0, -16($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -112($fp)
+
+	# %23 = gre: i32  %21, %22
+	lw	$v0, -108($fp)
+	lw	$v1, -112($fp)
+	sgt	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -116($fp)
+
+	# if false %23 goto  $L6_if_end
+	lw	$v0, -116($fp)
+	beq	$v0, $zero, $L6_if_end
+
+
+	# %24 = call: i32  funvnop
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	jal	funvnop
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -116
+	addi	$sp, $sp, -4
+	sw	$v0, -120($fp)
+
+	# $L6_if_end:
+$L6_if_end:
+
+	# %25: i32 = ma2_6
+	lw	$v0, -12($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -124($fp)
+
+	# %26: i32 = ma3_6
+	lw	$v0, -16($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -128($fp)
+
+	# %27 = lss: i32  %25, %26
+	lw	$v0, -124($fp)
+	lw	$v1, -128($fp)
+	slt	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -132($fp)
+
+	# if false %27 goto  $L7_if_end
+	lw	$v0, -132($fp)
+	beq	$v0, $zero, $L7_if_end
+
+
+	# %28 = call: i32  funvnop
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	jal	funvnop
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -132
+	addi	$sp, $sp, -4
+	sw	$v0, -136($fp)
+
+	# $L7_if_end:
+$L7_if_end:
+
+	# %29 = call: i32  funvnop
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	jal	funvnop
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -136
+	addi	$sp, $sp, -4
+	sw	$v0, -140($fp)
+
+	# $L8_for_cond:
+$L8_for_cond:
+
+	# stack rem
+
+	# %30: i32 = ma1_6
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -144($fp)
+
+	# %31: i32 = ma4_6
+	lw	$v0, -20($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -148($fp)
+
+	# %32 = eql: i32  %30, %31
+	lw	$v0, -144($fp)
+	lw	$v1, -148($fp)
+	seq	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -152($fp)
+
+	# if false %32 goto  $L10_for_end
+	lw	$v0, -152($fp)
+	beq	$v0, $zero, $L10_for_end
+
+
+	# ma4_6: i32 = 2
+	li	$v0, 2
+	sw	$v0, -20($fp)
+
+	# goto  $L9_for_motion
+	j	$L9_for_motion
+
+
+	# $L9_for_motion:
+$L9_for_motion:
+
+	# stack lod
+	addi	$sp, $fp, -140
+
+	# goto  $L8_for_cond
+	j	$L8_for_cond
+
+
+	# $L10_for_end:
+$L10_for_end:
+
+	# stack lod
+	addi	$sp, $fp, -140
+
+	# $L11_for_cond:
+$L11_for_cond:
+
+	# stack rem
+
+	# %33: i32 = ma1_6
+	lw	$v0, -8($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -144($fp)
+
+	# %34: i32 = ma4_6
+	lw	$v0, -20($fp)
+	addi	$sp, $sp, -4
+	sw	$v0, -148($fp)
+
+	# %35 = eql: i32  %33, %34
+	lw	$v0, -144($fp)
+	lw	$v1, -148($fp)
+	seq	$v0, $v0, $v1
+	addi	$sp, $sp, -4
+	sw	$v0, -152($fp)
+
+	# if false %35 goto  $L13_for_end
+	lw	$v0, -152($fp)
+	beq	$v0, $zero, $L13_for_end
+
+
+	# goto  $L13_for_end
+	j	$L13_for_end
+
+
+	# $L12_for_motion:
+$L12_for_motion:
+
+	# stack lod
+	addi	$sp, $fp, -140
+
+	# goto  $L11_for_cond
+	j	$L11_for_cond
+
+
+	# $L13_for_end:
+$L13_for_end:
+
+	# stack lod
+	addi	$sp, $fp, -140
+
+	# param  116
+	li	$a0, 116
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  114
+	li	$a0, 114
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  121
+	li	$a0, 121
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  116
+	li	$a0, 116
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  114
+	li	$a0, 114
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  121
+	li	$a0, 121
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  116
+	li	$a0, 116
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  114
+	li	$a0, 114
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  121
+	li	$a0, 121
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  116
+	li	$a0, 116
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  114
+	li	$a0, 114
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  121
+	li	$a0, 121
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  116
+	li	$a0, 116
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  114
+	li	$a0, 114
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  121
+	li	$a0, 121
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  116
+	li	$a0, 116
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  114
+	li	$a0, 114
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  121
+	li	$a0, 121
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  116
+	li	$a0, 116
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  114
+	li	$a0, 114
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  121
+	li	$a0, 121
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
+
+	# param  10
+	li	$a0, 10
+	addi	$sp, $sp, -1
+	sb	$a0, -141($fp)
+
+	# call: void  putchar
+	addi	$sp, $sp, -7
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -140
 
 	# ret: i32  0
 	li	$v0, 0

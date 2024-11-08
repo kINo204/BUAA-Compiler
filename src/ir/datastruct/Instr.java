@@ -19,6 +19,14 @@ public class Instr {
         this.supl = supl;
     }
 
+    public static Instr genRemStack() {
+        return new Instr(Operator.REM_STACK);
+    }
+
+    public static Instr genLoadStack() {
+        return new Instr(Operator.LOD_STACK);
+    }
+
     public static Instr genGlobDecl(Var var, GlobInitVals initVals) {
         return new Instr(
                 Operator.GLOB, var.type, var,
@@ -187,6 +195,10 @@ public class Instr {
             }
             str += String.format("%s goto  %s", main, res);
             return str;
+        } else if (op == Operator.REM_STACK) {
+            return "stack rem";
+        } else if (op == Operator.LOD_STACK) {
+            return "stack lod";
         } else {
             StringBuilder sb = new StringBuilder();
             if (res != null) {
@@ -233,6 +245,8 @@ public class Instr {
         STORE,
         ADDR,
         DEREF,
+        REM_STACK,
+        LOD_STACK,
 
         // Arithmetic
         ADD,

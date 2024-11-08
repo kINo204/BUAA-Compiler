@@ -37,7 +37,6 @@ public class IrMaker {
     // Calling contract: on calling "fromXXX", parts of IR for XXX will be generated.
     private void fromCompUnit(AstCompUnit compUnit) {
         ir.module = new Module();
-        // TODO global decl
         for (AstDecl decl : compUnit.decls) {
             fromGlobDecl(decl, ir.module);
         }
@@ -270,10 +269,6 @@ public class IrMaker {
             varSymbol.irVar = var;
 
             if (var.isArray) {
-                // TODO We must fold this `constExp` at compile time! Then the
-                //      operand will be just a `Const` type.
-                //      `def.constExp = Calculator.calc(def.constExp);`
-                //      or fold all in Validator.
                 Operand arrayLength = fromConstExp(def.constExp, function);
                 var.arrayLength = ((Const) arrayLength).num;
                 function.appendInstr(Instr.genAlloc(var));
@@ -320,10 +315,6 @@ public class IrMaker {
             varSymbol.irVar = var;
 
             if (var.isArray) {
-                // TODO We must fold this `constExp` at compile time! Then the
-                //      operand will be just a `Const` type.
-                //      `def.constExp = Calculator.calc(def.constExp);`
-                //      or fold all in Validator.
                 Operand arrayLength = fromConstExp(def.constExp, function);
                 var.arrayLength = ((Const) arrayLength).num;
                 function.appendInstr(Instr.genAlloc(var));
@@ -363,8 +354,6 @@ public class IrMaker {
     }
 
     private void fromStmt(AstStmt stmt, Function function) {
-        // TODO getint
-        // TODO getchar
         if (stmt instanceof AstStmtSingleExp stmtSingleExp) {
             if (stmtSingleExp.exp != null) {
                 fromExp(stmtSingleExp.exp, function);
@@ -427,6 +416,7 @@ public class IrMaker {
             }
 
             function.appendInstr(Instr.genLabelDecl(forCond));
+            function.appendInstr(Instr.genRemStack());
 
             if (stmtFor.cond != null) {
                 Operand cond = fromCond(stmtFor.cond, function);
@@ -442,8 +432,11 @@ public class IrMaker {
                 fromForStmt(stmtFor.thirdForStmt, function);
             }
 
+            function.appendInstr(Instr.genLoadStack());
             function.appendInstr(Instr.genGoto(forCond));
             function.appendInstr(Instr.genLabelDecl(forEnd));
+            function.appendInstr(Instr.genLoadStack());
+
         } else if (stmt instanceof AstStmtBreak) {
             Label forEnd = symTbl.getCurLoopEnd();
             function.appendInstr(Instr.genGoto(forEnd));

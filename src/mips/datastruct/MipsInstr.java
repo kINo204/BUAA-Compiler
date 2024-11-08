@@ -203,7 +203,7 @@ public class MipsInstr {
 
     public enum MipsOperator {
         move,
-        addu, addi, subu, subi, mul, divu, sla,
+        addu, addi, subu, subi, mul, divu, sll,
         mfhi, mflo,
         li, la,
         lw, lb, sw, sb,
