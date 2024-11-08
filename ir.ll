@@ -1,34 +1,65 @@
-global ci0_1: i32 = 1
+global e_c_1[20]: i8 = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-global ci1_1: i32 = 2
+define fun oerr:
+	i_2 = alloc: i32
+	i_2: i32 = 0
 
-global ci2_1: i32 = 4
+$L0_for_cond:
+	%1: i32 = i_2
+	%2 = lss: i32  %1, 20
+	if false %2 goto  $L2_for_end
+	%4: i32 = i_2
+	%3: i8 = e_c_1[%4]
+	if false %3 goto  $L3_if_end
+	%6: i32 = i_2
+	%5: i8 = e_c_1[%6]
+	param  %5
+	call: void  putchar
 
-global cc0_1: i8 = 49
+$L3_if_end:
 
-global cc1_1: i8 = 50
+$L1_for_motion:
+	%7: i32 = i_2
+	%8 = add: i32  %7, 1
+	i_2: i32 = %8
+	goto  $L0_for_cond
 
-global cc2_1: i8 = 52
+$L2_for_end:
+	ret
 
-global vi0_1: i32 = 1
+define fun side_effect:
+	param  115
+	call: void  putchar
+	param  105
+	call: void  putchar
+	param  100
+	call: void  putchar
+	param  101
+	call: void  putchar
+	param  32
+	call: void  putchar
+	param  101
+	call: void  putchar
+	param  102
+	call: void  putchar
+	param  102
+	call: void  putchar
+	param  101
+	call: void  putchar
+	param  99
+	call: void  putchar
+	param  116
+	call: void  putchar
+	param  32
+	call: void  putchar
+	%1: i32 = num_4
+	param  %1
+	call: void  putint
+	param  10
+	call: void  putchar
+	ret: i32  1
 
-global vi1_1: i32 = 2
-
-global vi2_1: i32 = 4
-
-global vc0_1: i8 = 49
-
-global vc1_1: i8 = 50
-
-global vc2_1: i8 = 52
-
-fun add:
-	%1: i32 = a_2
-	%2: i8 = b_2
-	%3 = add: i32  %1, %2
-	ret: i32  %3
-
-fun main:
+define fun main:
 	param  50
 	call: void  putchar
 	param  50
@@ -44,6 +75,150 @@ fun main:
 	param  56
 	call: void  putchar
 	param  49
+	call: void  putchar
+	param  10
+	call: void  putchar
+	%1: i32 = 0
+	if false 1 goto  $L5_landexp_end
+	if false 0 goto  $L5_landexp_end
+	%1: i32 = 1
+	goto  $L5_landexp_end
+
+$L5_landexp_end:
+	if false %1 goto  $L4_if_end
+	e_c_1[0]: i8 = 49
+
+$L4_if_end:
+	%2: i32 = 1
+	%3: i32 = 0
+	if false 1 goto  $L8_landexp_end
+	if false 0 goto  $L8_landexp_end
+	%3: i32 = 1
+	goto  $L8_landexp_end
+
+$L8_landexp_end:
+	if %3 goto  $L7_lorexp_end
+	%4: i32 = 0
+	if false 0 goto  $L9_landexp_end
+	if false 4 goto  $L9_landexp_end
+	%4: i32 = 1
+	goto  $L9_landexp_end
+
+$L9_landexp_end:
+	if %4 goto  $L7_lorexp_end
+	%2: i32 = 0
+	goto  $L7_lorexp_end
+
+$L7_lorexp_end:
+	if false %2 goto  $L6_if_end
+	e_c_1[0]: i8 = 49
+
+$L6_if_end:
+	param  70
+	call: void  putchar
+	param  76
+	call: void  putchar
+	param  65
+	call: void  putchar
+	param  71
+	call: void  putchar
+	param  49
+	call: void  putchar
+	param  10
+	call: void  putchar
+	%5: i32 = 0
+	if false 0 goto  $L11_landexp_end
+	param  0
+	%6 = call: i32  side_effect
+	if false %6 goto  $L11_landexp_end
+	%5: i32 = 1
+	goto  $L11_landexp_end
+
+$L11_landexp_end:
+	if false %5 goto  $L10_if_end
+
+$L10_if_end:
+	param  70
+	call: void  putchar
+	param  76
+	call: void  putchar
+	param  65
+	call: void  putchar
+	param  71
+	call: void  putchar
+	param  50
+	call: void  putchar
+	param  10
+	call: void  putchar
+	%7: i32 = 0
+	if false 1 goto  $L13_landexp_end
+	param  1
+	%8 = call: i32  side_effect
+	if false %8 goto  $L13_landexp_end
+	%7: i32 = 1
+	goto  $L13_landexp_end
+
+$L13_landexp_end:
+	if false %7 goto  $L12_if_end
+
+$L12_if_end:
+	param  70
+	call: void  putchar
+	param  76
+	call: void  putchar
+	param  65
+	call: void  putchar
+	param  71
+	call: void  putchar
+	param  51
+	call: void  putchar
+	param  10
+	call: void  putchar
+	%9: i32 = 1
+	if 0 goto  $L15_lorexp_end
+	param  2
+	%10 = call: i32  side_effect
+	if %10 goto  $L15_lorexp_end
+	%9: i32 = 0
+	goto  $L15_lorexp_end
+
+$L15_lorexp_end:
+	if false %9 goto  $L14_if_end
+
+$L14_if_end:
+	param  70
+	call: void  putchar
+	param  76
+	call: void  putchar
+	param  65
+	call: void  putchar
+	param  71
+	call: void  putchar
+	param  52
+	call: void  putchar
+	param  10
+	call: void  putchar
+	%11: i32 = 1
+	if 1 goto  $L17_lorexp_end
+	param  3
+	%12 = call: i32  side_effect
+	if %12 goto  $L17_lorexp_end
+	%11: i32 = 0
+	goto  $L17_lorexp_end
+
+$L17_lorexp_end:
+	if false %11 goto  $L16_if_end
+
+$L16_if_end:
+	param  70
+	call: void  putchar
+	param  76
+	call: void  putchar
+	param  65
+	call: void  putchar
+	param  71
+	call: void  putchar
+	param  53
 	call: void  putchar
 	param  10
 	call: void  putchar
@@ -71,157 +246,5 @@ fun main:
 	call: void  putchar
 	param  32
 	call: void  putchar
-	e_c1_3 = alloc: i8
-	e_c1_3: i8 = 0
-	e_c2_3 = alloc: i8
-	e_c2_3: i8 = 0
-	e_c3_3 = alloc: i8
-	e_c3_3: i8 = 0
-	e_c4_3 = alloc: i8
-	e_c4_3: i8 = 0
-	e_c5_3 = alloc: i8
-	e_c5_3: i8 = 0
-	e_c6_3 = alloc: i8
-	e_c6_3: i8 = 0
-	e_c7_3 = alloc: i8
-	e_c7_3: i8 = 0
-	e_c8_3 = alloc: i8
-	e_c8_3: i8 = 0
-	e_c9_3 = alloc: i8
-	e_c9_3: i8 = 0
-	e_c10_3 = alloc: i8
-	e_c10_3: i8 = 0
-	e_c11_3 = alloc: i8
-	e_c11_3: i8 = 0
-	e_c12_3 = alloc: i8
-	e_c12_3: i8 = 0
-	e_c13_3 = alloc: i8
-	e_c13_3: i8 = 0
-	e_c14_3 = alloc: i8
-	e_c14_3: i8 = 0
-	e_c15_3 = alloc: i8
-	e_c15_3: i8 = 0
-	e_c16_3 = alloc: i8
-	e_c16_3: i8 = 0
-	%1: i32 = ci0_1
-	%2: i32 = ci1_1
-	%3: i32 = ci2_1
-	%4 = add: i32  %1, %2
-	%5 = add: i32  %4, %3
-	%6 = neq: i32  %5, 7
-	if not %6 goto  $L0_if_end
-	e_c1_3: i8 = 49
-
-$L0_if_end:
-	%7: i8 = cc0_1
-	%8: i8 = cc1_1
-	%9 = sub: i32  %8, 48
-	%10: i8 = cc2_1
-	%11 = sub: i32  %10, 48
-	%12 = add: i32  %7, %9
-	%13 = add: i32  %12, %11
-	%14 = neq: i32  %13, 55
-	if not %14 goto  $L1_if_end
-	e_c2_3: i8 = 50
-
-$L1_if_end:
-	%15: i32 = vi0_1
-	%16: i32 = vi1_1
-	%17: i32 = vi2_1
-	%18 = add: i32  %15, %16
-	%19 = add: i32  %18, %17
-	%20 = neq: i32  %19, 7
-	if not %20 goto  $L2_if_end
-	e_c3_3: i8 = 51
-
-$L2_if_end:
-	%21: i8 = vc0_1
-	%22: i8 = vc1_1
-	%23 = sub: i32  %22, 48
-	%24: i8 = vc2_1
-	%25 = sub: i32  %24, 48
-	%26 = add: i32  %21, %23
-	%27 = add: i32  %26, %25
-	%28 = neq: i32  %27, 55
-	if not %28 goto  $L3_if_end
-	e_c4_3: i8 = 52
-
-$L3_if_end:
-	c1_3 = alloc: i32
-	param  1
-	param  48
-	%29 = call: i32  add
-	c1_3: i32 = %29
-	%30: i32 = c1_3
-	%31 = neq: i32  %30, 49
-	if not %31 goto  $L4_if_end
-	e_c5_3: i8 = 53
-
-$L4_if_end:
-	b0_3 = alloc: i32
-	b0_3: i32 = 0
-	b0_6 = alloc: i32
-	b0_6: i32 = 5
-	%32: i32 = b0_6
-	%33 = neq: i32  %32, 5
-	if not %33 goto  $L5_if_end
-	e_c6_3: i8 = 54
-
-$L5_if_end:
-	%34: i32 = b0_3
-	%35 = neq: i32  %34, 0
-	if not %35 goto  $L6_if_end
-	e_c6_3: i8 = 54
-
-$L6_if_end:
-	%36: i8 = e_c1_3
-	param  %36
-	call: void  putchar
-	%37: i8 = e_c2_3
-	param  %37
-	call: void  putchar
-	%38: i8 = e_c3_3
-	param  %38
-	call: void  putchar
-	%39: i8 = e_c4_3
-	param  %39
-	call: void  putchar
-	%40: i8 = e_c5_3
-	param  %40
-	call: void  putchar
-	%41: i8 = e_c6_3
-	param  %41
-	call: void  putchar
-	%42: i8 = e_c7_3
-	param  %42
-	call: void  putchar
-	%43: i8 = e_c8_3
-	param  %43
-	call: void  putchar
-	%44: i8 = e_c9_3
-	param  %44
-	call: void  putchar
-	%45: i8 = e_c10_3
-	param  %45
-	call: void  putchar
-	%46: i8 = e_c11_3
-	param  %46
-	call: void  putchar
-	%47: i8 = e_c12_3
-	param  %47
-	call: void  putchar
-	%48: i8 = e_c13_3
-	param  %48
-	call: void  putchar
-	%49: i8 = e_c14_3
-	param  %49
-	call: void  putchar
-	%50: i8 = e_c15_3
-	param  %50
-	call: void  putchar
-	%51: i8 = e_c16_3
-	param  %51
-	call: void  putchar
-	param  10
-	call: void  putchar
+	call: void  oerr
 	ret: i32  0

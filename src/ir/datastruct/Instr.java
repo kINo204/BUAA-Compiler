@@ -155,7 +155,7 @@ public class Instr {
             sb.append(String.format(": %s = %s", type, supl));
             return sb.toString();
         } else if (op == Operator.FUNC) {
-            return "fun " + res + ":";
+            return "define fun " + res + ":";
         } else if (op == Operator.MOVE) {
             return "\t" + res + ": " + type + " = " + main;
         } else if (op == Operator.LABEL) {
@@ -183,7 +183,7 @@ public class Instr {
             if (op == Operator.GOIF) {
                 str = "\tif ";
             } else {
-                str = "\tif not ";
+                str = "\tif false ";
             }
             str += String.format("%s goto  %s", main, res);
             return str;

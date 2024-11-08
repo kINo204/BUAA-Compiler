@@ -559,21 +559,19 @@ public class IrMaker {
         if (lOrExp.lAndExps.size() == 1) {
             return fromLAndExp(lOrExp.lAndExps.get(0), function);
         } else {
-            Label labelTrue = new Label("lorexp_true");
             Label labelEnd = new Label("lorexp_end");
+            Reg res = new Reg(i32);
+
+            function.appendInstr(Instr.genMove(new Const(1), res));
 
             for (AstLAndExp lAndExp : lOrExp.lAndExps) {
                 Operand operand = fromLAndExp(lAndExp, function);
-                Instr instrGoif = Instr.genGoif(labelTrue, operand);
+                Instr instrGoif = Instr.genGoif(labelEnd, operand);
                 function.appendInstr(instrGoif);
             }
 
-            Reg res = new Reg(i32);
             function.appendInstr(Instr.genMove(new Const(0), res));
             function.appendInstr(Instr.genGoto(labelEnd));
-
-            function.appendInstr(Instr.genLabelDecl(labelTrue));
-            function.appendInstr(Instr.genMove(new Const(1), res));
 
             function.appendInstr(Instr.genLabelDecl(labelEnd));
 
@@ -585,21 +583,19 @@ public class IrMaker {
         if (lAndExp.eqExps.size() == 1) {
             return fromEqExp(lAndExp.eqExps.get(0), function);
         } else {
-            Label labelFalse = new Label("landexp_false");
             Label labelEnd = new Label("landexp_end");
+            Reg res = new Reg(i32);
+
+            function.appendInstr(Instr.genMove(new Const(0), res));
 
             for (AstEqExp eqExp : lAndExp.eqExps) {
                 Operand operand = fromEqExp(eqExp, function);
-                Instr instrGont = Instr.genGoIfNot(labelFalse, operand);
+                Instr instrGont = Instr.genGoIfNot(labelEnd, operand);
                 function.appendInstr(instrGont);
             }
 
-            Reg res = new Reg(i32);
             function.appendInstr(Instr.genMove(new Const(1), res));
             function.appendInstr(Instr.genGoto(labelEnd));
-
-            function.appendInstr(Instr.genLabelDecl(labelFalse));
-            function.appendInstr(Instr.genMove(new Const(0), res));
 
             function.appendInstr(Instr.genLabelDecl(labelEnd));
 

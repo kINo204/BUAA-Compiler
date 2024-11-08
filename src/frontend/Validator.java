@@ -75,6 +75,13 @@ public class Validator {
             ) {
                 loggerErr.error(funcDef.block.braceEnd.lineNo, "g");
             }
+        } else { // Add a "return" at tail for void function without one.
+            if (!(funcDef.block.blockItems.get(funcDef.block.blockItems.size() - 1).content
+                    instanceof AstStmtReturn)) {
+                AstBlockItem blockItem = new AstBlockItem();
+                blockItem.content = new AstStmtReturn();
+                funcDef.block.blockItems.add(blockItem);
+            }
         }
 
         symTbl.exitScope();

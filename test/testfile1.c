@@ -1,17 +1,3 @@
-#include <stdio.h>
-int getchar(){
-	char c; 
-	scanf("%c",&c); 
-	return (int)c; 
-}
-
-int getint(){
-	int t;
-	scanf("%d",&t);
-	while(getchar()!='\n');
-	return t;
-}
-
 /* Test level-a. Contents:
 	- Logic Exp
 	- Logic side effects
@@ -26,7 +12,6 @@ void oerr() {
 		if (e_c[i])
 			printf("%c", e_c[i]);
 	}
-	return;
 }
 
 int side_effect(int num) {

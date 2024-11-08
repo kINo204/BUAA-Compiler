@@ -38,7 +38,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         irInstrs = ir.genInstrs();
     }
 
-    private boolean firstParam;
+    private boolean firstParam = true;
     private int ofsCall;
     private void frameReset() {
         tmpRegAddr.clear();
@@ -68,7 +68,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         Const addr = new Const(nextMem);
 
         if (genSpInstr)
-            program.append(MipsInstr.genCalc(addi, r(sp), r(sp), new Const(-alter-size)));
+            program.append(MipsInstr.genCalc(addi, r(sp), r(sp), new Const(-(alter + size))));
 
         return addr;
     }
@@ -83,7 +83,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         tmpRegAddr.put(reg, addr);
 
         if (genSpInstr)
-            program.append(MipsInstr.genCalc(addi, r(sp), r(sp), new Const(-alter-size)));
+            program.append(MipsInstr.genCalc(addi, r(sp), r(sp), new Const(-(alter + size))));
 
         return addr;
     }
@@ -102,7 +102,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         varAddr.put(var, addr);
 
         if (genSpInstr)
-            program.append(MipsInstr.genCalc(addi, r(sp), r(sp), new Const(-alter-size)));
+            program.append(MipsInstr.genCalc(addi, r(sp), r(sp), new Const(-(alter + size))));
 
         return addr;
     }
@@ -115,7 +115,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         return varAddr.get(var);
     }
 
-    private void load(Operand operand, MipsReg reg) {
+    private void loadIrOperand(Operand operand, MipsReg reg) {
         if (operand instanceof Var var) {
             // Load from corresponding memory location.
             assert !var.isArray;
@@ -138,26 +138,48 @@ public class MipsMinimalTranslator implements MipsTranslator {
         }
     }
 
-    private void loadArray(Operand operand, int index, MipsReg reg) {
+    private void loadIrOperandArr(Operand operand, Operand index, MipsReg reg) {
         assert operand instanceof Var;
         Var var = (Var) operand;
         assert var.isArray;
-        assert var.arrayLength < 0 || index < var.arrayLength;
 
-        int ofs = index * var.type.size();
-        if (!var.isGlobal) {
-            program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(fp),
-                    new Const(offset(var).num + ofs)));
+        if (index instanceof Const c) {
+            int ofs = c.num * var.type.size();
+            if (!var.isGlobal) {
+                program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(fp),
+                        new Const(offset(var).num + ofs)));
+            } else {
+                // Load address.
+                program.append(MipsInstr.genLa(r(gp), var));
+                // Load data from address.
+                program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(gp),
+                        new Const(ofs)));
+            }
         } else {
-            // Load address.
-            program.append(MipsInstr.genLa(r(gp), var));
-            // Load data from address.
-            program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(gp),
-                    new Const(ofs)));
+            if (!var.isGlobal) {
+                loadIrOperand(index, r(t9)); // Compiler reserved register.
+                if (var.type == i32) {
+                    program.append(MipsInstr.genCalc(sla, r(t9), r(t9), new Const(2)));
+                }
+                program.append(MipsInstr.genCalc(addu, r(t9), r(fp), r(t9)));
+                program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(t9),
+                        new Const(offset(var).num)));
+            } else {
+                // Load address.
+                program.append(MipsInstr.genLa(r(gp), var));
+                // Load data from address.
+                loadIrOperand(index, r(t9)); // Compiler reserved register.
+                if (var.type == i32) {
+                    program.append(MipsInstr.genCalc(sla, r(t9), r(t9), new Const(2)));
+                }
+                program.append(MipsInstr.genCalc(addu, r(gp), r(gp), r(t9)));
+                program.append(MipsInstr.genMem(var.type == i8 ? lb : lw, reg, r(gp),
+                        new Const(0)));
+            }
         }
     }
 
-    private void store(Operand to, MipsReg from) {
+    private void writeIrOperand(Operand to, MipsReg from) {
         if (to instanceof Reg tmpReg) {
             if (tmpRegAddr.containsKey(tmpReg)) {
                 program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(fp),
@@ -190,29 +212,50 @@ public class MipsMinimalTranslator implements MipsTranslator {
         }
     }
 
-    private void storeArray(Operand to, int index, MipsReg from) {
+    private void writeIrOperandArr(Operand to, Operand index, MipsReg from) {
         assert to instanceof Var;
         Var var = (Var) to;
         assert var.isArray;
-        assert index < var.arrayLength;
 
-        int ofs = index * var.type.size();
-
-        if (var.isGlobal) {
-            // Load address.
-            program.append(MipsInstr.genLa(r(gp), var));
-            // Store data to address.
-            program.append(MipsInstr.genMem(var.type == i8 ? sb : sw, from, r(gp),
-                    new Const(ofs)));
-        } else {
-            int base;
-            if (varAddr.containsKey(var)) {
-                base = offset(var).num;
+        if (index instanceof Const c) {
+            int ofs = c.num * var.type.size();
+            if (var.isGlobal) {
+                // Load address.
+                program.append(MipsInstr.genLa(r(gp), var));
+                // Store data to address.
+                program.append(MipsInstr.genMem(var.type == i8 ? sb : sw, from, r(gp),
+                        new Const(ofs)));
             } else {
-                // Allocate memory.
-                base = allocMem(var, true).num;
+                int base;
+                if (varAddr.containsKey(var)) {
+                    base = offset(var).num;
+                } else {
+                    // Allocate memory.
+                    base = allocMem(var, true).num;
+                }
+                program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(fp), new Const(base + ofs)));
             }
-            program.append(MipsInstr.genMem(to.type == i8 ? sb : sw, from, r(fp), new Const(base + ofs)));
+        } else {
+            if (!var.isGlobal) {
+                loadIrOperand(index, r(t9)); // Compiler reserved register.
+                if (var.type == i32) {
+                    program.append(MipsInstr.genCalc(sla, r(t9), r(t9), new Const(2)));
+                }
+                program.append(MipsInstr.genCalc(addu, r(t9), r(fp), r(t9)));
+                program.append(MipsInstr.genMem(var.type == i8 ? sb : sw, from, r(t9),
+                        new Const(offset(var).num)));
+            } else {
+                // Load address.
+                program.append(MipsInstr.genLa(r(gp), var));
+                // Load data from address.
+                loadIrOperand(index, r(t9)); // Compiler reserved register.
+                if (var.type == i32) {
+                    program.append(MipsInstr.genCalc(sla, r(t9), r(t9), new Const(2)));
+                }
+                program.append(MipsInstr.genCalc(addu, r(gp), r(gp), r(t9)));
+                program.append(MipsInstr.genMem(var.type == i8 ? sb : sw, from, r(gp),
+                        new Const(0)));
+            }
         }
     }
 
@@ -274,154 +317,154 @@ public class MipsMinimalTranslator implements MipsTranslator {
         Var varMain = (Var) irLoad.main;
         if (varMain.isArray) {
             if (irLoad.supl == null) {
-                loadArray(irLoad.main, 0, r(v0));
+                loadIrOperandArr(irLoad.main, new Const(0), r(v0));
             } else {
-                loadArray(irLoad.main, ((Const) irLoad.supl).num, r(v0));
+                loadIrOperandArr(irLoad.main, irLoad.supl, r(v0));
             }
         } else {
             assert irLoad.supl == null;
-            load(irLoad.main, r(v0));
+            loadIrOperand(irLoad.main, r(v0));
         }
 
         assert irLoad.res instanceof Reg;
-        store(irLoad.res, r(v0));
+        writeIrOperand(irLoad.res, r(v0));
     }
 
     private void fromIrStoreArr(Instr irStore) {
         if (irStore.main instanceof Var varMain) {
             if (varMain.isArray) {
                 if (irStore.supl == null) {
-                    loadArray(irStore.main, 0, r(v0));
+                    loadIrOperandArr(irStore.main, new Const(0), r(v0));
                 } else {
-                    loadArray(irStore.main, ((Const) irStore.supl).num, r(v0));
+                    loadIrOperandArr(irStore.main, irStore.supl, r(v0));
                 }
             } else {
                 assert irStore.supl == null;
-                load(irStore.main, r(v0));
+                loadIrOperand(irStore.main, r(v0));
             }
         } else { // Const, Reg
-            load(irStore.main, r(v0));
+            loadIrOperand(irStore.main, r(v0));
         }
 
         assert irStore.res instanceof Var;
         Var varRes = (Var) irStore.res;
         if (varRes.isArray) {
             if (irStore.supl == null) {
-                storeArray(irStore.res, 0, r(v0));
+                writeIrOperandArr(irStore.res, new Const(0), r(v0));
             } else {
-                storeArray(irStore.res, ((Const) irStore.supl).num, r(v0));
+                writeIrOperandArr(irStore.res, irStore.supl, r(v0));
             }
         } else {
             assert irStore.supl == null;
-            store(irStore.res, r(v0));
+            writeIrOperand(irStore.res, r(v0));
         }
     }
 
     private void fromIrGetAddress(Instr irGetAddr) {
         assert irGetAddr.main instanceof Var;
         program.append(MipsInstr.genCalc(addi, r(v0), r(fp), varAddr.get((Var) irGetAddr.main)));
-        store(irGetAddr.res, r(v0));
+        writeIrOperand(irGetAddr.res, r(v0));
     }
 
     private void fromIrDerefAndIndex(Instr irDeref) {
-        load(irDeref.main, r(a0)); // Address to deref.
+        loadIrOperand(irDeref.main, r(a0)); // Address to deref.
         int ofs = ((Const) irDeref.supl).num * irDeref.type.size();
         program.append(MipsInstr.genMem(irDeref.type == i8 ? lb : lw, r(v0), r(a0), new Const(ofs)));
-        store(irDeref.res, r(v0));
+        writeIrOperand(irDeref.res, r(v0));
     }
 
     private void fromIrAdd(Instr irAdd) {
-        load(irAdd.main, r(v0));
+        loadIrOperand(irAdd.main, r(v0));
         if (irAdd.supl instanceof Const) {
             program.append(MipsInstr.genCalc(addi, r(v0), r(v0), (Const) irAdd.supl));
-            store(irAdd.res, r(v0));
+            writeIrOperand(irAdd.res, r(v0));
         } else {
-            load(irAdd.supl, r(v1));
+            loadIrOperand(irAdd.supl, r(v1));
             program.append(MipsInstr.genCalc(addu, r(v0), r(v0), r(v1)));
-            store(irAdd.res, r(v0));
+            writeIrOperand(irAdd.res, r(v0));
         }
     }
 
     private void fromIrSub(Instr irSub) {
-        load(irSub.main, r(v0));
+        loadIrOperand(irSub.main, r(v0));
         if (irSub.supl instanceof Const) {
             program.append(MipsInstr.genCalc(subi, r(v0), r(v0), (Const) irSub.supl));
-            store(irSub.res, r(v0));
+            writeIrOperand(irSub.res, r(v0));
         } else {
-            load(irSub.supl, r(v1));
+            loadIrOperand(irSub.supl, r(v1));
             program.append(MipsInstr.genCalc(subu, r(v0), r(v0), r(v1)));
-            store(irSub.res, r(v0));
+            writeIrOperand(irSub.res, r(v0));
         }
     }
 
     private void fromIrMul(Instr irMul) {
-        load(irMul.main, r(v0));
-        load(irMul.supl, r(v1));
+        loadIrOperand(irMul.main, r(v0));
+        loadIrOperand(irMul.supl, r(v1));
         program.append(MipsInstr.genCalc(mul, r(v0), r(v0), r(v1)));
-        store(irMul.res, r(v0));
+        writeIrOperand(irMul.res, r(v0));
     }
 
     private void fromIrDiv(Instr irDiv) {
-        load(irDiv.main, r(v0));
-        load(irDiv.supl, r(v1));
+        loadIrOperand(irDiv.main, r(v0));
+        loadIrOperand(irDiv.supl, r(v1));
         program.append(MipsInstr.genCalc(divu, r(v0), r(v0), r(v1)));
         program.append(MipsInstr.genMoveFrom(mflo, r(v0)));
-        store(irDiv.res, r(v0));
+        writeIrOperand(irDiv.res, r(v0));
     }
 
     private void fromIrMod(Instr irMod) {
-        load(irMod.main, r(v0));
-        load(irMod.supl, r(v1));
+        loadIrOperand(irMod.main, r(v0));
+        loadIrOperand(irMod.supl, r(v1));
         program.append(MipsInstr.genCalc(divu, r(v0), r(v0), r(v1)));
         program.append(MipsInstr.genMoveFrom(mfhi, r(v0)));
-        store(irMod.res, r(v0));
+        writeIrOperand(irMod.res, r(v0));
     }
 
     private void fromIrMove(Instr irMove) {
-        load(irMove.main, r(v0));
-        store(irMove.res, r(v0));
+        loadIrOperand(irMove.main, r(v0));
+        writeIrOperand(irMove.res, r(v0));
     }
 
     private void fromIrLss(Instr irLss) {
-        load(irLss.main, r(v0));
-        load(irLss.supl, r(v1));
+        loadIrOperand(irLss.main, r(v0));
+        loadIrOperand(irLss.supl, r(v1));
         program.append(MipsInstr.genCalc(slt, r(v0), r(v0), r(v1)));
-        store(irLss.res, r(v0));
+        writeIrOperand(irLss.res, r(v0));
     }
 
     private void fromIrLeq(Instr irLeq) {
-        load(irLeq.main, r(v0));
-        load(irLeq.supl, r(v1));
+        loadIrOperand(irLeq.main, r(v0));
+        loadIrOperand(irLeq.supl, r(v1));
         program.append(MipsInstr.genCalc(sle, r(v0), r(v0), r(v1)));
-        store(irLeq.res, r(v0));
+        writeIrOperand(irLeq.res, r(v0));
     }
 
     private void fromIrGre(Instr irGre) {
-        load(irGre.main, r(v0));
-        load(irGre.supl, r(v1));
+        loadIrOperand(irGre.main, r(v0));
+        loadIrOperand(irGre.supl, r(v1));
         program.append(MipsInstr.genCalc(sgt, r(v0), r(v0), r(v1)));
-        store(irGre.res, r(v0));
+        writeIrOperand(irGre.res, r(v0));
     }
 
     private void fromIrGeq(Instr irGeq) {
-        load(irGeq.main, r(v0));
-        load(irGeq.supl, r(v1));
+        loadIrOperand(irGeq.main, r(v0));
+        loadIrOperand(irGeq.supl, r(v1));
         program.append(MipsInstr.genCalc(sge, r(v0), r(v0), r(v1)));
-        store(irGeq.res, r(v0));
+        writeIrOperand(irGeq.res, r(v0));
     }
 
     private void fromIrEql(Instr irEql) {
-        load(irEql.main, r(v0));
-        load(irEql.supl, r(v1));
+        loadIrOperand(irEql.main, r(v0));
+        loadIrOperand(irEql.supl, r(v1));
         program.append(MipsInstr.genCalc(seq, r(v0), r(v0), r(v1)));
-        store(irEql.res, r(v0));
+        writeIrOperand(irEql.res, r(v0));
     }
 
     private void fromIrNeq(Instr irNeq) {
-        load(irNeq.main, r(v0));
-        load(irNeq.supl, r(v1));
+        loadIrOperand(irNeq.main, r(v0));
+        loadIrOperand(irNeq.supl, r(v1));
         program.append(MipsInstr.genCalc(sne, r(v0), r(v0), r(v1)));
-        store(irNeq.res, r(v0));
+        writeIrOperand(irNeq.res, r(v0));
     }
 
     // Label decl
@@ -434,12 +477,12 @@ public class MipsMinimalTranslator implements MipsTranslator {
     }
 
     private void fromIrGoif(Instr irGoif) {
-        load(irGoif.main, r(v0));
+        loadIrOperand(irGoif.main, r(v0));
         program.append(MipsInstr.genBne(r(v0), r(zero), (Label) irGoif.res));
     }
 
     private void fromIrGont(Instr irGont) {
-        load(irGont.main, r(v0));
+        loadIrOperand(irGont.main, r(v0));
         program.append(MipsInstr.genBeq(r(v0), r(zero), (Label) irGont.res));
     }
 
@@ -478,11 +521,11 @@ public class MipsMinimalTranslator implements MipsTranslator {
         }
 
         // Push param.
-        load(irParam.main, r(a0));
+        loadIrOperand(irParam.main, r(a0));
         // Use "new Reg()" to force allocate new stack memory for parameter.
         // Reference is thrown away for there's no future use of real parameter.
         // For now, push all params on stack.
-        store(new Reg(irParam.main.type), r(a0)); // No one will remember you since, ever.
+        writeIrOperand(new Reg(irParam.main.type), r(a0)); // No one will remember you since, ever.
     }
 
     private void fromIrCall(Instr irCall) {
@@ -499,7 +542,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
         program.append(MipsInstr.genMem(lw, r(ra), r(sp), new Const(0)));
 
         if (irCall.res != null) {
-            store(irCall.res, r(v0));
+            writeIrOperand(irCall.res, r(v0));
         }
 
         // Recover param status.
@@ -510,7 +553,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
 
     private void fromIrRet(Instr irRet) {
         if (irRet.main != null) {
-            load(irRet.main, r(v0));
+            loadIrOperand(irRet.main, r(v0));
         }
 
         // Generate function tail.
