@@ -1,8 +1,8 @@
 package ir.datastruct.operand;
 
-import datastruct.symbol.SymConstVar;
-import datastruct.symbol.SymVar;
-import datastruct.symbol.Symbol;
+import frontend.datastruct.symbol.SymConstVar;
+import frontend.datastruct.symbol.SymVar;
+import frontend.datastruct.symbol.Symbol;
 
 import static ir.datastruct.Instr.Type.i32;
 import static ir.datastruct.Instr.Type.i8;

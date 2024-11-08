@@ -1,0 +1,77 @@
+        # [compiler-generated](os-wrapper)
+        jal     main
+        move    $a0, $v0
+        li      $v0, 17
+        syscall
+
+        # [compiler-generated](lib_io)
+.text
+putchar:
+        sw	$fp, -4($sp)
+        move	$fp, $sp
+        addi	$sp, $sp, -4
+
+        lb  $a0, 7($fp)
+        li  $v0, 11
+        syscall
+
+        move	$sp, $fp
+        lw	$fp, -4($sp)
+        jr  $ra
+
+        # [compiler-generated](lib_io)
+putint:
+        sw	$fp, -4($sp)
+        move	$fp, $sp
+        addi	$sp, $sp, -4
+
+        lw  $a0, 4($fp)
+        li  $v0, 1
+        syscall
+
+        move	$sp, $fp
+        lw	$fp, -4($sp)
+        jr  $ra
+
+        # [compiler-generated](lib_io)
+getchar:
+        sw	$fp, -4($sp)
+        move	$fp, $sp
+        addi	$sp, $sp, -4
+
+        li  $v0, 12
+        syscall
+
+        move	$sp, $fp
+        lw	$fp, -4($sp)
+        jr  $ra
+
+        # [compiler-generated](lib_io)
+getint:
+        sw	$fp, -4($sp)
+        move	$fp, $sp
+        addi	$sp, $sp, -4
+
+        li  $v0, 5
+        syscall
+
+        move	$sp, $fp
+        lw	$fp, -4($sp)
+        jr  $ra
+
+
+	# fun main:
+	addi	$sp, $sp, 0
+.text
+main:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+	addi	$sp, $sp, 0
+	addi	$sp, $sp, -4
+
+	# ret: i32  0
+	li	$v0, 0
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+

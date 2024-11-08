@@ -1,10 +1,10 @@
 package ir.datastruct.operand;
 
-import datastruct.ast.AstFuncFParam;
-import datastruct.ast.Token;
-import datastruct.symbol.SymFunc;
-import datastruct.symbol.SymVar;
-import datastruct.symbol.Symbol;
+import frontend.datastruct.ast.AstFuncFParam;
+import frontend.datastruct.ast.Token;
+import frontend.datastruct.symbol.SymFunc;
+import frontend.datastruct.symbol.SymVar;
+import frontend.datastruct.symbol.Symbol;
 import ir.datastruct.Instr;
 import mips.datastruct.MipsOperand;
 

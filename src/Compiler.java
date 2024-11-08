@@ -1,8 +1,8 @@
-import datastruct.ast.AstCompUnit;
+import frontend.datastruct.ast.AstCompUnit;
 import frontend.Lexer;
 import frontend.Parser;
 import frontend.Validator;
-import io.Log;
+import utils.Log;
 import ir.datastruct.Ir;
 import ir.IrMaker;
 import mips.MipsMinimalTranslator;

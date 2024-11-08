@@ -1,11 +1,11 @@
 package ir;
 
-import datastruct.ast.*;
-import datastruct.symbol.SymConstVar;
-import datastruct.symbol.SymFunc;
-import datastruct.symbol.SymVar;
-import datastruct.symbol.Symbol;
-import datastruct.symtbl.SymTbl;
+import frontend.datastruct.ast.*;
+import frontend.datastruct.symbol.SymConstVar;
+import frontend.datastruct.symbol.SymFunc;
+import frontend.datastruct.symbol.SymVar;
+import frontend.datastruct.symbol.Symbol;
+import frontend.datastruct.symtbl.SymTbl;
 import ir.datastruct.Function;
 import ir.datastruct.Instr;
 import ir.datastruct.Ir;

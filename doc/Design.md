@@ -26,9 +26,9 @@ The lexical analysis section of the compiler provides several modules: I/O handl
 
 | Class          | Function          | Description                                                  |
 | -------------- | ----------------- | ------------------------------------------------------------ |
-| datastruct.ast.Token | Datatype of token | Restore all information of a token, including token type `tokenId`, literal string `literal` and attributes `val`. |
+| frontend.datastruct.ast.Token | Datatype of token | Restore all information of a token, including token type `tokenId`, literal string `literal` and attributes `val`. |
 | frontend.Lexer | Lexical analyzer  | Use a `BufferedReader` of `System.in` for input, and provide `read()` for fetching the next token. Each contains two loggers `stdout` and `stderr` generating output info in `read()` process. |
-| io.Log         | Log output        | This is a reusable logger class. Contains a table of writers to put the same info to various output. Provide `addWriter`, `addFilewriter` and `configureWriter` for writer configurations. |
+| utils.Log         | Log output        | This is a reusable logger class. Contains a table of writers to put the same info to various output. Provide `addWriter`, `addFilewriter` and `configureWriter` for writer configurations. |
 
 ![design lexer init](./img/design_lexer_init.png)
 

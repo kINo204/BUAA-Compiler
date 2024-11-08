@@ -1,13 +1,13 @@
 package frontend;
 
-import datastruct.ast.Token;
-import datastruct.ast.*;
-import io.Log;
+import frontend.datastruct.ast.Token;
+import frontend.datastruct.ast.*;
+import utils.Log;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import static datastruct.ast.Token.TokenId.*;
+import static frontend.datastruct.ast.Token.TokenId.*;
 
 public class Parser {
     private final Lexer lexer;

@@ -1,7 +1,7 @@
 package ir.datastruct;
 
-import datastruct.symbol.SymFunc;
-import datastruct.symbol.Symbol;
+import frontend.datastruct.symbol.SymFunc;
+import frontend.datastruct.symbol.Symbol;
 import ir.datastruct.operand.FuncRef;
 
 import java.util.ArrayList;

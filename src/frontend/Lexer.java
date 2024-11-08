@@ -1,12 +1,12 @@
 package frontend;
 
-import datastruct.ast.Token;
-import io.Log;
+import frontend.datastruct.ast.Token;
+import utils.Log;
 
 import java.io.*;
 import java.util.*;
 
-import static datastruct.ast.Token.TokenId.*;
+import static frontend.datastruct.ast.Token.TokenId.*;
 
 
 public class Lexer {

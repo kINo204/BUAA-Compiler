@@ -1,18 +1,18 @@
 package frontend;
 
-import datastruct.ast.*;
-import datastruct.symbol.SymConstVar;
-import datastruct.symbol.SymFunc;
-import datastruct.symbol.Symbol;
-import datastruct.symbol.Symbol.SymId;
-import datastruct.symtbl.SymTbl;
-import io.Log;
+import frontend.datastruct.ast.*;
+import frontend.datastruct.symbol.SymConstVar;
+import frontend.datastruct.symbol.SymFunc;
+import frontend.datastruct.symbol.Symbol;
+import frontend.datastruct.symbol.Symbol.SymId;
+import frontend.datastruct.symtbl.SymTbl;
+import utils.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static datastruct.symbol.Symbol.SymId.*;
+import static frontend.datastruct.symbol.Symbol.SymId.*;
 
 
 public class Validator {
