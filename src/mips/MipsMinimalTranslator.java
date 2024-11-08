@@ -309,7 +309,12 @@ public class MipsMinimalTranslator implements MipsTranslator {
     }
 
     private void fromIrAlloc(Instr irAlloc) {
-        // Do nothing yet.
+        // We have to alloc here to avoid problem for single allocation
+        // not performed in some control flow branches because it has been
+        // allocated in a previous branch.
+
+        // Forward declaration
+        allocMem((Var) irAlloc.res, true);
     }
 
     private void fromIrLoadArr(Instr irLoad) {
