@@ -28,6 +28,7 @@ public final class MipsUtils {
             lw	$fp, -4($sp)
             jr  $ra
             
+            # [compiler-generated](lib_io)
     putint:
             sw	$fp, -4($sp)
             move	$fp, $sp
@@ -35,6 +36,32 @@ public final class MipsUtils {
                 
             lw  $a0, 4($fp)
             li  $v0, 1
+            syscall
+            
+            move	$sp, $fp
+            lw	$fp, -4($sp)
+            jr  $ra
+            
+            # [compiler-generated](lib_io)
+    getchar:
+            sw	$fp, -4($sp)
+            move	$fp, $sp
+            addi	$sp, $sp, -4
+                
+            li  $v0, 12
+            syscall
+            
+            move	$sp, $fp
+            lw	$fp, -4($sp)
+            jr  $ra
+            
+            # [compiler-generated](lib_io)
+    getint:
+            sw	$fp, -4($sp)
+            move	$fp, $sp
+            addi	$sp, $sp, -4
+                
+            li  $v0, 5
             syscall
             
             move	$sp, $fp

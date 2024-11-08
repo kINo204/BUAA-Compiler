@@ -45,6 +45,7 @@ public class FuncRef extends Operand implements MipsOperand {
 
     public static FuncRef frGetint() {
         FuncRef funcRef = new FuncRef();
+        funcRef.type = i32;
         funcRef.symbol = null;
         funcRef.funcName = "getint";
         funcRef.symtblId = 1;
@@ -53,6 +54,7 @@ public class FuncRef extends Operand implements MipsOperand {
 
     public static FuncRef frGetchar() {
         FuncRef funcRef = new FuncRef();
+        funcRef.type = i8;
         funcRef.symbol = null;
         funcRef.funcName = "getchar";
         funcRef.symtblId = 1;
@@ -61,6 +63,7 @@ public class FuncRef extends Operand implements MipsOperand {
 
     public static FuncRef frPutchar() {
         FuncRef funcRef = new FuncRef();
+        funcRef.type = VOID;
         funcRef.symbol = null;
         funcRef.funcName = "putchar";
         funcRef.symtblId = 1;
@@ -78,6 +81,7 @@ public class FuncRef extends Operand implements MipsOperand {
 
     public static FuncRef frPutint() {
         FuncRef funcRef = new FuncRef();
+        funcRef.type = VOID;
         funcRef.symbol = null;
         funcRef.funcName = "putint";
         funcRef.symtblId = 1;

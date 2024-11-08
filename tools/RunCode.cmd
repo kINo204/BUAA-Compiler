@@ -3,7 +3,7 @@ setlocal
 
 cd ..
 
-echo compiling ...
+echo Compiling ...
 java -jar target/compiler.jar
 if %errorlevel% neq 0 (
 	echo Compile error.
@@ -11,9 +11,9 @@ if %errorlevel% neq 0 (
 	exit /B
 )
 
-echo running ...
+echo Running ...
 java -jar marsc.jar ic mips.txt
-echo exit value %errorlevel%.
+echo Program exit with value %errorlevel%.
 
 echo.
 

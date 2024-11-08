@@ -32,7 +32,19 @@ public class Token {
                     val.bigInteger = new BigInteger(literal);
                 }
             }
-            case CHRCON -> val.character = literal.charAt(1);
+            case CHRCON -> val.character = literal.charAt(1) == '\\' ? (char) switch(literal.charAt(2)) {
+                case 'a' -> 7;
+                case 'b' -> 8;
+                case 't' -> 9;
+                case 'n' -> 10;
+                case 'v' -> 11;
+                case 'f' -> 12;
+                case '\"' -> 34;
+                case '\'' -> 39;
+                case '\\' -> 92;
+                case '0' -> 0;
+                default -> throw new IllegalStateException( "Unexpected escaping char in chrcon");
+            } : literal.charAt(1);
             case STRCON -> val.string = literal.substring(1, literal.length() - 1); // Strip "" symbols
         }
     }

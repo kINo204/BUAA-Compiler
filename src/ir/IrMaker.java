@@ -232,7 +232,9 @@ public class IrMaker {
         // TODO getint
         // TODO getchar
         if (stmt instanceof AstStmtSingleExp stmtSingleExp) {
-            fromExp(stmtSingleExp.exp, function);
+            if (stmtSingleExp.exp != null) {
+                fromExp(stmtSingleExp.exp, function);
+            }
         } else if (stmt instanceof AstStmtAssign stmtAssign) {
             Operand value = fromExp(stmtAssign.exp, function);
             SymVar varSym = (SymVar) symTbl.searchSym(stmtAssign.lVal.ident);
@@ -341,6 +343,30 @@ public class IrMaker {
                         expInd++; i++;
                     }
                 }
+            }
+        } else if (stmt instanceof AstStmtGetint stmtGetint) {
+            Reg res = new Reg(FuncRef.frGetint().type);
+            function.appendInstr(Instr.genFuncCall(res, FuncRef.frGetint()));
+
+            SymVar varSym = (SymVar) symTbl.searchSym(stmtGetint.lVal.ident);
+            Var var = varSym.irVar;
+            if (var.isArray) {
+                Operand arrayIndex = fromExp(stmtGetint.lVal.exp, function);
+                function.appendInstr(Instr.genStore(var, res, arrayIndex));
+            } else {
+                function.appendInstr(Instr.genStore(var, res));
+            }
+        } else if (stmt instanceof AstStmtGetchar stmtGetchar) {
+            Reg res = new Reg(FuncRef.frGetchar().type);
+            function.appendInstr(Instr.genFuncCall(res, FuncRef.frGetchar()));
+
+            SymVar varSym = (SymVar) symTbl.searchSym(stmtGetchar.lVal.ident);
+            Var var = varSym.irVar;
+            if (var.isArray) {
+                Operand arrayIndex = fromExp(stmtGetchar.lVal.exp, function);
+                function.appendInstr(Instr.genStore(var, res, arrayIndex));
+            } else {
+                function.appendInstr(Instr.genStore(var, res));
             }
         }
     }

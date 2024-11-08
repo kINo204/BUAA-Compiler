@@ -1,17 +1,3 @@
-#include <stdio.h>
-int getchar(){
-	char c; 
-	scanf("%c",&c); 
-	return (int)c; 
-}
-
-int getint(){
-	int t;
-	scanf("%d",&t);
-	while(getchar()!='\n');
-	return t;
-}
-
 /* Test level-c1. Contents:
 	- global decl/func
 	- function as exp

@@ -8,7 +8,7 @@ public class AstEqExp extends AstNode {
     }
 
     public final ArrayList<AstRelExp> relExps = new ArrayList<>();
-    public ArrayList<Token.TokenId> operators;
+    public ArrayList<Token.TokenId> operators = new ArrayList<>();
 
     public void addRelExp(AstRelExp relExp) {
         relExps.add(relExp);
