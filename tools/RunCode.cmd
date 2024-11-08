@@ -12,7 +12,7 @@ if %errorlevel% neq 0 (
 )
 
 echo Running ...
-java -jar marsc.jar ic mips.txt
+java -jar marsc.jar ic sp mips.txt
 echo Program exit with value %errorlevel%.
 
 echo.

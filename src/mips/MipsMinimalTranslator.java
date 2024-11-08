@@ -76,7 +76,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
     private Const allocMem(Reg reg, boolean genSpInstr) {
         int size = reg.type.size();
 
-        int alter = alignMem(size, genSpInstr);
+        int alter = alignMem(size, false);
 
         nextMem -= size;
         Const addr = new Const(nextMem); // Base addr is after stack push!
@@ -91,7 +91,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
     private Const allocMem(Var var, boolean genSpInstr) {
         int size = var.isReference ? 4 : var.type.size();
 
-        int alter = alignMem(size, genSpInstr);
+        int alter = alignMem(size, false);
         if (var.isArray) {
             assert !var.isReference;
             size *= var.arrayLength;
