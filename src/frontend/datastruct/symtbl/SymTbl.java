@@ -84,6 +84,14 @@ public class SymTbl {
         return currentScope.forEnd;
     }
 
+    public Label getEnteringLoopMotion() {
+        return currentScope.enteringForMotion;
+    }
+
+    public Label getEnteringLoopEnd() {
+        return currentScope.enteringForEnd;
+    }
+
     public void enterScope() {
         currentScope = currentScope.subScopes.get(
                 currentScope.subScopeVisitingIndex++);

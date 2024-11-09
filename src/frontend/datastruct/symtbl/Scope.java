@@ -20,6 +20,8 @@ class Scope {
     int subScopeVisitingIndex = 0;
     private final HashMap<String, Symbol> symbolMap = new HashMap<>();
     private final ArrayList<Symbol> symbolArray = new ArrayList<>();
+    Label enteringForMotion;
+    Label enteringForEnd;
 
     Scope(int id, Scope upperScope, boolean inLoop, Symbol.SymId functionEnv) {
         this.id = id;
@@ -46,6 +48,9 @@ class Scope {
         if (!rootCall) {
             this.forMotion = forMotion;
             this.forEnd = forEnd;
+        } else {
+            this.enteringForMotion = forMotion;
+            this.enteringForEnd = forEnd;
         }
         for (Scope scope : subScopes) {
             scope.setLoopLabels(forMotion, forEnd, false);

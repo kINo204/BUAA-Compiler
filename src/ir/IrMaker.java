@@ -365,6 +365,9 @@ public class IrMaker {
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtAssign.lVal.exp, function);
                 function.appendInstr(Instr.genStore(var, value, arrayIndex));
+            } else if (var.isReference) {
+                Operand arrayIndex = fromExp(stmtAssign.lVal.exp, function);
+                function.appendInstr(Instr.genStoreRef(var, value, arrayIndex));
             } else {
                 function.appendInstr(Instr.genStore(var, value));
             }
@@ -383,6 +386,7 @@ public class IrMaker {
 
                 Operand cond = fromCond(stmtIf.cond, function);
                 function.appendInstr(Instr.genGoIfNot(labelEnd, cond));
+
                 fromStmt(stmtIf.ifStmt, function);
                 function.appendInstr(Instr.genLabelDecl(labelEnd));
             } else {
@@ -399,8 +403,10 @@ public class IrMaker {
 
                 Operand cond = fromCond(stmtIf.cond, function);
                 function.appendInstr(Instr.genGoIfNot(labelElse, cond));
+
                 fromStmt(stmtIf.ifStmt, function);
                 function.appendInstr(Instr.genGoto(labelEnd));
+
                 function.appendInstr(Instr.genLabelDecl(labelElse));
                 fromStmt(stmtIf.elseStmt, function);
                 function.appendInstr(Instr.genLabelDecl(labelEnd));
@@ -409,6 +415,7 @@ public class IrMaker {
             Label forCond = new Label("for_cond"),
                     forMotion = new Label("for_motion"),
                     forEnd = new Label("for_end");
+
             symTbl.setLoopLabels(forMotion, forEnd);
 
             if (stmtFor.firstForStmt != null) {
@@ -416,7 +423,6 @@ public class IrMaker {
             }
 
             function.appendInstr(Instr.genLabelDecl(forCond));
-            function.appendInstr(Instr.genRemStack());
 
             if (stmtFor.cond != null) {
                 Operand cond = fromCond(stmtFor.cond, function);
@@ -432,17 +438,22 @@ public class IrMaker {
                 fromForStmt(stmtFor.thirdForStmt, function);
             }
 
-            function.appendInstr(Instr.genLoadStack());
             function.appendInstr(Instr.genGoto(forCond));
             function.appendInstr(Instr.genLabelDecl(forEnd));
-            function.appendInstr(Instr.genLoadStack());
-
         } else if (stmt instanceof AstStmtBreak) {
             Label forEnd = symTbl.getCurLoopEnd();
+            if (forEnd == null) {
+                forEnd = symTbl.getEnteringLoopEnd();
+                assert forEnd != null; // This has been validated.
+            }
             function.appendInstr(Instr.genGoto(forEnd));
         } else if (stmt instanceof AstStmtContinue) {
-            Label forStart = symTbl.getCurLoopMotion();
-            function.appendInstr(Instr.genGoto(forStart));
+            Label forCond = symTbl.getCurLoopMotion();
+            if (forCond == null) {
+                forCond = symTbl.getEnteringLoopMotion();
+                assert forCond != null; // This has been validated.
+            }
+            function.appendInstr(Instr.genGoto(forCond));
         } else if (stmt instanceof AstStmtPrintf funcCall) {
             String formatStr = funcCall.stringConst.val.string;
             int expInd = 0;
@@ -480,6 +491,9 @@ public class IrMaker {
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtGetint.lVal.exp, function);
                 function.appendInstr(Instr.genStore(var, res, arrayIndex));
+            } else if (var.isReference) {
+                Operand arrayIndex = fromExp(stmtGetint.lVal.exp, function);
+                function.appendInstr(Instr.genStoreRef(var, res, arrayIndex));
             } else {
                 function.appendInstr(Instr.genStore(var, res));
             }
@@ -492,6 +506,9 @@ public class IrMaker {
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtGetchar.lVal.exp, function);
                 function.appendInstr(Instr.genStore(var, res, arrayIndex));
+            } else if (var.isReference) {
+                Operand arrayIndex = fromExp(stmtGetchar.lVal.exp, function);
+                function.appendInstr(Instr.genStoreRef(var, res, arrayIndex));
             } else {
                 function.appendInstr(Instr.genStore(var, res));
             }
@@ -499,12 +516,12 @@ public class IrMaker {
     }
 
     private void genPutchar(Operand param, Function function) {
-        function.appendInstr(Instr.genParam(param));
+        function.appendInstr(Instr.genParam(param, i8));
         function.appendInstr(Instr.genFuncCall(FuncRef.frPutchar()));
     }
 
     private void genPutint(Operand param, Function function) {
-        function.appendInstr(Instr.genParam(param));
+        function.appendInstr(Instr.genParam(param, i32));
         function.appendInstr(Instr.genFuncCall(FuncRef.frPutint()));
     }
 
@@ -515,6 +532,9 @@ public class IrMaker {
         if (var.isArray) {
             Operand arrayIndex = fromExp(forStmt.lVal.exp, function);
             function.appendInstr(Instr.genStore(var, value, arrayIndex));
+        } else if (var.isReference) {
+            Operand arrayIndex = fromExp(forStmt.lVal.exp, function);
+            function.appendInstr(Instr.genStoreRef(var, value, arrayIndex));
         } else {
             function.appendInstr(Instr.genStore(var, value));
         }
@@ -720,13 +740,20 @@ public class IrMaker {
                 }
             }
         } else if (unaryExp instanceof AstUnaryExpFuncCall funcCall) {
+            FuncRef funcRef = ((SymFunc) symTbl.searchSym(funcCall.funcIdent)).funcRef;
+
             if (funcCall.funcRParams != null) {
+                ArrayList<Operand> rParamOperands = new ArrayList<>();
                 for (AstExp rParamExp : funcCall.funcRParams.exps) {
-                    Operand rParam = fromExp(rParamExp, function);
-                    function.appendInstr(Instr.genParam(rParam));
+                    rParamOperands.add(fromExp(rParamExp, function));
+                }
+                for (Operand operand : rParamOperands) {
+                    Var fParamVar = funcRef.params.get(
+                            rParamOperands.indexOf(operand));
+                    Instr.Type type = fParamVar.isReference ? i32 : fParamVar.type;
+                    function.appendInstr(Instr.genParam(operand, type));
                 }
             }
-            FuncRef funcRef = ((SymFunc) symTbl.searchSym(funcCall.funcIdent)).funcRef;
             if (funcRef.type == VOID) {
                 function.appendInstr(Instr.genFuncCall(funcRef));
             } else {
@@ -749,7 +776,6 @@ public class IrMaker {
             Symbol symbol = symTbl.searchSym(primaryExp.lVal.ident);
             Var var = symbol instanceof SymVar ? ((SymVar) symbol).irVar : ((SymConstVar) symbol).irVar;
 
-            Reg res = new Reg(var.type);
             if (var.isArray) {
                 if (primaryExp.lVal.exp == null) { // Use array base address
                     Reg addr = new Reg(i32);
@@ -757,19 +783,25 @@ public class IrMaker {
                     return addr;
                 } else { // Load of array
                     Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
+                    Reg res = new Reg(var.type);
                     function.appendInstr(Instr.genLoad(res, var, arrayIndex));
+                    return res;
                 }
             } else if (var.isReference) {
                 if (primaryExp.lVal.exp == null) { // No such grammar
                     assert false;
+                    return null;
                 } else { // Dereference of array base addr
                     Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
+                    Reg res = new Reg(var.type);
                     function.appendInstr(Instr.genDeref(res, var, arrayIndex));
+                    return res;
                 }
             } else {
+                Reg res = new Reg(var.type);
                 function.appendInstr(Instr.genLoad(res, var));
+                return res;
             }
-            return res;
         } else {
             return null; // Ast error.
         }

@@ -157,6 +157,12 @@ public class Validator {
             constDef.constExp = newConstExp;
         }
         vConstInitVal(constDef.constInitVal, symConstVar);
+        if (constDef.constExp != null) {
+            int len = (int) evaluator.evaluate(constDef.constExp);
+            while (symConstVar.values.size() < len) {
+                symConstVar.values.add('\0');
+            }
+        }
     }
 
     private void vConstInitVal(AstConstInitVal constInitVal, SymConstVar symConstVar) throws IOException {
@@ -170,7 +176,7 @@ public class Validator {
 
             symConstVar.values.add(
                     evaluator.evaluate(constInitVal.constExp));
-        } else {
+        } else if (constInitVal.stringConst == null) {
             ArrayList<AstConstExp> newConstExps = new ArrayList<>();
             for (AstConstExp constExp : constInitVal.constExps) {
                 vConstExp(constExp);
@@ -186,8 +192,48 @@ public class Validator {
             // Substitute original constExps.
             constInitVal.constExps.clear();
             constInitVal.constExps.addAll(newConstExps);
+        } else { // StringConst
+            symConstVar.values.addAll(
+                    getStringConstPieces(constInitVal.stringConst.val.string));
         }
     }
+
+    private ArrayList<Character> getStringConstPieces(String str) {
+        ArrayList<Character> pieces = new ArrayList<>();
+
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            if (ch == '\\') {
+                char next = str.charAt(i + 1);
+                assert Arrays.asList('a', 'b', 't', 'n', 'v', 'f', '\"', '\'', '\\', '0')
+                        .contains(next);
+                Character c = (char) switch (next) {
+                    case 'a' -> 7;
+                    case 'b' -> 8;
+                    case 't' -> 9;
+                    case 'n' -> 10;
+                    case 'v' -> 11;
+                    case 'f' -> 12;
+                    case '\"' -> 34;
+                    case '\'' -> 39;
+                    case '\\' -> 92;
+                    case '0' -> 0;
+                    default -> throw new IllegalStateException(
+                            "Unexpected escaping char: " + str.charAt(i + 1));
+                };
+                i++;
+                pieces.add(c);
+            } else {
+                pieces.add(ch);
+            }
+        }
+
+        // The "\0".
+        pieces.add('\0');
+
+        return pieces;
+    }
+
 
     private void vVarDecl(AstVarDecl varDecl) throws IOException {
         for (AstVarDef varDef : varDecl.varDefs)
@@ -307,12 +353,12 @@ public class Validator {
             vStmt(s.stmt, true);
 
         } else if (stmt instanceof AstStmtBreak s) {
-            if (!symTbl.inLoop()) {
+            if (!symTbl.inLoop() && !enterLoop) {
                 loggerErr.error(s.token.lineNo, "m");
             }
 
         } else if (stmt instanceof AstStmtContinue s) {
-            if (!symTbl.inLoop()) {
+            if (!symTbl.inLoop() && !enterLoop) {
                 loggerErr.error(s.token.lineNo, "m");
             }
 
@@ -599,7 +645,7 @@ public class Validator {
                     } else if (valUnaryExp instanceof Character charUnaryExp) {
                         return -Integer.valueOf(charUnaryExp);
                     } else {
-                        return valUnaryExp;
+                        return -(Integer) valUnaryExp;
                     }
                 }
             } else { // PrimaryExp

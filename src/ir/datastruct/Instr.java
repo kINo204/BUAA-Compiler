@@ -27,6 +27,10 @@ public class Instr {
         return new Instr(Operator.LOD_STACK);
     }
 
+    public static Instr genPopStack() {
+        return new Instr(Operator.POP_STACK);
+    }
+
     public static Instr genGlobDecl(Var var, GlobInitVals initVals) {
         return new Instr(
                 Operator.GLOB, var.type, var,
@@ -41,9 +45,9 @@ public class Instr {
         );
     }
 
-    public static Instr genParam(Operand param) {
+    public static Instr genParam(Operand param, Type type) {
         return new Instr(
-                Operator.PARAM, null, null, param, null
+                Operator.PARAM, type, null, param, null
         );
     }
 
@@ -152,6 +156,12 @@ public class Instr {
         );
     }
 
+    public static Instr genStoreRef(Var var, Operand data, Operand arrayIndex) {
+        return new Instr(
+                Operator.STREF, var.type, var, data, arrayIndex
+        );
+    }
+
     @Override
     public String toString() {
         if (op == Operator.GLOB) {
@@ -184,6 +194,8 @@ public class Instr {
             return String.format("\t%s: &%s = &(%s)", res, type, main);
         } else if (op == Operator.DEREF) {
             return String.format("\t%s: %s = *(%s)[%s]", res, type, main, supl);
+        } else if (op == Operator.STREF) {
+            return String.format("\t*(%s)[%s]: %s = %s", res, supl, type, main);
         } else if (op == Operator.GOTO) {
             return "\tgoto  " + res;
         } else if (op == Operator.GOIF || op == Operator.GONT) {
@@ -196,9 +208,11 @@ public class Instr {
             str += String.format("%s goto  %s", main, res);
             return str;
         } else if (op == Operator.REM_STACK) {
-            return "stack rem";
+            return "\tstack rem";
         } else if (op == Operator.LOD_STACK) {
-            return "stack lod";
+            return "\tstack lod";
+        } else if (op == Operator.POP_STACK) {
+            return "\tstack pop";
         } else {
             StringBuilder sb = new StringBuilder();
             if (res != null) {
@@ -245,8 +259,10 @@ public class Instr {
         STORE,
         ADDR,
         DEREF,
+        STREF,
         REM_STACK,
         LOD_STACK,
+        POP_STACK,
 
         // Arithmetic
         ADD,
