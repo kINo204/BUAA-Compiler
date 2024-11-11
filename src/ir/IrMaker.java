@@ -269,8 +269,9 @@ public class IrMaker {
             varSymbol.irVar = var;
 
             if (var.isArray) {
-                Operand arrayLength = fromConstExp(def.constExp, function);
-                var.arrayLength = ((Const) arrayLength).num;
+                Const arrayLength = (Const) fromConstExp(def.constExp, function);
+                var.arrayLength = arrayLength.num == null ?
+                        Integer.valueOf(arrayLength.ch) : arrayLength.num;
                 function.appendInstr(Instr.genAlloc(var));
 
                 final ArrayList<Operand> initVals = new ArrayList<>();
@@ -431,6 +432,7 @@ public class IrMaker {
 
 
             fromStmt(stmtFor.stmt, function);
+            symTbl.clearEnteringLoopLabels();
 
             function.appendInstr(Instr.genLabelDecl(forMotion));
 
@@ -441,45 +443,58 @@ public class IrMaker {
             function.appendInstr(Instr.genGoto(forCond));
             function.appendInstr(Instr.genLabelDecl(forEnd));
         } else if (stmt instanceof AstStmtBreak) {
-            Label forEnd = symTbl.getCurLoopEnd();
+            Label forEnd = symTbl.getEnteringLoopEnd();
             if (forEnd == null) {
-                forEnd = symTbl.getEnteringLoopEnd();
+                forEnd = symTbl.getCurLoopEnd();
                 assert forEnd != null; // This has been validated.
             }
             function.appendInstr(Instr.genGoto(forEnd));
         } else if (stmt instanceof AstStmtContinue) {
-            Label forCond = symTbl.getCurLoopMotion();
+            Label forCond = symTbl.getEnteringLoopMotion();
             if (forCond == null) {
-                forCond = symTbl.getEnteringLoopMotion();
+                forCond = symTbl.getCurLoopMotion();
                 assert forCond != null; // This has been validated.
             }
             function.appendInstr(Instr.genGoto(forCond));
         } else if (stmt instanceof AstStmtPrintf funcCall) {
             String formatStr = funcCall.stringConst.val.string;
             int expInd = 0;
+            ArrayList<Operand> toPrint = new ArrayList<>();
+            ArrayList<Boolean> isInt = new ArrayList<>();
             for (int i = 0; i < formatStr.length(); i++) {
                 char ch = formatStr.charAt(i);
                 if (ch == '\\') {
                     assert formatStr.charAt(i + 1) == 'n';
-                    genPutchar(new Const('\n'), function);
+                    toPrint.add(new Const('\n'));
+                    isInt.add(false);
                     i++;
                 } else if (ch != '%') {
-                    genPutchar(new Const(ch), function);
-                } else {
+                    toPrint.add(new Const(ch));
+                    isInt.add(false);
+                } else { // Starting with "%"
                     if (i + 1 >= formatStr.length() || (
                             formatStr.charAt(i + 1) != 'd'
                             && formatStr.charAt(i + 1) != 'c')
                     ) {
-                        genPutchar(new Const(ch), function);
-                    } else {
+                        toPrint.add(new Const(ch));
+                        isInt.add(false);
+                    } else { // format symbol
                         Operand operand = fromExp(funcCall.exps.get(expInd), function);
+                        toPrint.add(operand);
                         if (formatStr.charAt(i + 1) == 'c') {
-                            genPutchar(operand, function);
+                            isInt.add(false);
                         } else {
-                            genPutint(operand, function);
+                            isInt.add(true);
                         }
                         expInd++; i++;
                     }
+                }
+            }
+            for (int i = 0; i < toPrint.size(); i++) {
+                if (isInt.get(i)) { // putint
+                    genPutint(toPrint.get(i), function);
+                } else {
+                    genPutchar(toPrint.get(i), function);
                 }
             }
         } else if (stmt instanceof AstStmtGetint stmtGetint) {
@@ -757,7 +772,7 @@ public class IrMaker {
             if (funcRef.type == VOID) {
                 function.appendInstr(Instr.genFuncCall(funcRef));
             } else {
-                Reg res = new Reg(funcRef.type);
+                Reg res = new Reg(funcRef.type); // Assign a Reg of the function's return type.
                 function.appendInstr(Instr.genFuncCall(res, funcRef));
                 return res;
             }
@@ -789,8 +804,9 @@ public class IrMaker {
                 }
             } else if (var.isReference) {
                 if (primaryExp.lVal.exp == null) { // No such grammar
-                    assert false;
-                    return null;
+                    Reg res = new Reg(i32);
+                    function.appendInstr(Instr.genLoad(res, var));
+                    return res;
                 } else { // Dereference of array base addr
                     Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
                     Reg res = new Reg(var.type);

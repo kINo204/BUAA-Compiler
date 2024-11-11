@@ -42,8 +42,9 @@ public class Validator {
     private void vCompUnit(AstCompUnit compUnit) throws IOException {
         for (AstDecl decl : compUnit.decls)
             vDecl(decl);
-        for (AstFuncDef funcDef : compUnit.funcDefs)
+        for (AstFuncDef funcDef : compUnit.funcDefs) {
             vFuncDef(funcDef);
+        }
         vMainFuncDef(compUnit.mainFuncDef);
     }
 
@@ -152,15 +153,19 @@ public class Validator {
         if (constDef.constExp != null) {
             vConstExp(constDef.constExp);
             // Try folding this.
-            AstConstExp newConstExp = new AstConstExp();
-            newConstExp.addExp = evaluator.buildAddExp(evaluator.evaluate(constDef.constExp));
-            constDef.constExp = newConstExp;
+            AstConstExp toFold = constDef.constExp;
+            AstConstExp constExp = evaluator.buildConstExp(evaluator.evaluate(toFold));
+            constDef.constExp = constExp == null ? toFold : constExp;
         }
         vConstInitVal(constDef.constInitVal, symConstVar);
+
         if (constDef.constExp != null) {
-            int len = (int) evaluator.evaluate(constDef.constExp);
-            while (symConstVar.values.size() < len) {
-                symConstVar.values.add('\0');
+            Object lenObj = evaluator.evaluate(constDef.constExp);
+            if (lenObj != null) {
+                int len = lenObj instanceof Character ? Integer.valueOf((Character) lenObj) : (int) lenObj;
+                while (symConstVar.values.size() < len) {
+                    symConstVar.values.add('\0');
+                }
             }
         }
     }
@@ -168,11 +173,10 @@ public class Validator {
     private void vConstInitVal(AstConstInitVal constInitVal, SymConstVar symConstVar) throws IOException {
         if (constInitVal.constExp != null) {
             vConstExp(constInitVal.constExp);
-
             // Try folding this.
-            AstConstExp newConstExp = new AstConstExp();
-            newConstExp.addExp = evaluator.buildAddExp(evaluator.evaluate(constInitVal.constExp));
-            constInitVal.constExp = newConstExp;
+            AstConstExp toFold = constInitVal.constExp;
+            AstConstExp constExp = evaluator.buildConstExp(evaluator.evaluate(toFold));
+            constInitVal.constExp = constExp == null ? toFold : constExp;
 
             symConstVar.values.add(
                     evaluator.evaluate(constInitVal.constExp));
@@ -182,9 +186,8 @@ public class Validator {
                 vConstExp(constExp);
 
                 // Try folding this.
-                AstConstExp newConstExp = new AstConstExp();
-                newConstExp.addExp = evaluator.buildAddExp(evaluator.evaluate(constExp));
-                newConstExps.add(newConstExp);
+                AstConstExp newConstExp = evaluator.buildConstExp(evaluator.evaluate(constExp));
+                newConstExps.add(newConstExp == null ? constExp : newConstExp);
 
                 symConstVar.values.add(
                         evaluator.evaluate(constExp));
@@ -245,9 +248,8 @@ public class Validator {
         if (varDef.constExp != null) {
             vConstExp(varDef.constExp);
             // Try folding this.
-            AstConstExp newConstExp = new AstConstExp();
-            newConstExp.addExp = evaluator.buildAddExp(evaluator.evaluate(varDef.constExp));
-            varDef.constExp = newConstExp;
+            AstConstExp newConstExp = evaluator.buildConstExp(evaluator.evaluate(varDef.constExp));
+            varDef.constExp = newConstExp == null ? varDef.constExp : newConstExp;
         }
         if (varDef.initVal != null)
             vInitVal(varDef.initVal);
@@ -285,11 +287,9 @@ public class Validator {
             vLVal(s.lVal); // Undefined error eliminated here.
             vExp(s.exp);
             // Try folding this.
-            AstExp newExp = new AstExp();
-            newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(s.exp));
-            if (newExp.addExp != null) {
-                s.exp = newExp;
-            }
+            AstExp newExp = evaluator.buildExp(evaluator.evaluate(s.exp));
+            s.exp = newExp == null ? s.exp : newExp;
+
             if (symTbl.searchSym(s.lVal.ident) instanceof SymConstVar)
                 loggerErr.error(s.lVal.ident.lineNo, "h");
 
@@ -297,11 +297,8 @@ public class Validator {
             if (s.exp != null) {
                 vExp(s.exp);
                 // Try folding this.
-                AstExp newExp = new AstExp();
-                newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(s.exp));
-                if (newExp.addExp != null) {
-                    s.exp = newExp;
-                }
+                AstExp newExp = evaluator.buildExp(evaluator.evaluate(s.exp));
+                s.exp = newExp == null ? s.exp : newExp;
             }
 
         } else if (stmt instanceof AstStmtGetint s) {
@@ -328,11 +325,9 @@ public class Validator {
                 vLVal(s.firstForStmt.lVal);
                 vExp(s.firstForStmt.exp);
                 // Try folding this.
-                AstExp newExp = new AstExp();
-                newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(s.firstForStmt.exp));
-                if (newExp.addExp != null) {
-                    s.firstForStmt.exp = newExp;
-                }
+                AstExp newExp = evaluator.buildExp(evaluator.evaluate(s.firstForStmt.exp));
+                s.firstForStmt.exp = newExp == null ? s.firstForStmt.exp : newExp;
+
                 if (symTbl.searchSym(s.firstForStmt.lVal.ident) instanceof SymConstVar)
                     loggerErr.error(s.firstForStmt.lVal.ident.lineNo, "h");
             }
@@ -342,11 +337,9 @@ public class Validator {
                 vLVal(s.thirdForStmt.lVal);
                 vExp(s.thirdForStmt.exp);
                 // Try folding this.
-                AstExp newExp = new AstExp();
-                newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(s.thirdForStmt.exp));
-                if (newExp.addExp != null) {
-                    s.thirdForStmt.exp = newExp;
-                }
+                AstExp newExp = evaluator.buildExp(evaluator.evaluate(s.thirdForStmt.exp));
+                s.thirdForStmt.exp = newExp == null ? s.thirdForStmt.exp : newExp;
+
                 if (symTbl.searchSym(s.thirdForStmt.lVal.ident) instanceof SymConstVar)
                     loggerErr.error(s.thirdForStmt.lVal.ident.lineNo, "h");
             }
@@ -369,11 +362,8 @@ public class Validator {
             if (s.exp != null) {
                 vExp(s.exp);
                 // Try folding this.
-                AstExp newExp = new AstExp();
-                newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(s.exp));
-                if (newExp.addExp != null) {
-                    s.exp = newExp;
-                }
+                AstExp newExp = evaluator.buildExp(evaluator.evaluate(s.exp));
+                s.exp = newExp == null ? s.exp : newExp;
             }
         } else if (stmt instanceof AstStmtPrintf s) {
             vStmtPrintf(s);
@@ -390,9 +380,8 @@ public class Validator {
         for (AstExp exp : stmtPrintf.exps) {
             vExp(exp);
             // Try folding this.
-            AstExp newExp = new AstExp();
-            newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(exp));
-            if (newExp.addExp != null) {
+            AstExp newExp = evaluator.buildExp(evaluator.evaluate(exp));
+            if (newExp != null) {
                 newExps.add(newExp);
             } else {
                 newExps.add(exp);
@@ -441,31 +430,22 @@ public class Validator {
     private void vUnaryExp(AstUnaryExp unaryExp) throws IOException {
         if (unaryExp instanceof AstUnaryExpPrimary s) {
             vPrimaryExp(s.primaryExp);
+            unaryExp.type = typer.typeof(unaryExp);
         } else if (unaryExp instanceof AstUnaryExpUnaryOp s) {
             vUnaryExp(s.unaryExp);
+            unaryExp.type = typer.typeof(unaryExp);
         } else if (unaryExp instanceof AstUnaryExpFuncCall s) {
-            vIdent(s.funcIdent, true);
+            boolean identStatus = vIdent(s.funcIdent, true);
 
-            // Validating params types.
-            SymFunc sym = (SymFunc) symTbl.searchSym(s.funcIdent);
-            if (sym != null) {
-                final ArrayList<SymId> fParams = sym.paramTypes;
-                if (s.funcRParams == null) {
-                    if (!fParams.isEmpty()) {
-                        loggerErr.error(s.funcIdent.lineNo, "d");
-                    }
-                    return;
-                }
-
+            // Validate rParams.
+            if (s.funcRParams != null) {
                 final ArrayList<AstExp> rParams = s.funcRParams.exps;
                 ArrayList<AstExp> newExps = new ArrayList<>();
                 for (AstExp exp : rParams) {
                     vExp(exp);
-
                     // Try folding this.
-                    AstExp newExp = new AstExp();
-                    newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(exp));
-                    if (newExp.addExp != null) {
+                    AstExp newExp = evaluator.buildExp(evaluator.evaluate(exp));
+                    if (newExp != null) {
                         newExps.add(newExp);
                     } else {
                         newExps.add(exp);
@@ -474,62 +454,92 @@ public class Validator {
                 rParams.clear();
                 rParams.addAll(newExps);
 
-                if (fParams.size() != rParams.size()) {
-                    loggerErr.error(s.funcIdent.lineNo, "d");
-                }
-                for (int i = 0; i < Math.min(fParams.size(), rParams.size()); i++) {
-                    SymId fp = fParams.get(i);
-                    SymId rp = typer.typeof(rParams.get(i));
-                    if (fp == IntArray || fp == CharArray) {
-                        if (rp == Int || rp == Char) {
-                            loggerErr.error(s.funcIdent.lineNo, "e");
-                        } else if (
-                                (fp == IntArray && rp == CharArray)
-                                        || (fp == CharArray && rp == IntArray)
-                        ) {
-                            loggerErr.error(s.funcIdent.lineNo, "e");
+                // Validating params types.
+                SymFunc sym = (SymFunc) symTbl.searchSym(s.funcIdent);
+                if (sym != null) {
+                    final ArrayList<SymId> fParams = sym.paramTypes;
+                    if (s.funcRParams == null) {
+                        if (!fParams.isEmpty()) {
+                            loggerErr.error(s.funcIdent.lineNo, "d");
                         }
-                    } else {
-                        if (rp == IntArray || rp == CharArray) {
-                            loggerErr.error(s.funcIdent.lineNo, "e");
+                        return;
+                    }
+
+                    if (fParams.size() != rParams.size()) {
+                        loggerErr.error(s.funcIdent.lineNo, "d");
+                    }
+                    for (int i = 0; i < Math.min(fParams.size(), rParams.size()); i++) {
+                        SymId fp = fParams.get(i);
+                        SymId rp = typer.typeof(rParams.get(i));
+                        if (fp == IntArray || fp == CharArray) {
+                            if (Arrays.asList(Int, ConstInt, Char, ConstChar)
+                                    .contains(rp)) {
+                                loggerErr.error(s.funcIdent.lineNo, "e");
+                            } else if (
+                                    (fp == IntArray && (rp == CharArray || rp == ConstCharArray))
+                                            || (fp == CharArray && (rp == IntArray || rp == ConstIntArray))
+                            ) {
+                                loggerErr.error(s.funcIdent.lineNo, "e");
+                            }
+                        } else {
+                            if (rp == IntArray || rp == CharArray || rp == ConstIntArray || rp == ConstCharArray) {
+                                loggerErr.error(s.funcIdent.lineNo, "e");
+                            }
                         }
                     }
                 }
             }
+
+            if (identStatus) {
+                unaryExp.type = typer.typeof(unaryExp);
+            } else {
+                unaryExp.type = Int;
+            }
         }
-        unaryExp.type = typer.typeof(unaryExp);
     }
 
     private void vPrimaryExp(AstPrimaryExp primaryExp) throws IOException {
         if (primaryExp.bracedExp != null) {
             vExp(primaryExp.bracedExp);
             // Try folding this.
-            AstExp newExp = new AstExp();
-            newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(primaryExp.bracedExp));
-            if (newExp.addExp != null) {
+            AstExp newExp = evaluator.buildExp(evaluator.evaluate(primaryExp.bracedExp));
+            if (newExp != null) {
                 primaryExp.bracedExp= newExp;
             }
         } else if (primaryExp.lVal != null) {
-            vLVal(primaryExp.lVal);
+            if (!vLVal(primaryExp.lVal)) {
+                primaryExp.type = Int;
+                return;
+            }
         }
         primaryExp.type = typer.typeof(primaryExp);
     }
 
-    private void vLVal(AstLVal lVal) throws IOException {
-        vIdent(lVal.ident, false);
+    private boolean vLVal(AstLVal lVal) throws IOException {
+        boolean identStatus = vIdent(lVal.ident, false);
         if (lVal.exp != null) {
             vExp(lVal.exp);
             // Try folding this.
-            AstExp newExp = new AstExp();
-            newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(lVal.exp));
-            if (newExp.addExp != null) {
+            AstExp newExp = evaluator.buildExp(evaluator.evaluate(lVal.exp));
+            if (newExp != null) {
                 lVal.exp = newExp;
             }
         }
-        lVal.type = typer.typeof(lVal);
+        if (identStatus) {
+            lVal.type = typer.typeof(lVal);
+        } else {
+            lVal.type = Int;
+        }
+        return identStatus;
     }
 
-    private void vIdent(Token ident, boolean isFuncCall) {
+    /**
+     *
+     * @param ident Token to search for the symbol.
+     * @param isFuncCall If the ident is a function symbol.
+     * @return False if the symbol is undefined.
+     */
+    private boolean vIdent(Token ident, boolean isFuncCall) {
         final Symbol s = symTbl.searchSym(ident);
         if (s == null)
             loggerErr.error(ident.lineNo, "c");
@@ -537,22 +547,26 @@ public class Validator {
             loggerErr.error(ident.lineNo, "c");
         } else if (!(s instanceof SymFunc) && isFuncCall) {
             loggerErr.error(ident.lineNo, "c");
+        } else {
+            return true;
         }
+        return false;
     }
 
     private class Evaluator {
         // Constant expanding helper.
         private Object evaluate(AstConstExp constExp) {
-            Object res = evaluate(constExp.addExp);
-            assert res != null;
-            return res;
+            if (constExp == null) return null;
+            return evaluate(constExp.addExp);
         }
 
         private Object evaluate(AstExp exp) {
+            if (exp == null) return null;
             return evaluate(exp.addExp);
         }
 
         private Object evaluate(AstAddExp addExp) {
+            if (addExp == null) return null;
             Object firstElm = evaluate(addExp.mulExps.get(0));
             // Single sub-exp.
             if (addExp.operators.isEmpty()) {
@@ -588,6 +602,8 @@ public class Validator {
         }
 
         private Object evaluate(AstMulExp mulExp) {
+            if (mulExp == null) return null;
+
             Object firstElm = evaluate(mulExp.unaryExps.get(0));
             // Single sub-exp.
             if (mulExp.operators.isEmpty()) {
@@ -633,6 +649,8 @@ public class Validator {
         }
 
         private Object evaluate(AstUnaryExp unaryExp) {
+            if (unaryExp == null) return null;
+
             if (unaryExp instanceof AstUnaryExpFuncCall) {
                 return null;
             } else if (unaryExp instanceof AstUnaryExpUnaryOp unaryExpUnaryOp) {
@@ -654,6 +672,8 @@ public class Validator {
         }
 
         private Object evaluate(AstPrimaryExp primaryExp) {
+            if (primaryExp == null) return null;
+
             if (primaryExp.bracedExp != null) {
                 return evaluate(primaryExp.bracedExp);
             } else if (primaryExp.number != null) {
@@ -664,18 +684,24 @@ public class Validator {
                 assert primaryExp.lVal != null;
                 // Dealing with variables.
                 Symbol symbol = symTbl.searchSym(primaryExp.lVal.ident);
+                if (symbol == null) return null;
                 if (symbol instanceof SymVar) {
                     return null; // Vars cannot be evaluated at compile time!
                 } else if (symbol instanceof SymConstVar constVar) {
                     if (!constVar.isArray) {
                         // Evaluate const single variable.
+                        if (constVar.values.isEmpty()) return null;
                         return constVar.values.get(0);
                     } else {
                         // Evaluate const (indexed) array.
+                        if (primaryExp.lVal.exp == null) {
+                            return null; // Address cannot be evaluated!
+                        }
                         Object indObj = evaluator.evaluate(primaryExp.lVal.exp); // No expand here, just evaluate.
                         int ind = indObj instanceof Integer ? (Integer) indObj :
                                 indObj instanceof Character ? Integer.valueOf((Character) indObj)
                                 : -1;
+                        if (ind >= constVar.values.size()) return null;
                         return constVar.values.get(ind);
                     }
                 } else {
@@ -683,6 +709,24 @@ public class Validator {
                     return null;
                 }
             }
+        }
+
+        private AstConstExp buildConstExp(Object value) {
+            AstConstExp constExp = new AstConstExp();
+            constExp.setAddExp(buildAddExp(value));
+            if (constExp.addExp == null) return null;
+
+            constExp.type = constExp.addExp.type;
+            return constExp;
+        }
+
+        private AstExp buildExp(Object value) {
+            AstExp exp = new AstExp();
+            exp.setAddExp(buildAddExp(value));
+            if (exp.addExp == null) return null;
+
+            exp.type = exp.addExp.type;
+            return exp;
         }
 
         private AstAddExp buildAddExp(Object value) {
@@ -729,16 +773,19 @@ public class Validator {
         // Type "checker" and calculator.
         /* As no error for type mismatching required, we'll simply panic on mismatch. */
         private SymId typeof(AstExp exp) {
+            if (exp == null) return null;
             if (exp.type != null) return exp.type;
             return typeof(exp.addExp);
         }
 
         private SymId typeof(AstConstExp constExp) {
+            if (constExp == null) return null;
             if (constExp.type != null) return constExp.type;
             return typeof(constExp.addExp);
         }
 
         private SymId typeof(AstAddExp addExp) {
+            if (addExp == null) return null;
             if (addExp.type != null) return addExp.type;
 
             if (addExp.mulExps.size() == 1) {
@@ -768,6 +815,7 @@ public class Validator {
         }
 
         private SymId typeof(AstMulExp mulExp) {
+            if (mulExp == null) return null;
             if (mulExp.type != null) return mulExp.type;
 
             if (mulExp.unaryExps.size() == 1) {
@@ -797,6 +845,7 @@ public class Validator {
         }
 
         private SymId typeof(AstUnaryExp unaryExp) {
+            if (unaryExp == null) return null;
             if (unaryExp.type != null) return unaryExp.type;
 
             if (unaryExp instanceof AstUnaryExpPrimary p) {
@@ -827,6 +876,7 @@ public class Validator {
         }
 
         private SymId typeof(AstPrimaryExp primaryExp) {
+            if (primaryExp == null) return null;
             if (primaryExp.type != null) return primaryExp.type;
 
             if (primaryExp.bracedExp != null) {
@@ -844,6 +894,7 @@ public class Validator {
         }
 
         private SymId typeof(AstLVal lVal) {
+            if (lVal == null) return null;
             if (lVal.type != null) return lVal.type;
 
             Symbol s = symTbl.searchSym(lVal.ident);

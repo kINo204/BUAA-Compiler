@@ -57,15 +57,15 @@ public final class MipsUtils {
             
             # [compiler-generated](lib_io)
     getint:
-            sw	$fp, -4($sp)
-            move	$fp, $sp
-            addi	$sp, $sp, -4
+            sw      $fp, -4($sp)
+            move    $fp, $sp
+            addi    $sp, $sp, -4
                 
             li  $v0, 5
             syscall
             
             move	$sp, $fp
-            lw	$fp, -4($sp)
+            lw  $fp, -4($sp)
             jr  $ra
             
     """;

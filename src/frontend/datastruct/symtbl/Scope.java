@@ -20,6 +20,7 @@ class Scope {
     int subScopeVisitingIndex = 0;
     private final HashMap<String, Symbol> symbolMap = new HashMap<>();
     private final ArrayList<Symbol> symbolArray = new ArrayList<>();
+    private int symbolReadInd = 0;
     Label enteringForMotion;
     Label enteringForEnd;
 

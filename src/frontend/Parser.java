@@ -519,7 +519,18 @@ public class Parser {
         AstStmtReturn stmtReturn = new AstStmtReturn();
         assert lexer.lookAhead(0).getTokenId() == RETURNTK;
 		stmtReturn.returnTk = lexer.read();
-        if (lexer.lookAhead(0).getTokenId() != SEMICN) {
+        // Read till EOL.
+        boolean hasExp = false;
+        for (int i = 0; ; i++) {
+            Token read = lexer.lookAhead(i);
+            if (read.lineNo > stmtReturn.returnTk.lineNo) break;
+            if (read.tokenId == SEMICN) {
+                break;
+            } else {
+                hasExp = true;
+            }
+        }
+        if (hasExp) {
             stmtReturn.setExp(parseExp());
         }
         expectTokenId(SEMICN, "i");

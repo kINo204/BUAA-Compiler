@@ -15,7 +15,6 @@ public class Compiler {
     private static final boolean debugInfo = true;
 
     private static FileReader sourceProgram;
-    private static Log lexerOut;
     private static Log parserOut;
     private static Log symbolOut;
     private static Log irOut;
@@ -27,12 +26,11 @@ public class Compiler {
         configureIO();
 
         /* Frontend. */
-        Lexer lexer = new Lexer(sourceProgram, lexerOut, errOut);
+        Lexer lexer = new Lexer(sourceProgram, parserOut, errOut);
 
         Parser parser = new Parser(lexer, "CompUnit", parserOut, errOut);
         AstCompUnit ast = (AstCompUnit) parser.parse();
         sourceProgram.close();
-        lexerOut.close();
         parserOut.close();
 
         Validator validator = new Validator(ast, errOut);
@@ -67,11 +65,6 @@ public class Compiler {
         sourceProgram = new FileReader("testfile.txt");
 
         // Configure loggers.
-        Writer lexerWriter = new FileWriter("lexer.txt");
-        lexerOut = new Log();
-        lexerOut.addWriter("file", lexerWriter);
-        lexerOut.switchLogger(debugInfo);
-
         Writer parserWriter = new FileWriter("parser.txt");
         parserOut = new Log();
         parserOut.addWriter("file", parserWriter);

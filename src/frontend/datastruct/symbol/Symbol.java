@@ -8,13 +8,13 @@ public abstract class Symbol {
     public final SymId symId;
     public int symtblId;
     public String literal;
-    public final int lineNo;
+    public final int defLineNo;
 
     public Symbol(SymId symId, Token ident) {
         assert ident.getTokenId() == Token.TokenId.IDENFR;
         this.literal = ident.literal;
         this.symId = symId;
-        this.lineNo = ident.lineNo;
+        this.defLineNo = ident.lineNo;
     }
 
     public static Symbol from(AstConstDef constDef) {

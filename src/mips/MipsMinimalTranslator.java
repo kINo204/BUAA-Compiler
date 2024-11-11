@@ -412,7 +412,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
     private void fromIrSub(Instr irSub) {
         loadIrOperand(irSub.main, r(v0));
         if (irSub.supl instanceof Const) {
-            program.append(MipsInstr.genCalc(subi, r(v0), r(v0), (Const) irSub.supl));
+            program.append(MipsInstr.genCalc(subiu, r(v0), r(v0), (Const) irSub.supl));
             writeIrOperand(irSub.res, r(v0));
         } else {
             loadIrOperand(irSub.supl, r(v1));
@@ -424,7 +424,7 @@ public class MipsMinimalTranslator implements MipsTranslator {
     private void fromIrMul(Instr irMul) {
         loadIrOperand(irMul.main, r(v0));
         loadIrOperand(irMul.supl, r(v1));
-        program.append(MipsInstr.genCalc(mul, r(v0), r(v0), r(v1)));
+        program.append(MipsInstr.genCalc(mulu, r(v0), r(v0), r(v1)));
         writeIrOperand(irMul.res, r(v0));
     }
 

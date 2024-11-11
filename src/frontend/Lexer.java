@@ -136,14 +136,18 @@ public class Lexer {
                         }
                     } while (ich != '\n' && ich != -1);
                 } else if (ch == '*') {
-                    do {
+                    while (true) {
+                        do {
+                            ch = (char) input.read();
+                            if (ch == '\n') {
+                                parsingLineNo++;
+                            }
+                        } while (ch != '*');
+                        input.mark(1);
                         ch = (char) input.read();
-                        if (ch == '\n') {
-                            parsingLineNo++;
-                        }
-                    } while (ch != '*');
-                    ch = (char) input.read();
-                    assert ch == '/';
+                        if (ch == '/') break;
+                        input.reset();
+                    }
                 } else {
                     input.reset();
                     ch = '/';
@@ -237,7 +241,7 @@ public class Lexer {
                     token = new Token(OR, "||", parsingLineNo);
                 } else {
                     input.reset();
-                    token = new Token(OR, "&&", parsingLineNo);
+                    token = new Token(OR, "||", parsingLineNo);
                     loggerErr.error(parsingLineNo, "a");
                 }
                 break;

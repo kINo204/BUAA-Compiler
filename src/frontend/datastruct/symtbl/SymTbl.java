@@ -32,13 +32,14 @@ public class SymTbl {
 
     public Symbol searchSym(Token identToken) {
         String literal = identToken.literal;
-        Scope seaching = currentScope;
-        while (seaching != null) {
-            Symbol res = seaching.searchSym(literal);
-            if (res != null) {
+        int refLineNo = identToken.lineNo;
+        Scope searching = currentScope;
+        while (searching != null) {
+            Symbol res = searching.searchSym(literal);
+            if (res != null && res.defLineNo <= refLineNo) {
                 return res;
             } else {
-                seaching = seaching.upperScope;
+                searching = searching.upperScope;
             }
         }
         return null;
@@ -47,7 +48,7 @@ public class SymTbl {
     public void addSymbol(Symbol s) throws IOException {
         // We ignore any redefined symbol at the time.
         if (currentScope.containsSym(s.literal)) {
-            loggerErr.println(s.lineNo + " b");
+            loggerErr.error(s.defLineNo, "b");
         } else {
             currentScope.addSym(s);
         }
@@ -113,5 +114,10 @@ public class SymTbl {
     @Override
     public String toString() {
         return scopesRoot.toString();
+    }
+
+    public void clearEnteringLoopLabels() {
+        currentScope.enteringForMotion = null;
+        currentScope.enteringForEnd = null;
     }
 }
