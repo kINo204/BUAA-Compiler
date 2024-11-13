@@ -43,7 +43,7 @@ public class Token {
                 case '\'' -> 39;
                 case '\\' -> 92;
                 case '0' -> 0;
-                default -> throw new IllegalStateException( "Unexpected escaping char in chrcon");
+                default -> throw new IllegalStateException("Unexpected escaping char in chrcon");
             } : literal.charAt(1);
             case STRCON -> val.string = literal.substring(1, literal.length() - 1); // Strip "" symbols
         }

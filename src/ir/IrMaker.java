@@ -65,12 +65,11 @@ public class IrMaker {
             // Fill array length.
             if (def.constExp != null) {
                 Operand arrayLength = fromConstExp(def.constExp, null);
-                var.arrayLength = ((Const) arrayLength).num;
+                var.arrayLength = ((Const) arrayLength).num; // folded const
             }
 
             // Prepare init values.
             GlobInitVals initVals = fromGlobConstInitVals(var, def.constInitVal);
-
             module.addGlobal(Instr.genGlobDecl(var, initVals));
         }
     }
@@ -80,15 +79,16 @@ public class IrMaker {
 
         if (!var.isArray) {
             assert constInitVal.constExp != null;
+            // By referring this as `Const`, we assume the constExp must have been folded!
             Const c = (Const) fromConstExp(constInitVal.constExp, null);
             initVals.addVal(c);
         } else {
             assert constInitVal.constExp == null;
             Const zero = new Const(0);
-
             if (constInitVal.stringConst == null) {
                 for (int i = 0; i < var.arrayLength; i++) {
                     if (i < constInitVal.constExps.size()) {
+                        // By referring this as `Const`, we assume the constExp must have been folded!
                         Const c = (Const) fromConstExp(constInitVal.constExps.get(i), null);
                         initVals.addVal(c);
                     } else { // set to zero
@@ -98,11 +98,9 @@ public class IrMaker {
             } else { // StringConst
                 String strInitVal = constInitVal.stringConst.val.string;
                 ArrayList<Const> charConsts = getStringConstPieces(strInitVal);
-
                 while (charConsts.size() < var.arrayLength) {
                     charConsts.add(zero);
                 }
-
                 initVals.initVals.addAll(charConsts);
             }
         }
@@ -121,7 +119,7 @@ public class IrMaker {
             // Fill array length.
             if (def.constExp != null) {
                 Operand arrayLength = fromConstExp(def.constExp, null);
-                var.arrayLength = ((Const) arrayLength).num;
+                var.arrayLength = ((Const) arrayLength).num; // folded const
             }
 
             // Prepare init values.
@@ -165,11 +163,9 @@ public class IrMaker {
             } else { // StringConst
                 String strInitVal = initVal.stringConst.val.string;
                 ArrayList<Const> charConsts = getStringConstPieces(strInitVal);
-
                 while (charConsts.size() < var.arrayLength) {
                     charConsts.add(zero);
                 }
-
                 initVals.initVals.addAll(charConsts);
             }
         }
@@ -247,7 +243,7 @@ public class IrMaker {
                     case '\\' -> 92;
                     case '0' -> 0;
                     default -> throw new IllegalStateException(
-                            "Unexpected escaping char: " + str.charAt(i + 1));
+                            "Unexpected escaping char: \\" + str.charAt(i + 1));
                 });
                 i++;
                 pieces.add(charConst);
@@ -326,8 +322,14 @@ public class IrMaker {
                         for (AstExp exp : def.initVal.exps) {
                             initVals.add(fromExp(exp, function));
                         }
-                        for (int i = 0; i < initVals.size(); i++) {
-                            function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                        for (int i = 0; i < var.arrayLength; i++) {
+                            if (i < initVals.size()) {
+                                function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                            } else {
+                                if (var.type == i8) {
+                                    function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                                }
+                            }
                         }
                     } else { // string const
                         String strInitVal = def.initVal.stringConst.val.string;
@@ -771,6 +773,7 @@ public class IrMaker {
             }
             if (funcRef.type == VOID) {
                 function.appendInstr(Instr.genFuncCall(funcRef));
+                return null;
             } else {
                 Reg res = new Reg(funcRef.type); // Assign a Reg of the function's return type.
                 function.appendInstr(Instr.genFuncCall(res, funcRef));
@@ -803,7 +806,7 @@ public class IrMaker {
                     return res;
                 }
             } else if (var.isReference) {
-                if (primaryExp.lVal.exp == null) { // No such grammar
+                if (primaryExp.lVal.exp == null) {
                     Reg res = new Reg(i32);
                     function.appendInstr(Instr.genLoad(res, var));
                     return res;

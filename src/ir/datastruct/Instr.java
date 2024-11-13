@@ -34,7 +34,7 @@ public class Instr {
     public static Instr genGlobDecl(Var var, GlobInitVals initVals) {
         return new Instr(
                 Operator.GLOB, var.type, var,
-                var.arrayLength == 0 ? null : new Const(var.arrayLength),
+                !var.isArray ? null : new Const(var.arrayLength),
                 initVals
         );
     }

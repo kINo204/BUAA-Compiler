@@ -207,6 +207,7 @@ public class Validator {
         for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
             if (ch == '\\') {
+                if (str.length() == i + 1) break; // invalid escaping symbol
                 char next = str.charAt(i + 1);
                 assert Arrays.asList('a', 'b', 't', 'n', 'v', 'f', '\"', '\'', '\\', '0')
                         .contains(next);
@@ -259,9 +260,8 @@ public class Validator {
         if (initVal.exp != null) {
             vExp(initVal.exp);
             // Try folding this.
-            AstExp newExp = new AstExp();
-            newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(initVal.exp));
-            if (newExp.addExp != null) {
+            AstExp newExp = evaluator.buildExp(evaluator.evaluate(initVal.exp));
+            if (newExp != null) {
                 initVal.exp = newExp;
             }
         } else {
@@ -269,9 +269,8 @@ public class Validator {
             for (AstExp exp : initVal.exps) {
                 vExp(exp);
                 // Try folding this.
-                AstExp newExp = new AstExp();
-                newExp.addExp = evaluator.buildAddExp(evaluator.evaluate(exp));
-                if (newExp.addExp != null) {
+                AstExp newExp = evaluator.buildExp(evaluator.evaluate(exp));
+                if (newExp != null) {
                     newExps.add(newExp);
                 } else {
                     newExps.add(exp);
@@ -409,9 +408,17 @@ public class Validator {
         for (AstLAndExp lAndExp : lOrExp.lAndExps) {
             for (AstEqExp eqExp : lAndExp.eqExps) {
                 for (AstRelExp relExp : eqExp.relExps) {
+                    ArrayList<AstAddExp> newAddExps = new ArrayList<>();
                     for (AstAddExp addExp : relExp.addExps) {
                         vAddExp(addExp);
+                        AstAddExp newAddExp = evaluator.buildAddExp(evaluator.evaluate(addExp));
+                        if (newAddExp != null) {
+                            newAddExps.add(newAddExp);
+                        } else {
+                            newAddExps.add(addExp);
+                        }
                     }
+                    relExp.addExps = newAddExps;
                 }
             }
         }
@@ -631,20 +638,51 @@ public class Validator {
                 } else if (elm instanceof Integer integer) {
                     val = switch (op) {
                         case MULT -> val * integer;
-                        case DIV ->  val / integer;
-                        case MOD ->  val % integer;
-                        default ->   0;
+                        case DIV ->  {
+                            if (integer == 0) {
+                                yield null;
+                            } else {
+                                yield val / integer;
+                            }
+                        }
+                        case MOD ->  {
+                            if (integer == 0) {
+                                yield null;
+                            } else {
+                                yield val % integer;
+                            }
+                        }
+                        default ->   null;
                     };
+                    if (val == null) {
+                        return null;
+                    }
                 } else if (elm instanceof Character character) {
                     val = switch (op) {
                         case MULT -> val * Integer.valueOf(character);
-                        case DIV ->  val / Integer.valueOf(character);
-                        case MOD ->  val % Integer.valueOf(character);
-                        default ->   0;
+                        case DIV ->  {
+                            int charVal = Integer.valueOf(character);
+                            if (charVal == 0) {
+                                yield null;
+                            } else {
+                                yield val / charVal;
+                            }
+                        }
+                        case MOD ->  {
+                            int charVal = Integer.valueOf(character);
+                            if (charVal == 0) {
+                                yield null;
+                            } else {
+                                yield val % charVal;
+                            }
+                        }
+                        default ->   null;
                     };
+                    if (val == null) {
+                        return null;
+                    }
                 }
             }
-
             return val;
         }
 
@@ -656,14 +694,25 @@ public class Validator {
             } else if (unaryExp instanceof AstUnaryExpUnaryOp unaryExpUnaryOp) {
                 if (unaryExpUnaryOp.unaryOp.op.tokenId == Token.TokenId.PLUS) {
                     return evaluate(unaryExpUnaryOp.unaryExp);
-                } else { // -
+                } else if (unaryExpUnaryOp.unaryOp.op.tokenId == Token.TokenId.MINU) { // -
                     Object valUnaryExp = evaluate(unaryExpUnaryOp.unaryExp);
                     if (valUnaryExp == null) {
                         return null;
                     } else if (valUnaryExp instanceof Character charUnaryExp) {
                         return -Integer.valueOf(charUnaryExp);
                     } else {
-                        return -(Integer) valUnaryExp;
+                        return -((Integer) valUnaryExp);
+                    }
+                } else { // ! (Neg)
+                    Object valUnaryExp = evaluate(unaryExpUnaryOp.unaryExp);
+                    if (valUnaryExp == null) {
+                        return null;
+                    } else if (valUnaryExp instanceof Character charUnaryExp) {
+                        Integer num = Integer.valueOf(charUnaryExp);
+                        return num == 0 ? 1 : 0;
+                    } else {
+                        Integer num = (Integer) valUnaryExp;
+                        return num == 0 ? 1 : 0;
                     }
                 }
             } else { // PrimaryExp
@@ -677,9 +726,9 @@ public class Validator {
             if (primaryExp.bracedExp != null) {
                 return evaluate(primaryExp.bracedExp);
             } else if (primaryExp.number != null) {
-                return primaryExp.number.intConst.val.integer;
+                return Integer.valueOf(primaryExp.number.intConst.val.integer);
             } else if (primaryExp.character != null) {
-                return primaryExp.character.charConst.val.character;
+                return Character.valueOf(primaryExp.character.charConst.val.character);
             } else {
                 assert primaryExp.lVal != null;
                 // Dealing with variables.
@@ -698,6 +747,8 @@ public class Validator {
                             return null; // Address cannot be evaluated!
                         }
                         Object indObj = evaluator.evaluate(primaryExp.lVal.exp); // No expand here, just evaluate.
+                        if (indObj == null) return null;
+
                         int ind = indObj instanceof Integer ? (Integer) indObj :
                                 indObj instanceof Character ? Integer.valueOf((Character) indObj)
                                 : -1;
@@ -744,13 +795,12 @@ public class Validator {
                 primaryExp.type = ConstInt;
             } else {
                 Character character = (Character) value;
-                // TODO about escaping char?
-                Token token = new Token(Token.TokenId.CHRCON,
-                        "'" + character + "'", 0);
-                AstCharacter astCharacter = new AstCharacter();
-                astCharacter.charConst = token;
-                primaryExp.character = astCharacter;
-                primaryExp.type = ConstChar;
+                Integer integer = Integer.valueOf(character);
+                Token token = new Token(Token.TokenId.INTCON, integer.toString(), 0);
+                AstNumber number = new AstNumber();
+                number.intConst = token;
+                primaryExp.number = number;
+                primaryExp.type = ConstInt;
             }
 
             AstUnaryExpPrimary unaryExpPrimary = new AstUnaryExpPrimary();

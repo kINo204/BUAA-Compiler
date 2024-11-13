@@ -3,7 +3,6 @@ package ir.datastruct;
 import java.util.ArrayList;
 
 public class Module implements IrStruct {
-    // TODO Other elements in Module
     public ArrayList<Instr> globals = new ArrayList<>();
     public ArrayList<Function> functions = new ArrayList<>();
 

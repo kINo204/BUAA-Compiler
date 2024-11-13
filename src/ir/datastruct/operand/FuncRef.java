@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import static ir.datastruct.Instr.Type.*;
 
 public class FuncRef extends Operand implements MipsOperand {
-    // Backup info in symbol.
-    private SymFunc symbol;
 
     public String funcName;
     private int symtblId;
@@ -22,7 +20,6 @@ public class FuncRef extends Operand implements MipsOperand {
     public final ArrayList<Var> params = new ArrayList<>();
 
     public FuncRef(SymFunc symbol) {
-        this.symbol = symbol;
         funcName = symbol.literal;
         symtblId = symbol.symtblId;
 
@@ -46,7 +43,6 @@ public class FuncRef extends Operand implements MipsOperand {
     public static FuncRef frGetint() {
         FuncRef funcRef = new FuncRef();
         funcRef.type = i32;
-        funcRef.symbol = null;
         funcRef.funcName = "getint";
         funcRef.symtblId = 1;
         return funcRef;
@@ -55,7 +51,6 @@ public class FuncRef extends Operand implements MipsOperand {
     public static FuncRef frGetchar() {
         FuncRef funcRef = new FuncRef();
         funcRef.type = i8;
-        funcRef.symbol = null;
         funcRef.funcName = "getchar";
         funcRef.symtblId = 1;
         return funcRef;
@@ -64,7 +59,6 @@ public class FuncRef extends Operand implements MipsOperand {
     public static FuncRef frPutchar() {
         FuncRef funcRef = new FuncRef();
         funcRef.type = VOID;
-        funcRef.symbol = null;
         funcRef.funcName = "putchar";
         funcRef.symtblId = 1;
 
@@ -82,7 +76,6 @@ public class FuncRef extends Operand implements MipsOperand {
     public static FuncRef frPutint() {
         FuncRef funcRef = new FuncRef();
         funcRef.type = VOID;
-        funcRef.symbol = null;
         funcRef.funcName = "putint";
         funcRef.symtblId = 1;
 
@@ -99,7 +92,6 @@ public class FuncRef extends Operand implements MipsOperand {
 
     public FuncRef(boolean isMain) {
         assert isMain;
-        this.symbol = null;
         funcName = "main";
         symtblId = 1;
         super.type = i32;
