@@ -1,22 +1,9 @@
-INTTK int
-MAINTK main
+VOIDTK void
+<FuncType>
+IDENFR func
 LPARENT (
 RPARENT )
 LBRACE {
-INTTK int
-IDENFR i
-ASSIGN =
-INTCON 0
-<Number>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
-<InitVal>
-<VarDef>
-SEMICN ;
-<VarDecl>
 IFTK if
 LPARENT (
 INTCON 1
@@ -32,18 +19,21 @@ INTCON 1
 <Cond>
 RPARENT )
 LBRACE {
-INTTK int
-IDENFR a
-<VarDef>
-SEMICN ;
-<VarDecl>
 RBRACE }
 <Block>
 <Stmt>
-ELSETK else
+<Stmt>
+RBRACE }
+<Block>
+<FuncDef>
+INTTK int
+MAINTK main
+LPARENT (
+RPARENT )
+LBRACE {
 IFTK if
 LPARENT (
-INTCON 2
+INTCON 1
 <Number>
 <PrimaryExp>
 <UnaryExp>
@@ -56,24 +46,8 @@ INTCON 2
 <Cond>
 RPARENT )
 LBRACE {
-INTTK int
-IDENFR b
-<VarDef>
-SEMICN ;
-<VarDecl>
 RBRACE }
 <Block>
-<Stmt>
-ELSETK else
-LBRACE {
-INTTK int
-IDENFR c
-<VarDef>
-SEMICN ;
-<VarDecl>
-RBRACE }
-<Block>
-<Stmt>
 <Stmt>
 <Stmt>
 RETURNTK return

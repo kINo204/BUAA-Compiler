@@ -18,6 +18,7 @@ public class IrFuncOptimizer {
     private ArrayList<Instr> instrs;
     private ArrayList<Instr> optInstrs = new ArrayList<>();
     private Instr funcDefInstr;
+    private int labelStartingInd;
 
     public IrFuncOptimizer(Log log) {
         this.log = log;
@@ -31,6 +32,7 @@ public class IrFuncOptimizer {
     public ArrayList<Instr> optimize() throws IOException {
         // Remove function def instr.
         funcDefInstr = instrs.remove(0);
+        labelStartingInd = Label.getInd();
 
         // 1. Generate CFG.
         while (true) {
@@ -57,7 +59,7 @@ public class IrFuncOptimizer {
     }
 
     private void initResource() {
-        Label.reset();
+        Label.resetInd(labelStartingInd);
 
     }
 

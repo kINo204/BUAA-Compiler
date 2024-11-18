@@ -9,8 +9,12 @@ public class Label extends Operand implements MipsOperand {
 
     public Instr target = null;
 
-    public static void reset() {
-        index = 0;
+    public static int getInd() {
+        return index;
+    }
+
+    public static void resetInd(int labelStartingInd) {
+        index = labelStartingInd;
     }
 
     public Label(String text) {

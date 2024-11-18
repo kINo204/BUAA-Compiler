@@ -1,4 +1,1 @@
-2 i Int
-3 a Int
-4 b Int
-5 c Int
+1 func VoidFunc

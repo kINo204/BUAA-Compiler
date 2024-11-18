@@ -5,50 +5,35 @@
         syscall
 
 
-	# define fun main:
+	# define fun func:
 .text
-main:
+func:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
-
-	# i_2 = alloc: i32
-
-	# i_2: i32 = 0
-	li	$v0, 0
-	sw	$v0, -8($fp)
 
 	# if false 1 goto  $L0
 	li	$v0, 1
 	beq	$v0, $zero, $L0
 
 
-	# a_3 = alloc: i32
-
-	# goto  $L1
-	j	$L1
-
-
 	# $L0:
 $L0:
 
-	# if false 2 goto  $L2
-	li	$v0, 2
-	beq	$v0, $zero, $L2
+	# ret
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
 
 
-	# b_4 = alloc: i32
+	# define fun main:
+main:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
 
-	# goto  $L3
-	j	$L3
+	# if false 1 goto  $L1
+	li	$v0, 1
+	beq	$v0, $zero, $L1
 
-
-	# $L2:
-$L2:
-
-	# c_5 = alloc: i32
-
-	# $L3:
-$L3:
 
 	# $L1:
 $L1:

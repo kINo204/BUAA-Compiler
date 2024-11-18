@@ -1,19 +1,11 @@
-define fun main:
-	i_2 = alloc: i32
-	i_2: i32 = 0
+define fun func:
 	if false 1 goto  $L0
-	a_3 = alloc: i32
-	goto  $L1
 
 $L0:
-	if false 2 goto  $L2
-	b_4 = alloc: i32
-	goto  $L3
+	ret
 
-$L2:
-	c_5 = alloc: i32
-
-$L3:
+define fun main:
+	if false 1 goto  $L1
 
 $L1:
 	ret: i32  0
