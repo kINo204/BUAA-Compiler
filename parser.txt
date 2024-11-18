@@ -4,7 +4,7 @@ LPARENT (
 RPARENT )
 LBRACE {
 INTTK int
-IDENFR a
+IDENFR i
 ASSIGN =
 INTCON 0
 <Number>
@@ -17,47 +17,64 @@ INTCON 0
 <VarDef>
 SEMICN ;
 <VarDecl>
-CONSTTK const
+IFTK if
+LPARENT (
+INTCON 1
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+RPARENT )
+LBRACE {
 INTTK int
-IDENFR b
-LBRACK [
+IDENFR a
+<VarDef>
+SEMICN ;
+<VarDecl>
+RBRACE }
+<Block>
+<Stmt>
+ELSETK else
+IFTK if
+LPARENT (
 INTCON 2
 <Number>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
-<ConstExp>
-RBRACK ]
-ASSIGN =
-LBRACE {
-RBRACE }
-<ConstInitVal>
-<ConstDef>
-SEMICN ;
-<ConstDecl>
-PRINTFTK printf
-LPARENT (
-STRCON "%c"
-COMMA ,
-IDENFR b
-LBRACK [
-IDENFR a
-<LVal>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
-RBRACK ]
-<LVal>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
 RPARENT )
+LBRACE {
+INTTK int
+IDENFR b
+<VarDef>
 SEMICN ;
+<VarDecl>
+RBRACE }
+<Block>
+<Stmt>
+ELSETK else
+LBRACE {
+INTTK int
+IDENFR c
+<VarDef>
+SEMICN ;
+<VarDecl>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
 <Stmt>
 RETURNTK return
 INTCON 0

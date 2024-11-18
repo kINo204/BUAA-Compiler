@@ -1,11 +1,19 @@
 define fun main:
-	a_2 = alloc: i32
-	a_2: i32 = 0
-	b_2 = alloc: i32  2
-	b_2[0]: i32 = 0
-	b_2[1]: i32 = 0
-	%1: i32 = a_2
-	%2: i32 = b_2[%1]
-	param: i8  %2
-	call: void  putchar
+	i_2 = alloc: i32
+	i_2: i32 = 0
+	if false 1 goto  $L0_if_else
+	a_3 = alloc: i32
+	goto  $L1_if_end
+
+$L0_if_else:
+	if false 2 goto  $L2_if_else
+	b_4 = alloc: i32
+	goto  $L3_if_end
+
+$L2_if_else:
+	c_5 = alloc: i32
+
+$L3_if_end:
+
+$L1_if_end:
 	ret: i32  0

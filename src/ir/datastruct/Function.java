@@ -12,7 +12,7 @@ public class Function implements IrStruct {
 
     // The final position of instructions. Whatever data structures are used
     // for optimization, this field must be refilled with the final instructions.
-    ArrayList<Instr> instrs = new ArrayList<>();
+    public ArrayList<Instr> instrs = new ArrayList<>();
 
     public Function(SymFunc symbol) {
         this.symbol = symbol;

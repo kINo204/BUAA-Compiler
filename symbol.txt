@@ -1,2 +1,4 @@
-2 a Int
-2 b ConstIntArray
+2 i Int
+3 a Int
+4 b Int
+5 c Int

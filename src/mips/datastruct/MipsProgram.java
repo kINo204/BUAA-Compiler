@@ -19,8 +19,9 @@ public class MipsProgram {
         sb.append(MipsUtils.osWrapper);
 
         for (MipsInstr i : instrs) {
-            sb.append(i.toString()).append("\n");
+            sb.append(i).append("\n");
         }
+        sb.append("\n");
 
         // Language libs.
         sb.append(MipsUtils.lib_io);

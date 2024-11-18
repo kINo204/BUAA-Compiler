@@ -3,7 +3,7 @@ package ir.datastruct;
 import ir.datastruct.operand.*;
 
 public class Instr {
-    private final Operator op;
+    public final Operator op;
     public Type type = null;
     public Operand res = null, main = null, supl = null;
 
