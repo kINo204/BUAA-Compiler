@@ -14,7 +14,7 @@ public class BBlock {
     public final HashSet<BBlock> prevSet = new HashSet<>();
 
     // Info for regeneration.
-    public boolean condJump = false;
+    public boolean isCondJump = false;
     public Operand condition = null;
     public BBlock tarTrue = null;
     public BBlock tarFalse = null;

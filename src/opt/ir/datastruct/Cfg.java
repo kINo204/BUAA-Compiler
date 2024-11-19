@@ -12,4 +12,38 @@ public class Cfg {
         this.exit = exit;
         this.blocks = blocks;
     }
+
+    public void connect(BBlock from, BBlock to) {
+        from.nextSet.add(to);
+        to.prevSet.add(from);
+    }
+
+    public void connectTrue(BBlock from, BBlock to) {
+        from.tarTrue = to;
+        to.prevSet.add(from);
+    }
+
+    public void connectFalse(BBlock from, BBlock to) {
+        from.tarFalse = to;
+        to.prevSet.add(from);
+    }
+
+    public void disconnect(BBlock from, BBlock to) {
+        from.nextSet.remove(to);
+        to.prevSet.remove(from);
+    }
+
+    public void disconnectTrue(BBlock from, BBlock to) {
+        from.tarTrue = null;
+        if (from.tarFalse != to) {
+            to.prevSet.remove(from);
+        }
+    }
+
+    public void disconnectFalse(BBlock from, BBlock to) {
+        from.tarFalse = null;
+        if (from.tarTrue != to) {
+            to.prevSet.remove(from);
+        }
+    }
 }

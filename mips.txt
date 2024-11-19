@@ -5,19 +5,307 @@
         syscall
 
 
-	# define fun func:
+	# global const_var1_1: i32 = 17
+.data
+	const_var1_1: .word 17
+
+	# global const_var2_1: i32 = 3
+	const_var2_1: .word 3
+
+	# global arr_1[3]: i32 = 1, 2, 3
+	arr_1: .word 1, 2, 3
+
+	# global const_var3_1: i8 = 99
+	const_var3_1: .byte 99
+
+	# global s_1[5]: i8 = 97, 98, 99, 100, 0
+	s_1: .byte 97, 98, 99, 100, 0
+
+	# global str_1[5]: i8 = 97, 98, 99, 100, 0
+	str_1: .byte 97, 98, 99, 100, 0
+
+	# global cot_var1_1: i32 = 20
+	cot_var1_1: .word 20
+
+	# global var1_1: i32 = 5
+	var1_1: .word 5
+
+	# global var2_1: i32 = 2
+	var2_1: .word 2
+
+	# global var3_1: i32 = 10
+	var3_1: .word 10
+
+	# global var4_1: i8 = 7
+	var4_1: .byte 7
+
+	# global var5_1: i8 = 8
+	var5_1: .byte 8
+
+	# define fun f3:
 .text
-func:
+f3:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
 
-	# if false 1 goto  $L0
-	li	$v0, 1
+	# i_2 = alloc: i32
+
+	# i_2: i32 = 0
+	li	$v0, 0
+	sw	$v0, -8($fp)
+
+	# $L1:
+$L1:
+
+	# %1: i32 = i_2
+	lw	$v0, -8($fp)
+	sw	$v0, -12($fp)
+
+	# %2 = eql: i32  %1, 0
+	lw	$v0, -12($fp)
+	li	$v1, 0
+	seq	$v0, $v0, $v1
+	sw	$v0, -16($fp)
+
+	# if false %2 goto  $L0
+	lw	$v0, -16($fp)
 	beq	$v0, $zero, $L0
+
+
+	# %3: i32 = para1_2
+	lw	$v0, 8($fp)
+	sw	$v0, -20($fp)
+
+	# %4: i32 = para2_2
+	lw	$v0, 4($fp)
+	sw	$v0, -24($fp)
+
+	# %5 = add: i32  %3, %4
+	lw	$v0, -20($fp)
+	lw	$v1, -24($fp)
+	addu	$v0, $v0, $v1
+	sw	$v0, -28($fp)
+
+	# para1_2: i32 = %5
+	lw	$v0, -28($fp)
+	sw	$v0, 8($fp)
+
+	# %6: i32 = i_2
+	lw	$v0, -8($fp)
+	sw	$v0, -32($fp)
+
+	# %7 = add: i32  %6, 1
+	lw	$v0, -32($fp)
+	addi	$v0, $v0, 1
+	sw	$v0, -36($fp)
+
+	# i_2: i32 = %7
+	lw	$v0, -36($fp)
+	sw	$v0, -8($fp)
+
+	# goto  $L1
+	j	$L1
 
 
 	# $L0:
 $L0:
+
+	# %8: i32 = i_2
+	lw	$v0, -8($fp)
+	sw	$v0, -40($fp)
+
+	# %9: i32 = *(arr1_2)[%8]
+	lw	$a0, 16($fp)
+	lw	$t9, -40($fp)
+	sll	$t9, $t9, 2
+	addu	$a0, $a0, $t9
+	lw	$v0, 0($a0)
+	sw	$v0, -44($fp)
+
+	# %10: i32 = i_2
+	lw	$v0, -8($fp)
+	sw	$v0, -48($fp)
+
+	# %11: i32 = *(arr2_2)[%10]
+	lw	$a0, 12($fp)
+	lw	$t9, -48($fp)
+	sll	$t9, $t9, 2
+	addu	$a0, $a0, $t9
+	lw	$v0, 0($a0)
+	sw	$v0, -52($fp)
+
+	# %12: i32 = para1_2
+	lw	$v0, 8($fp)
+	sw	$v0, -56($fp)
+
+	# %13 = add: i32  %11, %12
+	lw	$v0, -52($fp)
+	lw	$v1, -56($fp)
+	addu	$v0, $v0, $v1
+	sw	$v0, -60($fp)
+
+	# %14 = mul: i32  %9, %13
+	lw	$v0, -44($fp)
+	lw	$v1, -60($fp)
+	mulu	$v0, $v0, $v1
+	sw	$v0, -64($fp)
+
+	# %15: i32 = para2_2
+	lw	$v0, 4($fp)
+	sw	$v0, -68($fp)
+
+	# %16 = sub: i32  %14, %15
+	lw	$v0, -64($fp)
+	lw	$v1, -68($fp)
+	subu	$v0, $v0, $v1
+	sw	$v0, -72($fp)
+
+	# ret: i32  %16
+	lw	$v0, -72($fp)
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun f4:
+f4:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+
+	# %1: i32 = para1_4
+	lw	$v0, 8($fp)
+	sw	$v0, -8($fp)
+
+	# %2: i32 = para2_4
+	lw	$v0, 4($fp)
+	sw	$v0, -12($fp)
+
+	# %3 = add: i32  %1, %2
+	lw	$v0, -8($fp)
+	lw	$v1, -12($fp)
+	addu	$v0, $v0, $v1
+	sw	$v0, -16($fp)
+
+	# ret: i32  %3
+	lw	$v0, -16($fp)
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun f5:
+f5:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+
+	# %1: i8 = para1_5
+	lb	$v0, 7($fp)
+	sb	$v0, -5($fp)
+
+	# %2: i8 = para2_5
+	lb	$v0, 6($fp)
+	sb	$v0, -6($fp)
+
+	# %3 = add: i32  %1, %2
+	lb	$v0, -5($fp)
+	lb	$v1, -6($fp)
+	addu	$v0, $v0, $v1
+	sw	$v0, -12($fp)
+
+	# ret: i32  %3
+	lw	$v0, -12($fp)
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun f7:
+f7:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+
+	# %1: i32 = para_6
+	lw	$v0, 4($fp)
+	sw	$v0, -8($fp)
+
+	# ret: i32  %1
+	lw	$v0, -8($fp)
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun f8:
+f8:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+
+	# %1: i8 = para_7
+	lb	$v0, 7($fp)
+	sb	$v0, -5($fp)
+
+	# ret: i8  %1
+	lb	$v0, -5($fp)
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun f6:
+f6:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+
+	# ret: i32  0
+	li	$v0, 0
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun f2:
+f2:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+
+	# %1: i32 = para_9
+	lw	$v0, 4($fp)
+	sw	$v0, -8($fp)
+
+	# param: i32  %1
+	lw	$a0, -8($fp)
+	sw	$a0, -12($fp)
+
+	# call: void  putint
+	addi	$sp, $fp, -16
+	sw	$ra, 0($sp)
+	jal	putint
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -8
+
+	# param: i8  10
+	li	$a0, 10
+	sb	$a0, -9($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -16
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -8
+
+	# ret
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+	# define fun f9:
+f9:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
 
 	# ret
 	move	$sp, $fp
@@ -30,13 +318,1240 @@ main:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
 
-	# if false 1 goto  $L1
+	# param: i8  50
+	li	$a0, 50
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param: i8  50
+	li	$a0, 50
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param: i8  51
+	li	$a0, 51
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param: i8  55
+	li	$a0, 55
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param: i8  49
+	li	$a0, 49
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param: i8  52
+	li	$a0, 52
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param: i8  57
+	li	$a0, 57
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param: i8  49
+	li	$a0, 49
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# param: i8  10
+	li	$a0, 10
+	sb	$a0, -5($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -4
+
+	# a_11 = alloc: i32
+
+	# a_11: i32 = 0
+	li	$v0, 0
+	sw	$v0, -8($fp)
+
+	# call: void  f9
+	addi	$sp, $fp, -12
+	sw	$ra, 0($sp)
+	jal	f9
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -8
+
+	# ff_11 = alloc: i32
+
+	# ff_11: i32 = 1
 	li	$v0, 1
-	beq	$v0, $zero, $L1
+	sw	$v0, -12($fp)
+
+	# arr_11 = alloc: i32  3
+
+	# arr1_11 = alloc: i32  3
+
+	# arr1_11[0]: i32 = 1
+	li	$v0, 1
+	sw	$v0, -36($fp)
+
+	# arr1_11[1]: i32 = 2
+	li	$v0, 2
+	sw	$v0, -32($fp)
+
+	# arr1_11[2]: i32 = 3
+	li	$v0, 3
+	sw	$v0, -28($fp)
+
+	# arr2_11 = alloc: i32  3
+
+	# arr2_11[0]: i32 = 4
+	li	$v0, 4
+	sw	$v0, -48($fp)
+
+	# arr2_11[1]: i32 = 5
+	li	$v0, 5
+	sw	$v0, -44($fp)
+
+	# arr2_11[2]: i32 = 6
+	li	$v0, 6
+	sw	$v0, -40($fp)
+
+	# o_11 = alloc: i32
+
+	# %1: &i32 = &(arr1_11)
+	addi	$v0, $fp, -36
+	sw	$v0, -56($fp)
+
+	# %2: &i32 = &(arr2_11)
+	addi	$v0, $fp, -48
+	sw	$v0, -60($fp)
+
+	# %3: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -64($fp)
+
+	# %4: i32 = ff_11
+	lw	$v0, -12($fp)
+	sw	$v0, -68($fp)
+
+	# param: i32  %1
+	lw	$a0, -56($fp)
+	sw	$a0, -72($fp)
+
+	# param: i32  %2
+	lw	$a0, -60($fp)
+	sw	$a0, -76($fp)
+
+	# param: i32  %3
+	lw	$a0, -64($fp)
+	sw	$a0, -80($fp)
+
+	# param: i32  %4
+	lw	$a0, -68($fp)
+	sw	$a0, -84($fp)
+
+	# %5 = call: i32  f3
+	addi	$sp, $fp, -88
+	sw	$ra, 0($sp)
+	jal	f3
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -68
+	sw	$v0, -72($fp)
+
+	# o_11: i32 = %5
+	lw	$v0, -72($fp)
+	sw	$v0, -52($fp)
+
+	# b_11 = alloc: i32
+
+	# b_11: i32 = 1
+	li	$v0, 1
+	sw	$v0, -76($fp)
+
+	# e_11 = alloc: i8
+
+	# e_11: i8 = 99
+	li	$v0, 99
+	sb	$v0, -77($fp)
+
+	# param: i8  99
+	li	$a0, 99
+	sb	$a0, -81($fp)
+
+	# %6 = call: i8  f8
+	addi	$sp, $fp, -88
+	sw	$ra, 0($sp)
+	jal	f8
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -77
+	sb	$v0, -78($fp)
+
+	# e_11: i8 = %6
+	lb	$v0, -78($fp)
+	sb	$v0, -77($fp)
+
+	# %7: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -84($fp)
+
+	# %8: i32 = b_11
+	lw	$v0, -76($fp)
+	sw	$v0, -88($fp)
+
+	# %9 = add: i32  %7, %8
+	lw	$v0, -84($fp)
+	lw	$v1, -88($fp)
+	addu	$v0, $v0, $v1
+	sw	$v0, -92($fp)
+
+	# %10: i32 = b_11
+	lw	$v0, -76($fp)
+	sw	$v0, -96($fp)
+
+	# %11 = add: i32  %9, %10
+	lw	$v0, -92($fp)
+	lw	$v1, -96($fp)
+	addu	$v0, $v0, $v1
+	sw	$v0, -100($fp)
+
+	# %12 = add: i32  %11, 10
+	lw	$v0, -100($fp)
+	addi	$v0, $v0, 10
+	sw	$v0, -104($fp)
+
+	# a_11: i32 = %12
+	lw	$v0, -104($fp)
+	sw	$v0, -8($fp)
+
+	# %13: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -108($fp)
+
+	# %14 = sub: i32  0, %13
+	li	$v0, 0
+	lw	$v1, -108($fp)
+	subu	$v0, $v0, $v1
+	sw	$v0, -112($fp)
+
+	# a_11: i32 = %14
+	lw	$v0, -112($fp)
+	sw	$v0, -8($fp)
+
+	# %15: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -116($fp)
+
+	# %16 = sub: i32  0, %15
+	li	$v0, 0
+	lw	$v1, -116($fp)
+	subu	$v0, $v0, $v1
+	sw	$v0, -120($fp)
+
+	# %17: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -124($fp)
+
+	# %18: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -128($fp)
+
+	# %19 = div: i32  %18, 2
+	lw	$v0, -128($fp)
+	li	$v1, 2
+	div	$v0, $v0, $v1
+	mflo	$v0
+	sw	$v0, -132($fp)
+
+	# a_11: i32 = %19
+	lw	$v0, -132($fp)
+	sw	$v0, -8($fp)
+
+	# %20: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -136($fp)
+
+	# %21 = mod: i32  %20, 2
+	lw	$v0, -136($fp)
+	li	$v1, 2
+	div	$v0, $v0, $v1
+	mfhi	$v0
+	sw	$v0, -140($fp)
+
+	# a_11: i32 = %21
+	lw	$v0, -140($fp)
+	sw	$v0, -8($fp)
+
+	# %22: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -144($fp)
+
+	# %23 = eql: i32  %22, 0
+	lw	$v0, -144($fp)
+	li	$v1, 0
+	seq	$v0, $v0, $v1
+	sw	$v0, -148($fp)
+
+	# if false %23 goto  $L2
+	lw	$v0, -148($fp)
+	beq	$v0, $zero, $L2
 
 
-	# $L1:
-$L1:
+	# $L2:
+$L2:
+
+	# param: i8  103
+	li	$a0, 103
+	sb	$a0, -149($fp)
+
+	# param: i8  102
+	li	$a0, 102
+	sb	$a0, -150($fp)
+
+	# %24 = call: i8  f5
+	addi	$sp, $fp, -156
+	sw	$ra, 0($sp)
+	jal	f5
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -148
+	sb	$v0, -149($fp)
+
+	# e_11: i8 = %24
+	lb	$v0, -149($fp)
+	sb	$v0, -77($fp)
+
+	# h_11 = alloc: i32
+
+	# %25: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -160($fp)
+
+	# %26 = add: i32  %25, 1
+	lw	$v0, -160($fp)
+	addi	$v0, $v0, 1
+	sw	$v0, -164($fp)
+
+	# h_11: i32 = %26
+	lw	$v0, -164($fp)
+	sw	$v0, -156($fp)
+
+	# %27: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -168($fp)
+
+	# h_11: i32 = %27
+	lw	$v0, -168($fp)
+	sw	$v0, -156($fp)
+
+	# %28 = call: i8  getchar
+	addi	$sp, $fp, -172
+	sw	$ra, 0($sp)
+	jal	getchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -168
+	sb	$v0, -169($fp)
+
+	# e_11: i8 = %28
+	lb	$v0, -169($fp)
+	sb	$v0, -77($fp)
+
+	# d_11 = alloc: i32
+
+	# d_11: i32 = 4
+	li	$v0, 4
+	sw	$v0, -176($fp)
+
+	# c_11 = alloc: i32
+
+	# c_11: i32 = 1
+	li	$v0, 1
+	sw	$v0, -180($fp)
+
+	# i_11 = alloc: i32
+
+	# param: i32  0
+	li	$a0, 0
+	sw	$a0, -188($fp)
+
+	# %29 = call: i32  f7
+	addi	$sp, $fp, -192
+	sw	$ra, 0($sp)
+	jal	f7
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -184
+	sw	$v0, -188($fp)
+
+	# i_11: i32 = %29
+	lw	$v0, -188($fp)
+	sw	$v0, -184($fp)
+
+	# %30 = call: i32  getint
+	addi	$sp, $fp, -192
+	sw	$ra, 0($sp)
+	jal	getint
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -188
+	sw	$v0, -192($fp)
+
+	# c_11: i32 = %30
+	lw	$v0, -192($fp)
+	sw	$v0, -180($fp)
+
+	# %31: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -196($fp)
+
+	# %32: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -200($fp)
+
+	# param: i32  %31
+	lw	$a0, -196($fp)
+	sw	$a0, -204($fp)
+
+	# param: i32  %32
+	lw	$a0, -200($fp)
+	sw	$a0, -208($fp)
+
+	# %33 = call: i32  f4
+	addi	$sp, $fp, -212
+	sw	$ra, 0($sp)
+	jal	f4
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -200
+	sw	$v0, -204($fp)
+
+	# c_11: i32 = %33
+	lw	$v0, -204($fp)
+	sw	$v0, -180($fp)
+
+	# i_11: i32 = 0
+	li	$v0, 0
+	sw	$v0, -184($fp)
+
+	# $L6:
+$L6:
+
+	# %34: i32 = i_11
+	lw	$v0, -184($fp)
+	sw	$v0, -208($fp)
+
+	# %35: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -212($fp)
+
+	# %36 = lss: i32  %34, %35
+	lw	$v0, -208($fp)
+	lw	$v1, -212($fp)
+	slt	$v0, $v0, $v1
+	sw	$v0, -216($fp)
+
+	# if false %36 goto  $L3
+	lw	$v0, -216($fp)
+	beq	$v0, $zero, $L3
+
+
+	# %37: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -220($fp)
+
+	# %38 = sub: i32  0, 1
+	li	$v0, 0
+	subiu	$v0, $v0, 1
+	sw	$v0, -224($fp)
+
+	# %39 = mul: i32  %37, %38
+	lw	$v0, -220($fp)
+	lw	$v1, -224($fp)
+	mulu	$v0, $v0, $v1
+	sw	$v0, -228($fp)
+
+	# %40: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -232($fp)
+
+	# %41: i32 = i_11
+	lw	$v0, -184($fp)
+	sw	$v0, -236($fp)
+
+	# %42 = add: i32  %41, 1
+	lw	$v0, -236($fp)
+	addi	$v0, $v0, 1
+	sw	$v0, -240($fp)
+
+	# %43 = div: i32  %40, %42
+	lw	$v0, -232($fp)
+	lw	$v1, -240($fp)
+	div	$v0, $v0, $v1
+	mflo	$v0
+	sw	$v0, -244($fp)
+
+	# %44 = mod: i32  %43, 2
+	lw	$v0, -244($fp)
+	li	$v1, 2
+	div	$v0, $v0, $v1
+	mfhi	$v0
+	sw	$v0, -248($fp)
+
+	# %45 = add: i32  %39, %44
+	lw	$v0, -228($fp)
+	lw	$v1, -248($fp)
+	addu	$v0, $v0, $v1
+	sw	$v0, -252($fp)
+
+	# %46 = add: i32  %45, 0
+	lw	$v0, -252($fp)
+	addi	$v0, $v0, 0
+	sw	$v0, -256($fp)
+
+	# c_11: i32 = %46
+	lw	$v0, -256($fp)
+	sw	$v0, -180($fp)
+
+	# %47: i32 = c_11
+	lw	$v0, -180($fp)
+	sw	$v0, -260($fp)
+
+	# param: i32  %47
+	lw	$a0, -260($fp)
+	sw	$a0, -264($fp)
+
+	# call: void  putint
+	addi	$sp, $fp, -268
+	sw	$ra, 0($sp)
+	jal	putint
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -260
+
+	# param: i8  10
+	li	$a0, 10
+	sb	$a0, -261($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -268
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -260
+
+	# %48: i32 = c_11
+	lw	$v0, -180($fp)
+	sw	$v0, -264($fp)
+
+	# %49 = gre: i32  %48, 0
+	lw	$v0, -264($fp)
+	li	$v1, 0
+	sgt	$v0, $v0, $v1
+	sw	$v0, -268($fp)
+
+	# if false %49 goto  $L4
+	lw	$v0, -268($fp)
+	beq	$v0, $zero, $L4
+
+
+	# param: i8  112
+	li	$a0, 112
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  97
+	li	$a0, 97
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  115
+	li	$a0, 115
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  115
+	li	$a0, 115
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  10
+	li	$a0, 10
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# goto  $L5
+	j	$L5
+
+
+	# $L4:
+$L4:
+
+	# param: i8  102
+	li	$a0, 102
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  97
+	li	$a0, 97
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  105
+	li	$a0, 105
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  108
+	li	$a0, 108
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  101
+	li	$a0, 101
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  100
+	li	$a0, 100
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# param: i8  10
+	li	$a0, 10
+	sb	$a0, -269($fp)
+
+	# call: void  putchar
+	addi	$sp, $fp, -276
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -268
+
+	# $L5:
+$L5:
+
+	# %50: i32 = i_11
+	lw	$v0, -184($fp)
+	sw	$v0, -272($fp)
+
+	# %51 = geq: i32  %50, 0
+	lw	$v0, -272($fp)
+	li	$v1, 0
+	sge	$v0, $v0, $v1
+	sw	$v0, -276($fp)
+
+	# if false %51 goto  $L3
+	lw	$v0, -276($fp)
+	beq	$v0, $zero, $L3
+
+
+	# %52: i32 = i_11
+	lw	$v0, -184($fp)
+	sw	$v0, -280($fp)
+
+	# %53 = add: i32  %52, 1
+	lw	$v0, -280($fp)
+	addi	$v0, $v0, 1
+	sw	$v0, -284($fp)
+
+	# i_11: i32 = %53
+	lw	$v0, -284($fp)
+	sw	$v0, -184($fp)
+
+	# goto  $L6
+	j	$L6
+
+
+	# $L3:
+$L3:
+
+	# i_11: i32 = 0
+	li	$v0, 0
+	sw	$v0, -184($fp)
+
+	# %54: i32 = i_11
+	lw	$v0, -184($fp)
+	sw	$v0, -288($fp)
+
+	# %55: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -292($fp)
+
+	# %56 = lss: i32  %54, %55
+	lw	$v0, -288($fp)
+	lw	$v1, -292($fp)
+	slt	$v0, $v0, $v1
+	sw	$v0, -296($fp)
+
+	# if false %56 goto  $L7
+	lw	$v0, -296($fp)
+	beq	$v0, $zero, $L7
+
+
+	# $L7:
+$L7:
+
+	# i_11: i32 = 0
+	li	$v0, 0
+	sw	$v0, -184($fp)
+
+	# i_11: i32 = 0
+	li	$v0, 0
+	sw	$v0, -184($fp)
+
+	# %61: i32 = i_11
+	lw	$v0, -184($fp)
+	sw	$v0, -300($fp)
+
+	# %62: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -304($fp)
+
+	# %63 = lss: i32  %61, %62
+	lw	$v0, -300($fp)
+	lw	$v1, -304($fp)
+	slt	$v0, $v0, $v1
+	sw	$v0, -308($fp)
+
+	# if false %63 goto  $L8
+	lw	$v0, -308($fp)
+	beq	$v0, $zero, $L8
+
+
+	# $L8:
+$L8:
+
+	# %66: i32 = i_11
+	lw	$v0, -184($fp)
+	sw	$v0, -312($fp)
+
+	# %67: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -316($fp)
+
+	# %68 = lss: i32  %66, %67
+	lw	$v0, -312($fp)
+	lw	$v1, -316($fp)
+	slt	$v0, $v0, $v1
+	sw	$v0, -320($fp)
+
+	# if false %68 goto  $L9
+	lw	$v0, -320($fp)
+	beq	$v0, $zero, $L9
+
+
+	# $L9:
+$L9:
+
+	# i_11: i32 = 0
+	li	$v0, 0
+	sw	$v0, -184($fp)
+
+	# if false 1 goto  $L10
+	li	$v0, 1
+	beq	$v0, $zero, $L10
+
+
+	# $L10:
+$L10:
+
+	# %69: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -324($fp)
+
+	# %70: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -328($fp)
+
+	# %71 = geq: i32  %69, %70
+	lw	$v0, -324($fp)
+	lw	$v1, -328($fp)
+	sge	$v0, $v0, $v1
+	sw	$v0, -332($fp)
+
+	# if false %71 goto  $L11
+	lw	$v0, -332($fp)
+	beq	$v0, $zero, $L11
+
+
+	# $L11:
+$L11:
+
+	# %72: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -336($fp)
+
+	# %73: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -340($fp)
+
+	# %74 = leq: i32  %72, %73
+	lw	$v0, -336($fp)
+	lw	$v1, -340($fp)
+	sle	$v0, $v0, $v1
+	sw	$v0, -344($fp)
+
+	# if false %74 goto  $L12
+	lw	$v0, -344($fp)
+	beq	$v0, $zero, $L12
+
+
+	# $L12:
+$L12:
+
+	# %75: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -348($fp)
+
+	# %76: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -352($fp)
+
+	# %77 = eql: i32  %75, %76
+	lw	$v0, -348($fp)
+	lw	$v1, -352($fp)
+	seq	$v0, $v0, $v1
+	sw	$v0, -356($fp)
+
+	# if false %77 goto  $L13
+	lw	$v0, -356($fp)
+	beq	$v0, $zero, $L13
+
+
+	# $L13:
+$L13:
+
+	# %78: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -360($fp)
+
+	# %79: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -364($fp)
+
+	# %80 = gre: i32  %78, %79
+	lw	$v0, -360($fp)
+	lw	$v1, -364($fp)
+	sgt	$v0, $v0, $v1
+	sw	$v0, -368($fp)
+
+	# if false %80 goto  $L14
+	lw	$v0, -368($fp)
+	beq	$v0, $zero, $L14
+
+
+	# $L14:
+$L14:
+
+	# %81: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -372($fp)
+
+	# %82: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -376($fp)
+
+	# %83 = lss: i32  %81, %82
+	lw	$v0, -372($fp)
+	lw	$v1, -376($fp)
+	slt	$v0, $v0, $v1
+	sw	$v0, -380($fp)
+
+	# if false %83 goto  $L15
+	lw	$v0, -380($fp)
+	beq	$v0, $zero, $L15
+
+
+	# $L15:
+$L15:
+
+	# %84: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -384($fp)
+
+	# %85: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -388($fp)
+
+	# %86 = neq: i32  %84, %85
+	lw	$v0, -384($fp)
+	lw	$v1, -388($fp)
+	sne	$v0, $v0, $v1
+	sw	$v0, -392($fp)
+
+	# if false %86 goto  $L16
+	lw	$v0, -392($fp)
+	beq	$v0, $zero, $L16
+
+
+	# $L16:
+$L16:
+
+	# %87 = call: i32  f6
+	addi	$sp, $fp, -396
+	sw	$ra, 0($sp)
+	jal	f6
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -392
+	sw	$v0, -396($fp)
+
+	# if false 1 goto  $L17
+	li	$v0, 1
+	beq	$v0, $zero, $L17
+
+
+	# param: i32  1
+	li	$a0, 1
+	sw	$a0, -400($fp)
+
+	# call: void  f2
+	addi	$sp, $fp, -404
+	sw	$ra, 0($sp)
+	jal	f2
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -396
+
+	# $L17:
+$L17:
+
+	# %88: i32 = 0
+	li	$v0, 0
+	sw	$v0, -400($fp)
+
+	# if false 0 goto  $L18
+	li	$v0, 0
+	beq	$v0, $zero, $L18
+
+
+	# %89: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -404($fp)
+
+	# %90: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -408($fp)
+
+	# %91 = neq: i32  %89, %90
+	lw	$v0, -404($fp)
+	lw	$v1, -408($fp)
+	sne	$v0, $v0, $v1
+	sw	$v0, -412($fp)
+
+	# if false %91 goto  $L18
+	lw	$v0, -412($fp)
+	beq	$v0, $zero, $L18
+
+
+	# %88: i32 = 1
+	li	$v0, 1
+	sw	$v0, -400($fp)
+
+	# $L18:
+$L18:
+
+	# if false %88 goto  $L19
+	lw	$v0, -400($fp)
+	beq	$v0, $zero, $L19
+
+
+	# $L19:
+$L19:
+
+	# %92: i32 = 1
+	li	$v0, 1
+	sw	$v0, -416($fp)
+
+	# if 1 goto  $L20
+	li	$v0, 1
+	bne	$v0, $zero, $L20
+
+
+	# %93: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -420($fp)
+
+	# %94 = gre: i32  %93, 0
+	lw	$v0, -420($fp)
+	li	$v1, 0
+	sgt	$v0, $v0, $v1
+	sw	$v0, -424($fp)
+
+	# if %94 goto  $L20
+	lw	$v0, -424($fp)
+	bne	$v0, $zero, $L20
+
+
+	# %92: i32 = 0
+	li	$v0, 0
+	sw	$v0, -416($fp)
+
+	# $L20:
+$L20:
+
+	# if false %92 goto  $L21
+	lw	$v0, -416($fp)
+	beq	$v0, $zero, $L21
+
+
+	# $L21:
+$L21:
+
+	# %95: i32 = 1
+	li	$v0, 1
+	sw	$v0, -428($fp)
+
+	# %96: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -432($fp)
+
+	# %97 = eql: i32  %96, 0
+	lw	$v0, -432($fp)
+	li	$v1, 0
+	seq	$v0, $v0, $v1
+	sw	$v0, -436($fp)
+
+	# %98: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -440($fp)
+
+	# %99 = eql: i32  %97, %98
+	lw	$v0, -436($fp)
+	lw	$v1, -440($fp)
+	seq	$v0, $v0, $v1
+	sw	$v0, -444($fp)
+
+	# if %99 goto  $L22
+	lw	$v0, -444($fp)
+	bne	$v0, $zero, $L22
+
+
+	# %100: i32 = 0
+	li	$v0, 0
+	sw	$v0, -448($fp)
+
+	# %101: i32 = a_11
+	lw	$v0, -8($fp)
+	sw	$v0, -452($fp)
+
+	# %102 = gre: i32  %101, 0
+	lw	$v0, -452($fp)
+	li	$v1, 0
+	sgt	$v0, $v0, $v1
+	sw	$v0, -456($fp)
+
+	# if false %102 goto  $L23
+	lw	$v0, -456($fp)
+	beq	$v0, $zero, $L23
+
+
+	# %103 = eql: i32  1, 1
+	li	$v0, 1
+	li	$v1, 1
+	seq	$v0, $v0, $v1
+	sw	$v0, -460($fp)
+
+	# if false %103 goto  $L23
+	lw	$v0, -460($fp)
+	beq	$v0, $zero, $L23
+
+
+	# %104: i32 = d_11
+	lw	$v0, -176($fp)
+	sw	$v0, -464($fp)
+
+	# %105 = add: i32  %104, 1
+	lw	$v0, -464($fp)
+	addi	$v0, $v0, 1
+	sw	$v0, -468($fp)
+
+	# %106 = mod: i32  %105, 2
+	lw	$v0, -468($fp)
+	li	$v1, 2
+	div	$v0, $v0, $v1
+	mfhi	$v0
+	sw	$v0, -472($fp)
+
+	# %107 = div: i32  %106, 2
+	lw	$v0, -472($fp)
+	li	$v1, 2
+	div	$v0, $v0, $v1
+	mflo	$v0
+	sw	$v0, -476($fp)
+
+	# if false %107 goto  $L23
+	lw	$v0, -476($fp)
+	beq	$v0, $zero, $L23
+
+
+	# %100: i32 = 1
+	li	$v0, 1
+	sw	$v0, -448($fp)
+
+	# $L23:
+$L23:
+
+	# if %100 goto  $L22
+	lw	$v0, -448($fp)
+	bne	$v0, $zero, $L22
+
+
+	# %95: i32 = 0
+	li	$v0, 0
+	sw	$v0, -428($fp)
+
+	# $L22:
+$L22:
+
+	# if false %95 goto  $L24
+	lw	$v0, -428($fp)
+	beq	$v0, $zero, $L24
+
+
+	# $L24:
+$L24:
 
 	# ret: i32  0
 	li	$v0, 0

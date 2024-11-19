@@ -601,7 +601,6 @@ public class IrMaker {
             }
 
             function.appendInstr(Instr.genMove(new Const(0), res));
-            function.appendInstr(Instr.genGoto(labelEnd));
 
             function.appendInstr(Instr.genLabelDecl(labelEnd));
 
@@ -625,7 +624,6 @@ public class IrMaker {
             }
 
             function.appendInstr(Instr.genMove(new Const(1), res));
-            function.appendInstr(Instr.genGoto(labelEnd));
 
             function.appendInstr(Instr.genLabelDecl(labelEnd));
 

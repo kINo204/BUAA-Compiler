@@ -7,9 +7,7 @@ import opt.ir.datastruct.Cfg;
 import utils.Log;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 
 import static ir.datastruct.Instr.Operator.*;
 
@@ -35,23 +33,21 @@ public class IrFuncOptimizer {
         labelStartingInd = Label.getInd();
 
         // 1. Generate CFG.
-        while (true) {
-            toBBlocks();
-            toCfg();
-            if (!trimCfg()) break;
-            regenerateInstrs();
-        }
+        toBBlocks();
+        toCfg();
+        trimCfg();
+        regenerateInstrs(); // Regenerate once here to eliminate following block fragments.
+        toBBlocks();
+        toCfg();
+        trimCfg();
 
         // 2. Call optimizers. todo
 
         // 3. Get optimized instrs.
         regenerateInstrs();
-        while (true) {
-            toBBlocks();
-            toCfg();
-            if (!trimCfg()) break;
-            regenerateInstrs();
-        }
+        toBBlocks();
+        toCfg();
+        trimCfg();
         regenerateInstrs();
         optInstrs = instrs;
         optInstrs.add(0, funcDefInstr);
@@ -114,12 +110,16 @@ public class IrFuncOptimizer {
     }
 
     /* BBlocks -> CFG */
-    private final BBlock
-            entry = new BBlock(new ArrayList<>()),
-            exit  = new BBlock(new ArrayList<>());
     private Cfg cfg;
 
     private void toCfg() {
+        BBlock entry = new BBlock(new ArrayList<>());
+        BBlock exit = new BBlock(new ArrayList<>());
+        if (!bBlocks.isEmpty()) {
+            BBlock first = bBlocks.get(0);
+            entry.addNext(first);
+            first.addPrev(entry);
+        }
         for (BBlock block : bBlocks) {
             assert !block.instrs.isEmpty();
             final Instr lastInstr = block.instrs.get(block.instrs.size() - 1);
@@ -128,17 +128,20 @@ public class IrFuncOptimizer {
                     // One out-edge towards GOTO target.
                     BBlock tar = blockOfInstr(((Label) lastInstr.res).target);
                     block.addNext(tar);
+                    tar.addPrev(block);
                 }
                 case GOIF, GONT -> {
                     // One out-edge towards GO** target, and another out-edge
                     // towards NEXT BBlock.
                     BBlock condTar = blockOfInstr(((Label) lastInstr.res).target);
                     block.addNext(condTar);
+                    condTar.addPrev(block);
                     // One out-edge towards next BBlock. Same as default.
                     BBlock next = successor(block);
                     block.addNext(next);
+                    next.addPrev(block);
                     // Set conditional targets.
-                    block.condJump = true;
+                    block.isCondJump = true;
                     block.condition = lastInstr.main;
                     if (lastInstr.op == GOIF) {
                         block.tarTrue = condTar;
@@ -151,11 +154,13 @@ public class IrFuncOptimizer {
                 case RET -> {
                     // This one is simple: one out-edge towards exit.
                     block.addNext(exit);
+                    exit.addPrev(block);
                 }
                 default -> { // The BBlock doesn't end with a jumping instr.
                     // One out-edge towards next BBlock.
                     BBlock next = successor(block);
                     block.addNext(next);
+                    next.addPrev(block);
                 }
             }
         }
@@ -173,12 +178,53 @@ public class IrFuncOptimizer {
     /**
      * @return True if CFG changes during trimming.
      */
-    private boolean trimCfg() {
-        boolean changed = false;
-        // Merging.
-        // Removing empty blocks.
-        // todo
-        return changed;
+    private void trimCfg() {
+        boolean changed;
+        do {
+            // Removing unreachable blocks.
+            Iterator<BBlock> iterator = cfg.blocks.iterator();
+            while (iterator.hasNext()) {
+                BBlock block = iterator.next();
+                if (block.prevSet.isEmpty()) {
+                    for (BBlock successor : block.nextSet) {
+                        cfg.disconnect(block, successor);
+                    }
+                    iterator.remove();
+                }
+            }
+
+            // Removing empty blocks.
+            changed = false;
+            ArrayList<BBlock> blocks = new ArrayList<>(cfg.blocks);
+            blocks.add(0, cfg.entry);
+            for (BBlock block : blocks) {
+                if (!block.isCondJump) {
+                    assert block.nextSet.size() == 1;
+                    BBlock next = (BBlock) block.nextSet.toArray()[0];
+                    if (next.isEmpty() && !next.isCondJump && next != cfg.exit) {
+                        BBlock newNext = (BBlock) next.nextSet.toArray()[0];
+                        changed = next != newNext;
+                        cfg.disconnect(block, next);
+                        cfg.connect(block, newNext);
+                    }
+                } else {
+                    if (block.tarTrue.isEmpty() && !block.tarTrue.isCondJump && block.tarTrue != cfg.exit) {
+                        BBlock next = block.tarTrue;
+                        BBlock newNext = (BBlock) next.nextSet.toArray()[0];
+                        changed = next != newNext;
+                        cfg.disconnectTrue(block, next);
+                        cfg.connectTrue(block, newNext);
+                    }
+                    if (block.tarFalse.isEmpty() && !block.tarFalse.isCondJump && block.tarFalse != cfg.exit) {
+                        BBlock next = block.tarFalse;
+                        BBlock newNext = (BBlock) next.nextSet.toArray()[0];
+                        changed = next != newNext;
+                        cfg.disconnectFalse(block, next);
+                        cfg.connectFalse(block, newNext);
+                    }
+                }
+            }
+        } while (changed);
     }
 
     private void regenerateInstrs() {
@@ -187,7 +233,7 @@ public class IrFuncOptimizer {
 
         for (BBlock block : bBlocks) {
             if (!block.isRet()) {
-                if (!block.condJump) { // None, Goto
+                if (!block.isCondJump) { // None, Goto
                     assert block.nextSet.size() == 1;
                     if (block.nextSet.toArray()[0] != successor(block)) {
                         block.instrs.add(Instr.genGoto(
@@ -222,7 +268,7 @@ public class IrFuncOptimizer {
         int ind = bBlocks.indexOf(block);
         // If this is the last block, next is exit. (Although the Validator ensures
         // in this case the last instruction is always a RET.)
-        return ind < bBlocks.size() - 1 ? bBlocks.get(ind + 1) : exit;
+        return ind < bBlocks.size() - 1 ? bBlocks.get(ind + 1) : cfg.exit;
     }
 
     /**
