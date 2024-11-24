@@ -375,8 +375,16 @@ public class MipsRealTranslator implements MipsTranslator {
         if (irCall.res != null) {
             Unit u = new Unit(irCall.res);
             regsPool.currentOperands = new ArrayList<>(List.of(u));
-            MipsReg r = getReg(u, false);
-            program.append(MipsInstr.genMove(r, r(v0)));
+            if (!u.noRegAlloc()) {
+                MipsReg rT = getReg(u, false);
+                if (u.operand.type == i8) {
+                    program.append(MipsInstr.genCalc(andi, rT, r(v0), new Const(0xFF)));
+                } else {
+                    program.append(MipsInstr.genMove(rT, r(v0)));
+                }
+            } else {
+                stack.storeUnit(u, r(v0));
+            }
             invalidateMem(u);
         }
     }

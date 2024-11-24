@@ -35,4 +35,11 @@ echo.
 echo statistics:
 cat target/statistics.txt
 
+cd target/cfgs
+rm -f *.png
+
+cd ../..
+cd tools
+python DrawCfg.py
+
 endlocal

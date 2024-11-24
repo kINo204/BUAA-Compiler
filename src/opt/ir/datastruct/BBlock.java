@@ -9,6 +9,8 @@ import java.util.HashSet;
 import static ir.datastruct.Instr.Operator.RET;
 
 public class BBlock {
+    public static int count = 0;
+    final int id;
     public final ArrayList<Instr> instrs;
     public final HashSet<BBlock> nextSet = new HashSet<>();
     public final HashSet<BBlock> prevSet = new HashSet<>();
@@ -20,6 +22,7 @@ public class BBlock {
     public BBlock tarFalse = null;
 
     public BBlock(ArrayList<Instr> instrs) {
+        this.id = count++;
         this.instrs = instrs;
     }
 
@@ -40,12 +43,37 @@ public class BBlock {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\n");
+        StringBuilder strInstrs = new StringBuilder();
         for (Instr i : instrs) {
-            sb.append("\t").append(i.toString().trim()).append("\n");
+            strInstrs.append(i.toString().trim()).append("\\l");
         }
-        sb.append("}\n");
-        return sb.toString();
+
+        StringBuilder strConnections = new StringBuilder();
+        if (isCondJump) {
+            strConnections.append(String.format(
+                    "\tB%d -> B%d [label=\"%s True\"]\n",
+                    id, tarTrue.id, condition
+            ));
+            strConnections.append(String.format(
+                    "\tB%d -> B%d [label=\"%s False\"]",
+                    id, tarFalse.id, condition
+            ));
+        } else {
+            if (isRet()) {
+                strConnections.append("\tB").append(id).append(" -> ").append(
+                        "Exit"
+                );
+            } else {
+                strConnections.append("\tB").append(id).append(" -> ").append("B").append(
+                        ((BBlock) nextSet.toArray()[0]).id
+                );
+            }
+        }
+
+        return String.format("""
+                    B%d [shape=box xlabel="B%d" label="%s"]
+                %s
+                
+                """, id, id, strInstrs, strConnections);
     }
 }

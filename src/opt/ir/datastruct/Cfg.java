@@ -1,16 +1,21 @@
 package opt.ir.datastruct;
 
+import ir.datastruct.Instr;
+import ir.datastruct.operand.FuncRef;
+
 import java.util.ArrayList;
 
 public class Cfg {
+    private final String funcName;
     public final BBlock entry;
     public final BBlock exit;
     public final ArrayList<BBlock> blocks;
 
-    public Cfg(BBlock entry, BBlock exit, ArrayList<BBlock> blocks) {
+    public Cfg(BBlock entry, BBlock exit, ArrayList<BBlock> blocks, Instr funcDef) {
         this.entry = entry;
         this.exit = exit;
         this.blocks = blocks;
+        this.funcName = ((FuncRef) funcDef.res).funcName;
     }
 
     public void connect(BBlock from, BBlock to) {
@@ -46,4 +51,29 @@ public class Cfg {
             to.prevSet.remove(from);
         }
     }
+
+    @Override
+    public String toString() {
+        StringBuilder strEntry = new StringBuilder();
+        for (BBlock block : entry.nextSet) {
+            strEntry.append(String.format(
+                    "\tEntry -> B%d\n", block.id
+            ));
+        }
+        StringBuilder sb = new StringBuilder();
+        for (BBlock block : blocks) {
+            sb.append(block);
+        }
+        return String.format(
+        """
+        digraph %s {
+            graph [dpi=320]
+            Entry [shape=ellipse]
+            Exit [shape=ellipse]
+            
+        %s
+        %s}
+        """, funcName, strEntry, sb
+    );
+}
 }

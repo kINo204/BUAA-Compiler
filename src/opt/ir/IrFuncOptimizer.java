@@ -48,6 +48,9 @@ public class IrFuncOptimizer {
         toBBlocks();
         toCfg();
         trimCfg();
+
+        log.println(cfg); // Print CFG here.
+
         regenerateInstrs();
         optInstrs = instrs;
         optInstrs.add(0, funcDefInstr);
@@ -56,7 +59,6 @@ public class IrFuncOptimizer {
 
     private void initResource() {
         Label.resetInd(labelStartingInd);
-
     }
 
     /* Instr -> Basic Blocks */
@@ -64,6 +66,7 @@ public class IrFuncOptimizer {
 
     private void toBBlocks() {
         bBlocks.clear();
+        BBlock.count = 0;
         assert !instrs.isEmpty();
 
         // Find the leader instrs:
@@ -172,7 +175,7 @@ public class IrFuncOptimizer {
                     Arrays.asList(GOTO, GOIF, GONT, LABEL).contains(instr.op));
         }
 
-        cfg = new Cfg(entry, exit, bBlocks);
+        cfg = new Cfg(entry, exit, bBlocks, funcDefInstr);
     }
 
     /**

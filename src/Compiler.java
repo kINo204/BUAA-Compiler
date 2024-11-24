@@ -20,6 +20,7 @@ public class Compiler {
     private static Log parserOut;
     private static Log symbolOut;
     private static Log irOut;
+    private static Log irOptOutput;
     private static Log irOptInfoOutput;
     private static Log programOut;
     private static Log errOut;
@@ -56,7 +57,8 @@ public class Compiler {
 
         IrOptimizer irOptimizer = new IrOptimizer(ir, irOptInfoOutput);
         irOptimizer.optimize();
-        irOptInfoOutput.print(ir); // unoptimized IR
+        irOptOutput.print(ir); // unoptimized IR
+        irOptOutput.close();
         irOptInfoOutput.close();
 
         /* Backend. */
@@ -86,6 +88,11 @@ public class Compiler {
         irOut = new Log();
         irOut.addWriter("file", irWriter);
         irOut.switchLogger(debugInfo);
+
+        Writer irOptWriter = new FileWriter("ir_opt.ll");
+        irOptOutput = new Log();
+        irOptOutput.addWriter("file", irOptWriter);
+        irOptOutput.switchLogger(debugInfo);
 
         Writer irOptInfoWriter = new FileWriter("ir_opt_info.ll");
         irOptInfoOutput = new Log();
