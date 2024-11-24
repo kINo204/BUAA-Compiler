@@ -51,11 +51,11 @@ public class BBlock {
         StringBuilder strConnections = new StringBuilder();
         if (isCondJump) {
             strConnections.append(String.format(
-                    "\tB%d -> B%d [label=\"%s True\"]\n",
+                    "\tB%d -> B%d [label=\"%s T\"]\n",
                     id, tarTrue.id, condition
             ));
             strConnections.append(String.format(
-                    "\tB%d -> B%d [label=\"%s False\"]",
+                    "\tB%d -> B%d [label=\"%s F\"]",
                     id, tarFalse.id, condition
             ));
         } else {
