@@ -133,7 +133,7 @@ public class MipsInstr {
     @Override
     public String toString() {
         if (type == COMMENT) {
-            return "\n\t# " + comment.strip();
+            return "\t# " + comment.strip();
         } else if (type == DOT_TEXT) {
             return ".text";
         } else if (type == DOT_DATA) {
@@ -151,8 +151,9 @@ public class MipsInstr {
             if (res != null) {
                 sb.append(res);
             }
+            if (res != null && first != null) sb.append(", ");
             if (first != null) {
-                sb.append(", ").append(first);
+                sb.append(first);
             }
             if (second != null) {
                 sb.append(", ").append(second);
@@ -203,7 +204,7 @@ public class MipsInstr {
 
     public enum MipsOperator {
         move,
-        addu, addi, subu, subiu, mulu, div, sll,
+        addu, addi, subu, subiu, mulu, div, sll, andi,
         mfhi, mflo,
         li, la,
         lw, lb, sw, sb,

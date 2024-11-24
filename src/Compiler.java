@@ -2,6 +2,7 @@ import frontend.datastruct.ast.AstCompUnit;
 import frontend.Lexer;
 import frontend.Parser;
 import frontend.Validator;
+import mips.MipsRealTranslator;
 import opt.ir.IrOptimizer;
 import utils.Log;
 import ir.datastruct.Ir;
@@ -59,7 +60,7 @@ public class Compiler {
         irOptInfoOutput.close();
 
         /* Backend. */
-        MipsTranslator translator = new MipsMinimalTranslator(ir); // TODO
+        MipsTranslator translator = new MipsRealTranslator(ir);
         MipsProgram program = translator.translate();
         programOut.print(program);
         programOut.close();
