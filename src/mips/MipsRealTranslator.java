@@ -299,6 +299,7 @@ public class MipsRealTranslator implements MipsTranslator {
 
     private boolean firstParam = true;
     private boolean enteredTextSeg = false;
+    private boolean isMain = false;
     private void fromIrFunc(Instr irFunc) {
         stack.reset();
         regsPool.reset();
@@ -321,12 +322,14 @@ public class MipsRealTranslator implements MipsTranslator {
             program.append(MipsInstr.genTextSeg());
         }
         program.append(MipsInstr.genLabel((FuncRef) irFunc.res));
+        isMain = ((FuncRef) irFunc.res).funcName.equals("main");
 
         // Generate function head.
         program.append(MipsInstr.genMem(sw, r(fp), r(sp), new Const(-4)));
         program.append(MipsInstr.genMove(r(fp), r(sp)));
         stack.allocMem(4);
-        regsPool.saveRegs();
+        if (!isMain)
+            regsPool.saveRegs();
     }
 
     private void fromIrParam(Instr irParam) {
@@ -404,7 +407,8 @@ public class MipsRealTranslator implements MipsTranslator {
 
         // Generate function tail.
         regsPool.flushToMem();
-        regsPool.restoreRegs();
+        if (!isMain)
+            regsPool.restoreRegs();
         program.append(MipsInstr.genMove(r(sp), r(fp)));
         program.append(MipsInstr.genMem(lw, r(fp), r(sp), new Const(-4)));
         program.append(MipsInstr.genJumpReg(r(ra)));

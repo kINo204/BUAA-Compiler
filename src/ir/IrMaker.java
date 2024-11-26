@@ -805,9 +805,10 @@ public class IrMaker {
                 }
             } else if (var.isReference) {
                 if (primaryExp.lVal.exp == null) {
-                    Reg res = new Reg(i32);
-                    function.appendInstr(Instr.genLoad(res, var));
-                    return res;
+//                    Reg res = new Reg(i32);
+//                    function.appendInstr(Instr.genLoad(res, var));
+//                    return res;
+                    return var;
                 } else { // Dereference of array base addr
                     Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
                     Reg res = new Reg(var.type);
@@ -815,9 +816,10 @@ public class IrMaker {
                     return res;
                 }
             } else {
-                Reg res = new Reg(var.type);
-                function.appendInstr(Instr.genLoad(res, var));
-                return res;
+//                Reg res = new Reg(var.type);
+//                function.appendInstr(Instr.genLoad(res, var));
+//                return res;
+                return var;
             }
         } else {
             return null; // Ast error.
