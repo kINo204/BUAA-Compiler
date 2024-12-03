@@ -11,7 +11,7 @@ import static ir.datastruct.Instr.Type.*;
 
 public class IrOptUtils {
     // Configs
-    public static boolean genBlockExCounter;
+    public static boolean genBlockExCounter = false;
     public static ArrayList<Var> blockProfilerVars = new ArrayList<>();
 
     public static ArrayList<Instr> cPrint(String s) {

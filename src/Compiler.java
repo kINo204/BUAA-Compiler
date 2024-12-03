@@ -28,7 +28,8 @@ public class Compiler {
 
     /* Compiler execution entry point. */
     public static void main(String[] args) throws IOException {
-        IrOptUtils.genBlockExCounter = args[1].equals("P");
+        if (args.length > 0)
+            IrOptUtils.genBlockExCounter = args[1].equals("P");
 
         configureIO();
 
@@ -65,8 +66,8 @@ public class Compiler {
         irOptInfoOutput.close();
 
         /* Backend. */
-        MipsTranslator translator =
-                args[0].equals("O") ? new MipsRealTranslator(ir) : new MipsMinimalTranslator(ir);
+        MipsTranslator translator = args.length == 0 || args[0].equals("O") ?
+                        new MipsRealTranslator(ir) : new MipsMinimalTranslator(ir);
         MipsProgram program = translator.translate();
         programOut.print(program);
         programOut.close();
