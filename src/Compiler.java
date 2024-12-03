@@ -3,6 +3,7 @@ import frontend.Lexer;
 import frontend.Parser;
 import frontend.Validator;
 import mips.MipsRealTranslator;
+import opt.ir.IrOptUtils;
 import opt.ir.IrOptimizer;
 import utils.Log;
 import ir.datastruct.Ir;
@@ -27,6 +28,8 @@ public class Compiler {
 
     /* Compiler execution entry point. */
     public static void main(String[] args) throws IOException {
+        IrOptUtils.genBlockExCounter = args[1].equals("P");
+
         configureIO();
 
         /* Frontend. */
@@ -62,7 +65,8 @@ public class Compiler {
         irOptInfoOutput.close();
 
         /* Backend. */
-        MipsTranslator translator = new MipsRealTranslator(ir);
+        MipsTranslator translator =
+                args[0].equals("O") ? new MipsRealTranslator(ir) : new MipsMinimalTranslator(ir);
         MipsProgram program = translator.translate();
         programOut.print(program);
         programOut.close();

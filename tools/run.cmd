@@ -21,7 +21,7 @@ cat target/statistics.txt
 
 echo.
 echo [optimized]
-java -jar target/compiler.jar
+java -jar target/compiler.jar O P
 if %errorlevel% neq 0 (
 	echo Compile error.
 	cat error.txt

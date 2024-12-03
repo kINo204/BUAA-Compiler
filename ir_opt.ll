@@ -1,19 +1,38 @@
+global fib_B0_0: i32 = 0
+global fib_B1_0: i32 = 0
+global fib_B2_0: i32 = 0
+global fib_B3_0: i32 = 0
+global fib_B4_0: i32 = 0
+global main_B0_0: i32 = 0
+global main_B1_0: i32 = 0
+global main_B2_0: i32 = 0
+global main_B3_0: i32 = 0
 
 global N_1: i32 = 10
 
 global a_1[10]: i32 = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 
 define fun fib:
+	%55 = add: i32  fib_b0_0, 1
+	fib_B0_0: i32 = %55
 	%1 = eql: i32  i_2, 1
 	if false %1 goto  $L0
+	%56 = add: i32  fib_b1_0, 1
+	fib_B1_0: i32 = %56
 	ret: i32  1
 
 $L0:
+	%57 = add: i32  fib_b2_0, 1
+	fib_B2_0: i32 = %57
 	%2 = eql: i32  i_2, 2
 	if false %2 goto  $L1
+	%58 = add: i32  fib_b3_0, 1
+	fib_B3_0: i32 = %58
 	ret: i32  2
 
 $L1:
+	%59 = add: i32  fib_b4_0, 1
+	fib_B4_0: i32 = %59
 	%3 = sub: i32  i_2, 1
 	param: i32  %3
 	%4 = call: i32  fib
@@ -24,6 +43,8 @@ $L1:
 	ret: i32  %7
 
 define fun main:
+	%60 = add: i32  main_b0_0, 1
+	main_B0_0: i32 = %60
 	i_5 = alloc: i32
 	i_5: i32 = 2
 	j_5 = alloc: i32
@@ -105,8 +126,12 @@ define fun main:
 	i_5: i32 = 0
 
 $L3:
+	%61 = add: i32  main_b1_0, 1
+	main_B1_0: i32 = %61
 	%52 = lss: i32  i_5, 10
 	if false %52 goto  $L2
+	%62 = add: i32  main_b2_0, 1
+	main_B2_0: i32 = %62
 	%53: i32 = a_1[i_5]
 	param: i32  %53
 	call: void  putint
@@ -119,6 +144,8 @@ $L3:
 	goto  $L3
 
 $L2:
+	%63 = add: i32  main_b3_0, 1
+	main_B3_0: i32 = %63
 	param: i8  10
 	call: void  putchar
 	param: i32  i_5
@@ -134,6 +161,212 @@ $L2:
 	param: i8  32
 	call: void  putchar
 	param: i32  k_5
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  102
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  98
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  fib_b0_0
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  102
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  98
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  49
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  fib_b1_0
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  102
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  98
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  50
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  fib_b2_0
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  102
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  98
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  51
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  fib_b3_0
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  102
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  98
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  52
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  fib_b4_0
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  109
+	call: void  putchar
+	param: i8  97
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  110
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  main_b0_0
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  109
+	call: void  putchar
+	param: i8  97
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  110
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  49
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  main_b1_0
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  109
+	call: void  putchar
+	param: i8  97
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  110
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  50
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  main_b2_0
+	call: void  putint
+	param: i8  10
+	call: void  putchar
+	param: i8  109
+	call: void  putchar
+	param: i8  97
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  110
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  66
+	call: void  putchar
+	param: i8  51
+	call: void  putchar
+	param: i8  95
+	call: void  putchar
+	param: i8  48
+	call: void  putchar
+	param: i8  9
+	call: void  putchar
+	param: i32  main_b3_0
 	call: void  putint
 	param: i8  10
 	call: void  putchar
