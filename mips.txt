@@ -893,6 +893,156 @@ $L2:
 
 	lw	$ra, 0($sp)
 	addi	$sp, $fp, -256
+	# param: i8  10
+	li	$a0, 10
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  80
+	li	$a0, 80
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  114
+	li	$a0, 114
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  111
+	li	$a0, 111
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  102
+	li	$a0, 102
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  105
+	li	$a0, 105
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  108
+	li	$a0, 108
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  101
+	li	$a0, 101
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  32
+	li	$a0, 32
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  105
+	li	$a0, 105
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  110
+	li	$a0, 110
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  102
+	li	$a0, 102
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  111
+	li	$a0, 111
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  58
+	li	$a0, 58
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
+	# param: i8  10
+	li	$a0, 10
+	sb	$a0, -257($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -264
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -256
 	# param: i8  102
 	li	$a0, 102
 	sb	$a0, -257($fp)
@@ -935,26 +1085,6 @@ $L2:
 	addi	$sp, $fp, -256
 	# param: i8  66
 	li	$a0, 66
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
 	sb	$a0, -257($fp)
 	# call: void  putchar
 	addi	$sp, $fp, -264
@@ -1064,26 +1194,6 @@ $L2:
 
 	lw	$ra, 0($sp)
 	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
 	# param: i8  9
 	li	$a0, 9
 	sb	$a0, -257($fp)
@@ -1167,26 +1277,6 @@ $L2:
 	addi	$sp, $fp, -256
 	# param: i8  50
 	li	$a0, 50
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
 	sb	$a0, -257($fp)
 	# call: void  putchar
 	addi	$sp, $fp, -264
@@ -1286,26 +1376,6 @@ $L2:
 
 	lw	$ra, 0($sp)
 	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
 	# param: i8  9
 	li	$a0, 9
 	sb	$a0, -257($fp)
@@ -1397,26 +1467,6 @@ $L2:
 
 	lw	$ra, 0($sp)
 	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
 	# param: i8  9
 	li	$a0, 9
 	sb	$a0, -257($fp)
@@ -1500,26 +1550,6 @@ $L2:
 	addi	$sp, $fp, -256
 	# param: i8  66
 	li	$a0, 66
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
 	sb	$a0, -257($fp)
 	# call: void  putchar
 	addi	$sp, $fp, -264
@@ -1639,26 +1669,6 @@ $L2:
 
 	lw	$ra, 0($sp)
 	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
 	# param: i8  9
 	li	$a0, 9
 	sb	$a0, -257($fp)
@@ -1760,26 +1770,6 @@ $L2:
 
 	lw	$ra, 0($sp)
 	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
 	# param: i8  9
 	li	$a0, 9
 	sb	$a0, -257($fp)
@@ -1873,26 +1863,6 @@ $L2:
 	addi	$sp, $fp, -256
 	# param: i8  51
 	li	$a0, 51
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  95
-	li	$a0, 95
-	sb	$a0, -257($fp)
-	# call: void  putchar
-	addi	$sp, $fp, -264
-	sw	$ra, 0($sp)
-	jal	putchar
-
-	lw	$ra, 0($sp)
-	addi	$sp, $fp, -256
-	# param: i8  48
-	li	$a0, 48
 	sb	$a0, -257($fp)
 	# call: void  putchar
 	addi	$sp, $fp, -264

@@ -14,10 +14,14 @@ public class Ir implements IrStruct {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (Instr i : frontInstrs) {
-            sb.append(i).append("\n");
+        StringBuilder sbFront = new StringBuilder();
+        if (!frontInstrs.isEmpty()) {
+            for (Instr i : frontInstrs) {
+                sbFront.append(i).append("\n");
+            }
+            sbFront.append("\n");
         }
-        return sb.append("\n") + module.toString();
+
+        return sbFront + module.toString();
     }
 }

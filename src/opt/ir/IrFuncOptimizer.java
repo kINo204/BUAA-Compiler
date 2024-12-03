@@ -275,8 +275,9 @@ public class IrFuncOptimizer {
             } else {
                 if (funcName.equals("main") && IrOptUtils.genBlockExCounter && isFinalGeneration) {
                     Instr ret = block.instrs.remove(block.instrs.size() - 1);
+                    block.instrs.addAll(IrOptUtils.cPrintln("\nProfile info:"));
                     for (Var profileVar : IrOptUtils.blockProfilerVars) {
-                        block.instrs.addAll(IrOptUtils.cPrint(profileVar.name));
+                        block.instrs.addAll(IrOptUtils.cPrint(profileVar.name.substring(0, profileVar.name.length() - 2)));
                         block.instrs.addAll(IrOptUtils.cPrint("\t"));
                         block.instrs.addAll(IrOptUtils.cPrintln(profileVar));
                     }

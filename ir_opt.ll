@@ -164,6 +164,36 @@ $L2:
 	call: void  putint
 	param: i8  10
 	call: void  putchar
+	param: i8  10
+	call: void  putchar
+	param: i8  80
+	call: void  putchar
+	param: i8  114
+	call: void  putchar
+	param: i8  111
+	call: void  putchar
+	param: i8  102
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  108
+	call: void  putchar
+	param: i8  101
+	call: void  putchar
+	param: i8  32
+	call: void  putchar
+	param: i8  105
+	call: void  putchar
+	param: i8  110
+	call: void  putchar
+	param: i8  102
+	call: void  putchar
+	param: i8  111
+	call: void  putchar
+	param: i8  58
+	call: void  putchar
+	param: i8  10
+	call: void  putchar
 	param: i8  102
 	call: void  putchar
 	param: i8  105
@@ -173,10 +203,6 @@ $L2:
 	param: i8  95
 	call: void  putchar
 	param: i8  66
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
-	param: i8  95
 	call: void  putchar
 	param: i8  48
 	call: void  putchar
@@ -198,10 +224,6 @@ $L2:
 	call: void  putchar
 	param: i8  49
 	call: void  putchar
-	param: i8  95
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
 	param: i8  9
 	call: void  putchar
 	param: i32  fib_b1_0
@@ -219,10 +241,6 @@ $L2:
 	param: i8  66
 	call: void  putchar
 	param: i8  50
-	call: void  putchar
-	param: i8  95
-	call: void  putchar
-	param: i8  48
 	call: void  putchar
 	param: i8  9
 	call: void  putchar
@@ -242,10 +260,6 @@ $L2:
 	call: void  putchar
 	param: i8  51
 	call: void  putchar
-	param: i8  95
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
 	param: i8  9
 	call: void  putchar
 	param: i32  fib_b3_0
@@ -264,10 +278,6 @@ $L2:
 	call: void  putchar
 	param: i8  52
 	call: void  putchar
-	param: i8  95
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
 	param: i8  9
 	call: void  putchar
 	param: i32  fib_b4_0
@@ -285,10 +295,6 @@ $L2:
 	param: i8  95
 	call: void  putchar
 	param: i8  66
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
-	param: i8  95
 	call: void  putchar
 	param: i8  48
 	call: void  putchar
@@ -312,10 +318,6 @@ $L2:
 	call: void  putchar
 	param: i8  49
 	call: void  putchar
-	param: i8  95
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
 	param: i8  9
 	call: void  putchar
 	param: i32  main_b1_0
@@ -336,10 +338,6 @@ $L2:
 	call: void  putchar
 	param: i8  50
 	call: void  putchar
-	param: i8  95
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
 	param: i8  9
 	call: void  putchar
 	param: i32  main_b2_0
@@ -359,10 +357,6 @@ $L2:
 	param: i8  66
 	call: void  putchar
 	param: i8  51
-	call: void  putchar
-	param: i8  95
-	call: void  putchar
-	param: i8  48
 	call: void  putchar
 	param: i8  9
 	call: void  putchar
