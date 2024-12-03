@@ -8,6 +8,9 @@ import utils.Log;
 import java.io.IOException;
 
 public class IrOptimizer {
+    // Configs
+    final static boolean genBlockExCounter = true;
+
     private final Ir ir;
 
     public IrOptimizer(Ir ir, Log log) {

@@ -26,6 +26,11 @@ public class Var extends Operand
     public final boolean isArray;
     public int arrayLength = 0;
 
+    // Compiler generated.
+    public static Var compilerTempVar(String name) {
+        return new Var(new SymVar(name));
+    }
+
     public Var(Symbol symbol) {
         this.symbol = symbol;
 

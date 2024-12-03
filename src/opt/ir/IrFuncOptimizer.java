@@ -1,7 +1,8 @@
 package opt.ir;
 
+import frontend.datastruct.symbol.SymVar;
 import ir.datastruct.Instr;
-import ir.datastruct.operand.Label;
+import ir.datastruct.operand.*;
 import opt.ir.datastruct.BBlock;
 import opt.ir.datastruct.Cfg;
 import utils.Log;
@@ -10,6 +11,8 @@ import java.io.IOException;
 import java.util.*;
 
 import static ir.datastruct.Instr.Operator.*;
+import static ir.datastruct.Instr.Type.i32;
+import static ir.datastruct.Instr.Type.i8;
 
 public class IrFuncOptimizer {
     private final Log log;
@@ -36,7 +39,7 @@ public class IrFuncOptimizer {
         toBBlocks();
         toCfg();
         trimCfg();
-        regenerateInstrs(); // Regenerate once here to eliminate following block fragments.
+        regenerateInstrs(false); // Regenerate once here to eliminate following block fragments.
         toBBlocks();
         toCfg();
         trimCfg();
@@ -44,14 +47,14 @@ public class IrFuncOptimizer {
         // 2. Call optimizers. todo
 
         // 3. Get optimized instrs.
-        regenerateInstrs();
+        regenerateInstrs(false);
         toBBlocks();
         toCfg();
         trimCfg();
 
         log.println(cfg); // Print CFG here.
 
-        regenerateInstrs();
+        regenerateInstrs(true);
         optInstrs = instrs;
         optInstrs.add(0, funcDefInstr);
         return optInstrs;
@@ -230,9 +233,17 @@ public class IrFuncOptimizer {
         } while (changed);
     }
 
-    private void regenerateInstrs() {
+    private void regenerateInstrs(boolean isFinalGeneration) {
         initResource();
         ArrayList<Instr> regenerated = new ArrayList<>();
+
+        if (IrOptimizer.genBlockExCounter && isFinalGeneration) {
+            for (BBlock block : bBlocks) {
+                Var tVar = Var.compilerTempVar("BLC_" + block.id);
+                regenerated.add(Instr.genAlloc(tVar));
+                regenerated.add(Instr.genStore(tVar, new Const(0)));
+            }
+        }
 
         for (BBlock block : bBlocks) {
             if (!block.isRet()) {
@@ -257,10 +268,31 @@ public class IrFuncOptimizer {
                                 labelBlock(block.tarFalse)));
                     }
                 }
+            } else {
+                if (IrOptimizer.genBlockExCounter && isFinalGeneration) {
+                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const('B'), i8));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutchar()));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const(block.id), i32));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutint()));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const(':'), i8));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutchar()));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const(' '), i8));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutchar()));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(Var.compilerTempVar("BLC_" + block.id), i32));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutint()));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const('\n'), i8));
+                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutchar()));
+                }
             }
         }
 
         for (BBlock block : bBlocks) {
+            if (IrOptimizer.genBlockExCounter && isFinalGeneration) {
+                Var tVar = Var.compilerTempVar("BLC_" + block.id);
+                Reg res = new Reg(i32);
+                regenerated.add(Instr.genCalc(ADD, res, tVar, new Const(1)));
+                regenerated.add(Instr.genStore(tVar, res));
+            }
             regenerated.addAll(block.instrs);
         }
         instrs = regenerated;

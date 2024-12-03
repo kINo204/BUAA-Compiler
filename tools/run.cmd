@@ -12,7 +12,7 @@ if %errorlevel% neq 0 (
 	exit /B
 )
 
-java -jar marsc.jar ic mips.txt>nul
+java -jar marsc.jar mips.txt>nul
 
 mv InstructionStatistics.txt target/statistics.txt
 echo statistics
@@ -27,7 +27,7 @@ if %errorlevel% neq 0 (
 	cat error.txt
 	exit /B
 )
-java -jar marsc.jar ic mips.txt
+java -jar marsc.jar mips.txt
 echo Program exit with value %errorlevel%.
 echo.
 mv InstructionStatistics.txt target/statistics.txt

@@ -10,7 +10,7 @@ import static ir.datastruct.Instr.Operator.RET;
 
 public class BBlock {
     public static int count = 0;
-    final int id;
+    public final int id;
     public final ArrayList<Instr> instrs;
     public final HashSet<BBlock> nextSet = new HashSet<>();
     public final HashSet<BBlock> prevSet = new HashSet<>();

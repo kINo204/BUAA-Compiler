@@ -1,2 +1,2 @@
-2 a Int
-2 b Int
+2 a IntArray
+2 v Int

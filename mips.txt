@@ -9,24 +9,96 @@
 main:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
-	# a_2 = alloc: i32
-	# a_2: i32 = 1
-	# $t0 <= 1
-	li	$t0, 1
-	# $t0 <= a_2
-	# b_2 = alloc: i32
-	# %1 = add: i32  a_2, 2
-	# $t1 <= 2
-	li	$t1, 2
-	# $t2 <= %1
+	# blc_0_0 = alloc: i32
+	# BLC_0_0: i32 = 0
+	# $t0 <= 0
+	li	$t0, 0
+	# $t0 <= BLC_0_0
+	# %2 = add: i32  blc_0_0, 1
+	# $t1 <= 1
+	li	$t1, 1
+	# $t2 <= %2
 	addu	$t2, $t0, $t1
-	# b_2: i32 = %1
-	# $t2 <= b_2
-	# ret: i32  b_2
-	move	$v0, $t2
-	sw	$t0, -8($fp)
-	sw	$t2, -16($fp)
-	sw	$t2, -12($fp)
+	# BLC_0_0: i32 = %2
+	# $t0 => BLC_0_0
+	# $t2 <= BLC_0_0
+	# a_2 = alloc: i32  1
+	# a_2[0]: i32 = 2
+	# $t3 <= 2
+	li	$t3, 2
+	# $t3 <= a_2[0]
+	# v_2 = alloc: i32
+	# %1: i32 = a_2[0]
+	# $t3 <= %1
+	# v_2: i32 = %1
+	# $t3 <= v_2
+	# param: i8  66
+	sw	$t2, -8($fp)
+	sw	$t2, -20($fp)
+	sw	$t3, -12($fp)
+	sw	$t3, -16($fp)
+	sw	$t3, -24($fp)
+	li	$a0, 66
+	sb	$a0, -25($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -32
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -24
+	# param: i32  0
+	li	$a0, 0
+	sw	$a0, -28($fp)
+	# call: void  putint
+	addi	$sp, $fp, -32
+	sw	$ra, 0($sp)
+	jal	putint
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -24
+	# param: i8  58
+	li	$a0, 58
+	sb	$a0, -25($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -32
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -24
+	# param: i8  32
+	li	$a0, 32
+	sb	$a0, -25($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -32
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -24
+	# param: i32  blc_0_0
+	lw	$a0, -8($fp)
+	sw	$a0, -28($fp)
+	# call: void  putint
+	addi	$sp, $fp, -32
+	sw	$ra, 0($sp)
+	jal	putint
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -24
+	# param: i8  10
+	li	$a0, 10
+	sb	$a0, -25($fp)
+	# call: void  putchar
+	addi	$sp, $fp, -32
+	sw	$ra, 0($sp)
+	jal	putchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -24
+	# ret: i32  v_2
+	lw	$v0, -16($fp)
 	move	$sp, $fp
 	lw	$fp, -4($sp)
 	jr	$ra

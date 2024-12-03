@@ -12,6 +12,13 @@ public class SymVar extends Symbol {
     public final boolean isArray;
     public final boolean isReference;
 
+    // Compiler generated.
+    public SymVar(String name) {
+        super(SymId.Int, new Token(Token.TokenId.IDENFR, name, 0));
+        isArray = false;
+        isReference = false;
+    }
+
     public SymVar(AstVarDef varDef) {
         super(
                 varDef.constExp == null ? (

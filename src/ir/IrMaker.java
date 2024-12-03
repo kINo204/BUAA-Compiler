@@ -18,6 +18,11 @@ import java.util.Arrays;
 import static ir.datastruct.Instr.Type.*;
 
 public class IrMaker {
+    // Configs.
+    private final boolean allowConstOperand = true;
+    private final boolean allowVarOperand = true;
+    private final boolean allowRefOperand = true;
+
     private final AstCompUnit tree;
     private final SymTbl symTbl;
     private Ir ir;
@@ -785,9 +790,21 @@ public class IrMaker {
         if (primaryExp.bracedExp != null) {
             return fromExp(primaryExp.bracedExp, function);
         } else if (primaryExp.number != null) {
-            return fromNumber(primaryExp.number);
+            if (allowConstOperand) {
+                return fromNumber(primaryExp.number);
+            } else {
+                Reg res = new Reg(i32);
+                function.appendInstr(Instr.genMove(fromNumber(primaryExp.number), res));
+                return res;
+            }
         } else if (primaryExp.character != null) {
-            return fromCharacter(primaryExp.character);
+            if (allowConstOperand) {
+                return fromCharacter(primaryExp.character);
+            } else {
+                Reg res = new Reg(i8);
+                function.appendInstr(Instr.genMove(fromCharacter(primaryExp.character), res));
+                return res;
+            }
         } else if (primaryExp.lVal != null) {
             Symbol symbol = symTbl.searchSym(primaryExp.lVal.ident);
             Var var = symbol instanceof SymVar ? ((SymVar) symbol).irVar : ((SymConstVar) symbol).irVar;
@@ -805,10 +822,13 @@ public class IrMaker {
                 }
             } else if (var.isReference) {
                 if (primaryExp.lVal.exp == null) {
-//                    Reg res = new Reg(i32);
-//                    function.appendInstr(Instr.genLoad(res, var));
-//                    return res;
-                    return var;
+                    if (allowRefOperand) {
+                        return var;
+                    } else {
+                        Reg res = new Reg(i32);
+                        function.appendInstr(Instr.genLoad(res, var));
+                        return res;
+                    }
                 } else { // Dereference of array base addr
                     Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
                     Reg res = new Reg(var.type);
@@ -816,10 +836,13 @@ public class IrMaker {
                     return res;
                 }
             } else {
-//                Reg res = new Reg(var.type);
-//                function.appendInstr(Instr.genLoad(res, var));
-//                return res;
-                return var;
+                if (allowVarOperand) {
+                    return var;
+                } else {
+                    Reg res = new Reg(var.type);
+                    function.appendInstr(Instr.genLoad(res, var));
+                    return res;
+                }
             }
         } else {
             return null; // Ast error.

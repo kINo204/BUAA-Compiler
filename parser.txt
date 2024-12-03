@@ -5,30 +5,43 @@ RPARENT )
 LBRACE {
 INTTK int
 IDENFR a
-ASSIGN =
+LBRACK [
 INTCON 1
 <Number>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
+<ConstExp>
+RBRACK ]
+ASSIGN =
+LBRACE {
+INTCON 2
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
 <Exp>
+RBRACE }
 <InitVal>
 <VarDef>
 SEMICN ;
 <VarDecl>
 INTTK int
-IDENFR b
+IDENFR v
 ASSIGN =
 IDENFR a
-<LVal>
+LBRACK [
+INTCON 0
+<Number>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
-PLUS +
-INTCON 2
-<Number>
+<Exp>
+RBRACK ]
+<LVal>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
@@ -39,7 +52,7 @@ INTCON 2
 SEMICN ;
 <VarDecl>
 RETURNTK return
-IDENFR b
+IDENFR v
 <LVal>
 <PrimaryExp>
 <UnaryExp>
