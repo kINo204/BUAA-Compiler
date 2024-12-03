@@ -11,6 +11,12 @@ public class GlobInitVals extends Operand implements MipsOperand {
         initVals.add(val);
     }
 
+    public GlobInitVals() { }
+
+    public GlobInitVals(Const c) {
+        initVals.add(c);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

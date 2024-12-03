@@ -28,7 +28,9 @@ public class Var extends Operand
 
     // Compiler generated.
     public static Var compilerTempVar(String name) {
-        return new Var(new SymVar(name));
+        Var v = new Var(new SymVar(name));
+        v.isGlobal = true;
+        return v;
     }
 
     public Var(Symbol symbol) {

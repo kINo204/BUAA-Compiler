@@ -1,7 +1,7 @@
 package opt.ir;
 
-import frontend.datastruct.symbol.SymVar;
 import ir.datastruct.Instr;
+import ir.datastruct.Ir;
 import ir.datastruct.operand.*;
 import opt.ir.datastruct.BBlock;
 import opt.ir.datastruct.Cfg;
@@ -11,17 +11,19 @@ import java.io.IOException;
 import java.util.*;
 
 import static ir.datastruct.Instr.Operator.*;
-import static ir.datastruct.Instr.Type.i32;
-import static ir.datastruct.Instr.Type.i8;
+import static ir.datastruct.Instr.Type.*;
 
 public class IrFuncOptimizer {
+    private final Ir ir;
     private final Log log;
     private ArrayList<Instr> instrs;
     private ArrayList<Instr> optInstrs = new ArrayList<>();
     private Instr funcDefInstr;
+    private String funcName;
     private int labelStartingInd;
 
-    public IrFuncOptimizer(Log log) {
+    public IrFuncOptimizer(Ir ir, Log log) {
+        this.ir = ir;
         this.log = log;
     }
 
@@ -33,6 +35,7 @@ public class IrFuncOptimizer {
     public ArrayList<Instr> optimize() throws IOException {
         // Remove function def instr.
         funcDefInstr = instrs.remove(0);
+        funcName = ((FuncRef) funcDefInstr.res).funcName;
         labelStartingInd = Label.getInd();
 
         // 1. Generate CFG.
@@ -237,11 +240,12 @@ public class IrFuncOptimizer {
         initResource();
         ArrayList<Instr> regenerated = new ArrayList<>();
 
-        if (IrOptimizer.genBlockExCounter && isFinalGeneration) {
+        // Generate profiler vars global decl.
+        if (IrOptUtils.genBlockExCounter && isFinalGeneration) {
             for (BBlock block : bBlocks) {
-                Var tVar = Var.compilerTempVar("BLC_" + block.id);
-                regenerated.add(Instr.genAlloc(tVar));
-                regenerated.add(Instr.genStore(tVar, new Const(0)));
+                Var tVar = Var.compilerTempVar(funcName + "_B" + block.id);
+                IrOptUtils.blockProfilerVars.add(tVar);
+                ir.frontInstrs.add(Instr.genGlobDecl(tVar, new GlobInitVals(new Const(0))));
             }
         }
 
@@ -269,30 +273,32 @@ public class IrFuncOptimizer {
                     }
                 }
             } else {
-                if (IrOptimizer.genBlockExCounter && isFinalGeneration) {
-                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const('B'), i8));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutchar()));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const(block.id), i32));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutint()));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const(':'), i8));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutchar()));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const(' '), i8));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutchar()));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(Var.compilerTempVar("BLC_" + block.id), i32));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutint()));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genParam(new Const('\n'), i8));
-                    block.instrs.add(block.instrs.size() - 1, Instr.genFuncCall(FuncRef.frPutchar()));
+                if (funcName.equals("main") && IrOptUtils.genBlockExCounter && isFinalGeneration) {
+                    Instr ret = block.instrs.remove(block.instrs.size() - 1);
+                    for (Var profileVar : IrOptUtils.blockProfilerVars) {
+                        block.instrs.addAll(IrOptUtils.cPrint(profileVar.name));
+                        block.instrs.addAll(IrOptUtils.cPrint("\t"));
+                        block.instrs.addAll(IrOptUtils.cPrintln(profileVar));
+                    }
+                    block.instrs.add(ret);
                 }
             }
         }
 
         for (BBlock block : bBlocks) {
-            if (IrOptimizer.genBlockExCounter && isFinalGeneration) {
-                Var tVar = Var.compilerTempVar("BLC_" + block.id);
+            if (block.instrs.get(0).op == LABEL) {
+                regenerated.add(block.instrs.remove(0));
+            }
+
+            // Generate profiler var addition.
+            if (IrOptUtils.genBlockExCounter && isFinalGeneration) {
+                Var tVar = Var.compilerTempVar(funcName + "_B" + block.id);
                 Reg res = new Reg(i32);
                 regenerated.add(Instr.genCalc(ADD, res, tVar, new Const(1)));
                 regenerated.add(Instr.genStore(tVar, res));
+
             }
+
             regenerated.addAll(block.instrs);
         }
         instrs = regenerated;

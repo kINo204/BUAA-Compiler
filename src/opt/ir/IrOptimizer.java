@@ -8,14 +8,11 @@ import utils.Log;
 import java.io.IOException;
 
 public class IrOptimizer {
-    // Configs
-    final static boolean genBlockExCounter = true;
-
     private final Ir ir;
 
     public IrOptimizer(Ir ir, Log log) {
         this.ir = ir;
-        funcOptimizer = new IrFuncOptimizer(log);
+        funcOptimizer = new IrFuncOptimizer(ir, log);
     }
 
     public void optimize() throws IOException {
