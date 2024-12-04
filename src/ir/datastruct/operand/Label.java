@@ -17,8 +17,8 @@ public class Label extends Operand implements MipsOperand {
         index = labelStartingInd;
     }
 
-    public Label(String text) {
-        name = "$L" + index + "_" + text;
+    public Label(String comment) {
+        name = "$L" + index + "_" + comment;
         index++;
     }
 

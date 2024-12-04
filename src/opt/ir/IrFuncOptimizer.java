@@ -5,6 +5,7 @@ import ir.datastruct.Ir;
 import ir.datastruct.operand.*;
 import opt.ir.datastruct.BBlock;
 import opt.ir.datastruct.Cfg;
+import opt.ir.optimizer.TailRecursionEliminator;
 import utils.Log;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public class IrFuncOptimizer {
         funcName = ((FuncRef) funcDefInstr.res).funcName;
         labelStartingInd = Label.getInd();
 
-        // 1. Generate CFG.
+        // Generate CFG.
         toBBlocks();
         toCfg();
         trimCfg();
@@ -47,9 +48,10 @@ public class IrFuncOptimizer {
         toCfg();
         trimCfg();
 
-        // 2. Call optimizers. todo
+        // Call optimizers. todo
+        new TailRecursionEliminator(cfg).run();
 
-        // 3. Get optimized instrs.
+        // Get optimized instrs.
         regenerateInstrs(false);
         toBBlocks();
         toCfg();

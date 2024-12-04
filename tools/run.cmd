@@ -12,8 +12,11 @@ if %errorlevel% neq 0 (
 	exit /B
 )
 
-java -jar marsc.jar mips.txt>nul
+java -jar marsc.jar mips.txt
+echo Program exit with value %errorlevel%.
+echo.
 
+mv mips.txt target/mips_unopt.txt
 mv InstructionStatistics.txt target/statistics.txt
 echo statistics
 cat target/statistics.txt
@@ -21,7 +24,7 @@ cat target/statistics.txt
 
 echo.
 echo [optimized]
-java -jar target/compiler.jar O P
+java -jar target/compiler.jar O N
 if %errorlevel% neq 0 (
 	echo Compile error.
 	cat error.txt

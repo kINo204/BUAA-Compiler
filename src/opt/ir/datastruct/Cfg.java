@@ -6,16 +6,18 @@ import ir.datastruct.operand.FuncRef;
 import java.util.ArrayList;
 
 public class Cfg {
-    private final String funcName;
+    public final FuncRef funcRef;
+    public final String funcName;
     public final BBlock entry;
     public final BBlock exit;
     public final ArrayList<BBlock> blocks;
 
     public Cfg(BBlock entry, BBlock exit, ArrayList<BBlock> blocks, Instr funcDef) {
+        this.funcRef = ((FuncRef) funcDef.res);
         this.entry = entry;
         this.exit = exit;
         this.blocks = blocks;
-        this.funcName = ((FuncRef) funcDef.res).funcName;
+        this.funcName = funcRef.funcName;
     }
 
     public void connect(BBlock from, BBlock to) {
