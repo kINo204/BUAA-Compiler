@@ -17,6 +17,12 @@ import static mips.datastruct.MipsReg.RegId.*;
 import static mips.datastruct.MipsReg.r;
 
 public class MipsRealTranslator implements MipsTranslator {
+    /* An IR Translator follow the contract that, given a sequence
+    of linear IR instructions, it may execute translating motions
+    on each instruction, relatively independent on each other.
+      Therefore, get the IR we're told to translate, and start
+    working here.
+     */
     public MipsRealTranslator(Ir ir) { irInstrs = ir.genInstrs(); }
 
     /* Data */
@@ -482,14 +488,25 @@ public class MipsRealTranslator implements MipsTranslator {
         regsPool.memValidation.replace(unit, false);
     }
 
+    // 1. Memory Simulation Components: Regs & Stack
+
+    /* To produce memory motions within translations, we need to simulate
+    both the registers and the linear main memory model. To represent a
+    "unit" of this management, we may define a "Unit" here:
+     */
     private static final class Unit {
-        private enum Type {
-            VAL, REF, ARR, REG, CON
-        }
+        private enum Type { VAL, REF, ARR, REG, CON }
         private final Type type;
+
+        /* One of the main reasons for introducing "Unit" is, by tracking
+        the index of either array element or de-reference, we may treat
+        each element of a list individually. For example, when considering
+        allocating global registers, an array element may be included in
+        the awaiting variables, increasing the flexibilities of multiple
+        strategies.
+        */
         private final Operand operand;
         private final Operand arrayIndex;
-
         private Unit(Operand operand) {
             this.operand = operand;
             if (operand instanceof Var v) {
@@ -528,11 +545,6 @@ public class MipsRealTranslator implements MipsTranslator {
             }
             this.arrayIndex = arrayIndex;
         }
-
-        private boolean noRegAlloc() {
-            return
-                    arrayIndex != null && !(arrayIndex instanceof Const);
-        }
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -549,6 +561,16 @@ public class MipsRealTranslator implements MipsTranslator {
             int result = operand != null ? operand.hashCode() : 0;
             result = 31 * result + (arrayIndex != null ? arrayIndex.hashCode() : 0);
             return result;
+        }
+
+        /* Of course, we've not sure yet if this strategy would do good
+        to the performance or not, so there's a "switch" here to define
+        excluded types of units. Add the desired type here, and it will be
+        excluded from many strategies.
+         */
+        private boolean noRegAlloc() {
+            return
+                    arrayIndex != null && !(arrayIndex instanceof Const);
         }
 
         @Override
