@@ -24,7 +24,7 @@ digraph main {
 
 	Entry -> B0
 
-    B0 [shape=box xlabel="B0" label="param: i32  4\l%1 = call: i32  func\lret: i32  0\l"]
+    B0 [shape=box xlabel="B0" label="a_3 = alloc: i32\la_3: i32 = 5\lparam: i32  a_3\l%1 = call: i32  func\lret: i32  a_3\l"]
 	B0 -> Exit
 
 }

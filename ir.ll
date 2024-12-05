@@ -11,6 +11,8 @@ $L0_if_end:
 	ret: i32  %3
 
 define fun main:
-	param: i32  4
+	a_3 = alloc: i32
+	a_3: i32 = 5
+	param: i32  a_3
 	%1 = call: i32  func
-	ret: i32  0
+	ret: i32  a_3

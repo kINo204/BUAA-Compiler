@@ -334,8 +334,8 @@ public class MipsRealTranslator implements MipsTranslator {
         program.append(MipsInstr.genMem(sw, r(fp), r(sp), new Const(-4)));
         program.append(MipsInstr.genMove(r(fp), r(sp)));
         stack.allocMem(4);
-        if (!isMain)
-            regsPool.saveRegs();
+//        if (!isMain)
+//            regsPool.saveRegs();
     }
 
     private void fromIrParam(Instr irParam) {
@@ -413,8 +413,8 @@ public class MipsRealTranslator implements MipsTranslator {
 
         // Generate function tail.
         regsPool.flushToMem();
-        if (!isMain)
-            regsPool.restoreRegs();
+//        if (!isMain)
+//            regsPool.restoreRegs();
         program.append(MipsInstr.genMove(r(sp), r(fp)));
         program.append(MipsInstr.genMem(lw, r(fp), r(sp), new Const(-4)));
         program.append(MipsInstr.genJumpReg(r(ra)));

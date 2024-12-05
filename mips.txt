@@ -9,16 +9,6 @@
 func:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
-	sw	$t0, -8($fp)
-	sw	$t1, -12($fp)
-	sw	$t2, -16($fp)
-	sw	$t3, -20($fp)
-	sw	$t4, -24($fp)
-	sw	$t5, -28($fp)
-	sw	$t6, -32($fp)
-	sw	$t7, -36($fp)
-	sw	$t8, -40($fp)
-	sw	$t9, -44($fp)
 	# $L1:
 $L1:
 	# %1 = eql: i32  n_2, 0
@@ -29,21 +19,11 @@ $L1:
 	# $t2 <= %1
 	seq	$t2, $t0, $t1
 	# if false %1 goto  $L0
-	sw	$t2, -48($fp)
+	sw	$t2, -8($fp)
 	beq	$t2, $zero, $L0
 
 	# ret: i32  n_2
 	lw	$v0, 4($fp)
-	lw	$t0, -8($fp)
-	lw	$t1, -12($fp)
-	lw	$t2, -16($fp)
-	lw	$t3, -20($fp)
-	lw	$t4, -24($fp)
-	lw	$t5, -28($fp)
-	lw	$t6, -32($fp)
-	lw	$t7, -36($fp)
-	lw	$t8, -40($fp)
-	lw	$t9, -44($fp)
 	move	$sp, $fp
 	lw	$fp, -4($sp)
 	jr	$ra
@@ -61,7 +41,7 @@ $L0:
 	# $t0 => n_2
 	# $t2 <= n_2
 	# goto  $L1
-	sw	$t2, -52($fp)
+	sw	$t2, -12($fp)
 	sw	$t2, 4($fp)
 	j	$L1
 
@@ -69,21 +49,27 @@ $L0:
 main:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
-	# param: i32  4
-	li	$a0, 4
-	sw	$a0, -8($fp)
+	# a_3 = alloc: i32
+	# a_3: i32 = 5
+	# $t0 <= 5
+	li	$t0, 5
+	# $t0 <= a_3
+	# param: i32  a_3
+	sw	$t0, -8($fp)
+	move	$a0, $t0
+	sw	$a0, -12($fp)
 	# %1 = call: i32  func
-	addi	$sp, $fp, -12
+	addi	$sp, $fp, -16
 	sw	$ra, 0($sp)
 	jal	func
 
 	lw	$ra, 0($sp)
-	addi	$sp, $fp, -4
+	addi	$sp, $fp, -8
 	# $t0 <= %1
 	move	$t0, $v0
-	# ret: i32  0
-	li	$v0, 0
-	sw	$t0, -8($fp)
+	# ret: i32  a_3
+	lw	$v0, -8($fp)
+	sw	$t0, -12($fp)
 	move	$sp, $fp
 	lw	$fp, -4($sp)
 	jr	$ra

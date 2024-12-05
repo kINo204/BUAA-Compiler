@@ -4,7 +4,7 @@ setlocal
 cd ..
 
 echo.
-echo [unoptimized]
+echo [unoptimized + plain-trans]
 java -jar target/unoptimized.jar>nul
 if %errorlevel% neq 0 (
 	echo Compile error.
@@ -23,7 +23,7 @@ cat target/statistics.txt
 
 
 echo.
-echo [optimized]
+echo [optimized + real-trans]
 java -jar target/compiler.jar O N
 if %errorlevel% neq 0 (
 	echo Compile error.
