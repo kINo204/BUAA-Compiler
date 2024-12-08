@@ -28,6 +28,7 @@ public class Compiler {
 
     /* Compiler execution entry point. */
     public static void main(String[] args) throws IOException {
+        boolean optOn = args.length == 0 || args[0].equals("O");
         if (args.length > 0)
             IrOptUtils.genBlockExCounter = args[1].equals("P");
 
@@ -59,15 +60,16 @@ public class Compiler {
         irOut.print(ir); // unoptimized IR
         irOut.close();
 
-        IrOptimizer irOptimizer = new IrOptimizer(ir, irOptInfoOutput);
-        irOptimizer.optimize();
+        if (optOn) {
+            IrOptimizer irOptimizer = new IrOptimizer(ir, irOptInfoOutput);
+            irOptimizer.optimize();
+        }
         irOptOutput.print(ir); // unoptimized IR
         irOptOutput.close();
         irOptInfoOutput.close();
 
         /* Backend. */
-        MipsTranslator translator = args.length == 0 || args[0].equals("O") ?
-                        new MipsRealTranslator(ir) : new MipsMinimalTranslator(ir);
+        MipsTranslator translator = optOn ? new MipsRealTranslator(ir) : new MipsMinimalTranslator(ir);
         MipsProgram program = translator.translate();
         programOut.print(program);
         programOut.close();

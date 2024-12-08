@@ -213,6 +213,32 @@ public class Instr {
             return "\tstack lod";
         } else if (op == Operator.POP_STACK) {
             return "\tstack pop";
+        } else if (op == Operator.ADD) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "+", supl);
+        } else if (op == Operator.SUB) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "-", supl);
+        } else if (op == Operator.MUL) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "*", supl);
+        } else if (op == Operator.DIV) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "/", supl);
+        } else if (op == Operator.MOD) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "%", supl);
+        } else if (op == Operator.OR) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "||", supl);
+        } else if (op == Operator.AND) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "&&", supl);
+        } else if (op == Operator.GRE) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, ">", supl);
+        } else if (op == Operator.GEQ) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, ">=", supl);
+        } else if (op == Operator.LSS) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "<", supl);
+        } else if (op == Operator.LEQ) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "<=", supl);
+        } else if (op == Operator.EQL) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "==", supl);
+        } else if (op == Operator.NEQ) {
+            return String.format("\t%s: %s = %s %s %s", res, type, main, "!=", supl);
         } else {
             StringBuilder sb = new StringBuilder();
             if (res != null) {

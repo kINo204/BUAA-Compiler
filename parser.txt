@@ -1,16 +1,161 @@
 INTTK int
+IDENFR globalInt
+ASSIGN =
+INTCON 10
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+CHARTK char
+IDENFR globalChar
+ASSIGN =
+CHRCON 'a'
+<Character>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+INTTK int
+IDENFR globalIntArray
+LBRACK [
+INTCON 100
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<ConstExp>
+RBRACK ]
+<VarDef>
+SEMICN ;
+<VarDecl>
+CHARTK char
+IDENFR globalCharArray
+LBRACK [
+INTCON 100
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<ConstExp>
+RBRACK ]
+<VarDef>
+SEMICN ;
+<VarDecl>
+VOIDTK void
 <FuncType>
-IDENFR func
+IDENFR printInt
 LPARENT (
 INTTK int
-IDENFR n
+IDENFR value
 <FuncFParam>
 <FuncFParams>
 RPARENT )
 LBRACE {
-IFTK if
+PRINTFTK printf
 LPARENT (
-IDENFR n
+STRCON "%d\n"
+COMMA ,
+IDENFR value
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RPARENT )
+SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<FuncDef>
+VOIDTK void
+<FuncType>
+IDENFR printChar
+LPARENT (
+CHARTK char
+IDENFR value
+<FuncFParam>
+<FuncFParams>
+RPARENT )
+LBRACE {
+PRINTFTK printf
+LPARENT (
+STRCON "%c\n"
+COMMA ,
+IDENFR value
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RPARENT )
+SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<FuncDef>
+VOIDTK void
+<FuncType>
+IDENFR updateArray
+LPARENT (
+INTTK int
+IDENFR arr
+LBRACK [
+RBRACK ]
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR size
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR value
+<FuncFParam>
+<FuncFParams>
+RPARENT )
+LBRACE {
+INTTK int
+IDENFR i
+<VarDef>
+SEMICN ;
+<VarDecl>
+FORTK for
+LPARENT (
+IDENFR i
+<LVal>
+ASSIGN =
+INTCON 0
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<ForStmt>
+SEMICN ;
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+LSS <
+IDENFR size
 <LVal>
 <PrimaryExp>
 <UnaryExp>
@@ -18,9 +163,293 @@ IDENFR n
 <AddExp>
 <RelExp>
 <EqExp>
-EQL ==
+<LAndExp>
+<LOrExp>
+<Cond>
+SEMICN ;
+IDENFR i
+<LVal>
+ASSIGN =
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+PLUS +
+INTCON 1
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<ForStmt>
+RPARENT )
+LBRACE {
+IDENFR arr
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
+<LVal>
+ASSIGN =
+IDENFR value
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
+RBRACE }
+<Block>
+<FuncDef>
+VOIDTK void
+<FuncType>
+IDENFR processElements
+LPARENT (
+INTTK int
+IDENFR arr
+LBRACK [
+RBRACK ]
+<FuncFParam>
+COMMA ,
+CHARTK char
+IDENFR carr
+LBRACK [
+RBRACK ]
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR size
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR multiplier
+<FuncFParam>
+COMMA ,
+CHARTK char
+IDENFR addChar
+<FuncFParam>
+<FuncFParams>
+RPARENT )
+LBRACE {
+INTTK int
+IDENFR i
+<VarDef>
+SEMICN ;
+<VarDecl>
+FORTK for
+LPARENT (
+IDENFR i
+<LVal>
+ASSIGN =
 INTCON 0
 <Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<ForStmt>
+SEMICN ;
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+LSS <
+IDENFR size
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+SEMICN ;
+IDENFR i
+<LVal>
+ASSIGN =
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+PLUS +
+INTCON 1
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<ForStmt>
+RPARENT )
+LBRACE {
+IDENFR arr
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
+<LVal>
+ASSIGN =
+IDENFR arr
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+MULT *
+IDENFR multiplier
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+IDENFR carr
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
+<LVal>
+ASSIGN =
+IDENFR arr
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+PLUS +
+IDENFR addChar
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
+RBRACE }
+<Block>
+<FuncDef>
+INTTK int
+<FuncType>
+IDENFR compareAndSum
+LPARENT (
+INTTK int
+IDENFR a
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR b
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR c
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR d
+<FuncFParam>
+<FuncFParams>
+RPARENT )
+LBRACE {
+INTTK int
+IDENFR sum
+ASSIGN =
+INTCON 0
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+IFTK if
+LPARENT (
+IDENFR a
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+GRE >
+IDENFR b
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+AND &&
+IDENFR c
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+LSS <
+IDENFR d
+<LVal>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
@@ -31,8 +460,18 @@ INTCON 0
 <LOrExp>
 <Cond>
 RPARENT )
-RETURNTK return
-IDENFR n
+LBRACE {
+IDENFR sum
+<LVal>
+ASSIGN =
+IDENFR a
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+PLUS +
+IDENFR c
 <LVal>
 <PrimaryExp>
 <UnaryExp>
@@ -41,17 +480,212 @@ IDENFR n
 <Exp>
 SEMICN ;
 <Stmt>
+RBRACE }
+<Block>
 <Stmt>
-IDENFR n
+ELSETK else
+LBRACE {
+IDENFR sum
 <LVal>
 ASSIGN =
-IDENFR n
+IDENFR b
 <LVal>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
-MINU -
+PLUS +
+IDENFR d
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
+RETURNTK return
+IDENFR sum
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<FuncDef>
+VOIDTK void
+<FuncType>
+IDENFR complexOperation
+LPARENT (
+INTTK int
+IDENFR arr
+LBRACK [
+RBRACK ]
+<FuncFParam>
+COMMA ,
+CHARTK char
+IDENFR carr
+LBRACK [
+RBRACK ]
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR size
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR multiplier
+<FuncFParam>
+COMMA ,
+CHARTK char
+IDENFR addChar
+<FuncFParam>
+COMMA ,
+INTTK int
+IDENFR threshold
+<FuncFParam>
+<FuncFParams>
+RPARENT )
+LBRACE {
+INTTK int
+IDENFR i
+<VarDef>
+SEMICN ;
+<VarDecl>
+IDENFR updateArray
+LPARENT (
+IDENFR arr
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR size
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR multiplier
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<FuncRParams>
+RPARENT )
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+IDENFR processElements
+LPARENT (
+IDENFR arr
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR carr
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR size
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR multiplier
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR addChar
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<FuncRParams>
+RPARENT )
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+FORTK for
+LPARENT (
+IDENFR i
+<LVal>
+ASSIGN =
+INTCON 0
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<ForStmt>
+SEMICN ;
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+LSS <
+IDENFR size
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+SEMICN ;
+IDENFR i
+<LVal>
+ASSIGN =
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+PLUS +
 INTCON 1
 <Number>
 <PrimaryExp>
@@ -59,12 +693,53 @@ INTCON 1
 <MulExp>
 <AddExp>
 <Exp>
-SEMICN ;
-<Stmt>
-RETURNTK return
-IDENFR func
+<ForStmt>
+RPARENT )
+LBRACE {
+IFTK if
 LPARENT (
-IDENFR n
+IDENFR arr
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+GRE >
+IDENFR threshold
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+RPARENT )
+LBRACE {
+IDENFR printInt
+LPARENT (
+IDENFR arr
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
 <LVal>
 <PrimaryExp>
 <UnaryExp>
@@ -81,6 +756,45 @@ SEMICN ;
 <Stmt>
 RBRACE }
 <Block>
+<Stmt>
+ELSETK else
+LBRACE {
+IDENFR printChar
+LPARENT (
+IDENFR carr
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<FuncRParams>
+RPARENT )
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
+RBRACE }
+<Block>
 <FuncDef>
 INTTK int
 MAINTK main
@@ -88,7 +802,7 @@ LPARENT (
 RPARENT )
 LBRACE {
 INTTK int
-IDENFR a
+IDENFR mainInt
 ASSIGN =
 INTCON 5
 <Number>
@@ -101,9 +815,285 @@ INTCON 5
 <VarDef>
 SEMICN ;
 <VarDecl>
-IDENFR func
+CHARTK char
+IDENFR mainChar
+ASSIGN =
+CHRCON 'z'
+<Character>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+INTTK int
+IDENFR localInt
+ASSIGN =
+INTCON 3
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+CHARTK char
+IDENFR localChar
+ASSIGN =
+CHRCON 'y'
+<Character>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+INTTK int
+IDENFR size
+ASSIGN =
+INTCON 10
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+IDENFR updateArray
 LPARENT (
-IDENFR a
+IDENFR globalIntArray
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR size
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR globalInt
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<FuncRParams>
+RPARENT )
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+INTTK int
+IDENFR i
+<VarDef>
+SEMICN ;
+<VarDecl>
+FORTK for
+LPARENT (
+IDENFR i
+<LVal>
+ASSIGN =
+INTCON 0
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<ForStmt>
+SEMICN ;
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+LSS <
+IDENFR size
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+SEMICN ;
+IDENFR i
+<LVal>
+ASSIGN =
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+PLUS +
+INTCON 1
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<ForStmt>
+RPARENT )
+LBRACE {
+IDENFR globalCharArray
+LBRACK [
+IDENFR i
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+RBRACK ]
+<LVal>
+ASSIGN =
+IDENFR globalChar
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
+IDENFR complexOperation
+LPARENT (
+IDENFR globalIntArray
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR globalCharArray
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR size
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR localInt
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR localChar
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+INTCON 20
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<FuncRParams>
+RPARENT )
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+INTTK int
+IDENFR result
+ASSIGN =
+IDENFR compareAndSum
+LPARENT (
+IDENFR globalInt
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR mainInt
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+IDENFR localInt
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+COMMA ,
+INTCON 8
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<FuncRParams>
+RPARENT )
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+IDENFR printInt
+LPARENT (
+IDENFR result
 <LVal>
 <PrimaryExp>
 <UnaryExp>
@@ -119,8 +1109,8 @@ RPARENT )
 SEMICN ;
 <Stmt>
 RETURNTK return
-IDENFR a
-<LVal>
+INTCON 0
+<Number>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>

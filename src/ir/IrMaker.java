@@ -63,9 +63,8 @@ public class IrMaker {
         for (AstConstDef def : decl.constDefs) {
             // Init Var obj.
             SymConstVar symbol = (SymConstVar) symTbl.searchSym(def.ident);
+            symbol.isGlobal = true;
             Var var = new Var(symbol);
-            var.isGlobal = true;
-            symbol.irVar = var;
 
             // Fill array length.
             if (def.constExp != null) {
@@ -117,9 +116,8 @@ public class IrMaker {
         for (AstVarDef def : decl.varDefs) {
             // Init Var obj.
             SymVar symbol = (SymVar) symTbl.searchSym(def.ident);
+            symbol.isGlobal = true;
             Var var = new Var(symbol);
-            var.isGlobal = true;
-            symbol.irVar = var;
 
             // Fill array length.
             if (def.constExp != null) {
@@ -267,7 +265,6 @@ public class IrMaker {
         for (AstConstDef def : constDecl.constDefs) {
             SymConstVar varSymbol = (SymConstVar) symTbl.searchSym(def.ident);
             Var var = new Var(varSymbol);
-            varSymbol.irVar = var;
 
             if (var.isArray) {
                 Const arrayLength = (Const) fromConstExp(def.constExp, function);
@@ -314,7 +311,6 @@ public class IrMaker {
         for (AstVarDef def : varDecl.varDefs) {
             SymVar varSymbol = (SymVar) symTbl.searchSym(def.ident);
             Var var = new Var(varSymbol);
-            varSymbol.irVar = var;
 
             if (var.isArray) {
                 Operand arrayLength = fromConstExp(def.constExp, function);
@@ -369,7 +365,7 @@ public class IrMaker {
         } else if (stmt instanceof AstStmtAssign stmtAssign) {
             Operand value = fromExp(stmtAssign.exp, function);
             SymVar varSym = (SymVar) symTbl.searchSym(stmtAssign.lVal.ident);
-            Var var = varSym.irVar;
+            Var var = new Var(varSym);
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtAssign.lVal.exp, function);
                 function.appendInstr(Instr.genStore(var, value, arrayIndex));
@@ -509,7 +505,7 @@ public class IrMaker {
             function.appendInstr(Instr.genFuncCall(res, FuncRef.frGetint()));
 
             SymVar varSym = (SymVar) symTbl.searchSym(stmtGetint.lVal.ident);
-            Var var = varSym.irVar;
+            Var var = new Var(varSym);
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtGetint.lVal.exp, function);
                 function.appendInstr(Instr.genStore(var, res, arrayIndex));
@@ -524,7 +520,7 @@ public class IrMaker {
             function.appendInstr(Instr.genFuncCall(res, FuncRef.frGetchar()));
 
             SymVar varSym = (SymVar) symTbl.searchSym(stmtGetchar.lVal.ident);
-            Var var = varSym.irVar;
+            Var var = new Var(varSym);
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtGetchar.lVal.exp, function);
                 function.appendInstr(Instr.genStore(var, res, arrayIndex));
@@ -550,7 +546,7 @@ public class IrMaker {
     private void fromForStmt(AstForStmt forStmt, Function function) {
         Operand value = fromExp(forStmt.exp, function);
         SymVar varSym = (SymVar) symTbl.searchSym(forStmt.lVal.ident);
-        Var var = varSym.irVar;
+        Var var = new Var(varSym);
         if (var.isArray) {
             Operand arrayIndex = fromExp(forStmt.lVal.exp, function);
             function.appendInstr(Instr.genStore(var, value, arrayIndex));
@@ -807,7 +803,7 @@ public class IrMaker {
             }
         } else if (primaryExp.lVal != null) {
             Symbol symbol = symTbl.searchSym(primaryExp.lVal.ident);
-            Var var = symbol instanceof SymVar ? ((SymVar) symbol).irVar : ((SymConstVar) symbol).irVar;
+            Var var = new Var(symbol);
 
             if (var.isArray) {
                 if (primaryExp.lVal.exp == null) { // Use array base address

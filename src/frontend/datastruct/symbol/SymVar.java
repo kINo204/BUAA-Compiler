@@ -9,6 +9,7 @@ import ir.datastruct.operand.Var;
 
 public class SymVar extends Symbol {
     public Var irVar;
+    public boolean isGlobal = false;
     public final boolean isArray;
     public final boolean isReference;
 
@@ -17,6 +18,7 @@ public class SymVar extends Symbol {
         super(SymId.Int, new Token(Token.TokenId.IDENFR, name, 0));
         isArray = false;
         isReference = false;
+        isGlobal = true;
     }
 
     public SymVar(AstVarDef varDef) {

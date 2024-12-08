@@ -22,15 +22,13 @@ public class Var extends Operand
     public final String name;
     public final boolean isReference;
     public final boolean isConstant;
-    public boolean isGlobal = false;
+    public final boolean isGlobal;
     public final boolean isArray;
     public int arrayLength = 0;
 
     // Compiler generated.
     public static Var compilerTempVar(String name) {
-        Var v = new Var(new SymVar(name));
-        v.isGlobal = true;
-        return v;
+        return new Var(new SymVar(name));
     }
 
     public Var(Symbol symbol) {
@@ -38,13 +36,14 @@ public class Var extends Operand
 
         name = symbol.literal + "_" + symbol.symtblId;
 
-
         if (symbol instanceof SymConstVar var) {
             isReference = false;
             isArray = var.isArray;
+            isGlobal = var.isGlobal;
         } else {
             isReference = ((SymVar) symbol).isReference;
             isArray = ((SymVar) symbol).isArray;
+            isGlobal = ((SymVar) symbol).isGlobal;
         }
 
         switch (symbol.symId) {
