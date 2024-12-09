@@ -7,8 +7,10 @@ import frontend.datastruct.symbol.SymVar;
 import frontend.datastruct.symbol.Symbol;
 import ir.datastruct.Instr;
 import mips.datastruct.MipsOperand;
+import mips.datastruct.MipsReg;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static ir.datastruct.Instr.Type.*;
 
@@ -18,6 +20,8 @@ public class FuncRef extends Operand implements MipsOperand {
     private int symtblId;
 
     public final ArrayList<Var> params = new ArrayList<>();
+
+    public final HashSet<MipsReg> allocated = new HashSet<>();
 
     public FuncRef(SymFunc symbol) {
         funcName = symbol.literal;

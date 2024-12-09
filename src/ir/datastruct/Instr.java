@@ -39,6 +39,10 @@ public class Instr {
         );
     }
 
+    public static Instr genUseStub(Var var) {
+        return new Instr(Operator.USE, null, null, var, null);
+    }
+
     public static Instr genFuncDef(FuncRef funcRef) {
         return new Instr(
                 Operator.FUNC, funcRef.type, funcRef, null, null
@@ -314,5 +318,9 @@ public class Instr {
         PARAM, // push param
         CALL,
         RET,
+
+        // Dataflow Stubs
+        USE,
+        DEF,
     }
 }

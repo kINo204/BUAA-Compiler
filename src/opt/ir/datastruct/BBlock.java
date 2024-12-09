@@ -63,9 +63,10 @@ public class BBlock {
                 strConnections.append("\tB").append(id).append(" -> ").append(
                         "Exit"
                 );
-            } else {
-                strConnections.append("\tB").append(id).append(" -> ").append("B").append(
-                        ((BBlock) nextSet.toArray()[0]).id
+            } else if (!nextSet.isEmpty()) {
+                strConnections.append("\tB").append(id);
+                    strConnections.append(" -> ").append("B").append(
+                            ((BBlock) nextSet.toArray()[0]).id
                 );
             }
         }

@@ -60,8 +60,8 @@ public class Compiler {
         irOut.print(ir); // unoptimized IR
         irOut.close();
 
+        IrOptimizer irOptimizer = new IrOptimizer(ir, irOptInfoOutput);
         if (optOn) {
-            IrOptimizer irOptimizer = new IrOptimizer(ir, irOptInfoOutput);
             irOptimizer.optimize();
         }
         irOptOutput.print(ir); // unoptimized IR
@@ -69,7 +69,7 @@ public class Compiler {
         irOptInfoOutput.close();
 
         /* Backend. */
-        MipsTranslator translator = optOn ? new MipsRealTranslator(ir) : new MipsMinimalTranslator(ir);
+        MipsTranslator translator = optOn ? new MipsRealTranslator(ir, irOptimizer.globalAlloc) : new MipsMinimalTranslator(ir);
         MipsProgram program = translator.translate();
         programOut.print(program);
         programOut.close();

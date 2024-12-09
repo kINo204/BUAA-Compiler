@@ -6,6 +6,7 @@ import ir.datastruct.operand.*;
 import mips.datastruct.MipsInstr;
 import mips.datastruct.MipsProgram;
 import mips.datastruct.MipsReg;
+import opt.ir.GlobalAlloc;
 
 import java.util.*;
 
@@ -23,14 +24,16 @@ public class MipsRealTranslator implements MipsTranslator {
       Therefore, get the IR we're told to translate, and start
     working here.
      */
-    public MipsRealTranslator(Ir ir) { irInstrs = ir.genInstrs(); }
+    public MipsRealTranslator(Ir ir, GlobalAlloc globalAlloc) { irInstrs = ir.genInstrs();
+        this.globalAlloc = globalAlloc;
+    }
 
     /* Data */
     private final ArrayList<Instr> irInstrs;
     private final MipsProgram program = new MipsProgram();
 
     /* Components */
-    private final GlobalAlloc globalAlloc = new GlobalAlloc();
+    private final GlobalAlloc globalAlloc;
     private final RegsPool regsPool = new RegsPool();
     private final Stack stack = new Stack();
 
@@ -284,9 +287,9 @@ public class MipsRealTranslator implements MipsTranslator {
     }
 
     private void fromIrGoif(Instr irGoif) {
-        Unit u = new Unit(irGoif.main);
-        regsPool.currentOperands = new ArrayList<>(List.of(u));
-        MipsReg r = getReg(u, true);
+        Unit uCond = new Unit(irGoif.main);
+        regsPool.currentOperands = new ArrayList<>(List.of(uCond));
+        MipsReg r = getReg(uCond, true);
 
         regsPool.flushToMem();
         program.append(MipsInstr.genBne(r, r(zero), (Label) irGoif.res));
@@ -306,6 +309,7 @@ public class MipsRealTranslator implements MipsTranslator {
     private boolean firstParam = true;
     private boolean enteredTextSeg = false;
     private boolean isMain = false;
+    private FuncRef curFunc = null;
     private void fromIrFunc(Instr irFunc) {
         stack.reset();
         regsPool.reset();
@@ -327,15 +331,25 @@ public class MipsRealTranslator implements MipsTranslator {
             enteredTextSeg = true;
             program.append(MipsInstr.genTextSeg());
         }
-        program.append(MipsInstr.genLabel((FuncRef) irFunc.res));
-        isMain = ((FuncRef) irFunc.res).funcName.equals("main");
+        curFunc = (FuncRef) irFunc.res;
+        program.append(MipsInstr.genLabel(curFunc));
+        isMain = curFunc.funcName.equals("main");
 
         // Generate function head.
         program.append(MipsInstr.genMem(sw, r(fp), r(sp), new Const(-4)));
         program.append(MipsInstr.genMove(r(fp), r(sp)));
         stack.allocMem(4);
-//        if (!isMain)
-//            regsPool.saveRegs();
+        if (!isMain)
+            regsPool.saveRegs();
+
+        // Init global allocated params.
+        for (Var param : curFunc.params) {
+            Unit uParam = new Unit(param);
+            MipsReg globReg = globalAlloc.query(uParam);
+            if (globReg != null) {
+                stack.loadUnit(uParam, globReg);
+            }
+        }
     }
 
     private void fromIrParam(Instr irParam) {
@@ -350,15 +364,14 @@ public class MipsRealTranslator implements MipsTranslator {
         Unit u = new Unit(irParam.main);
         regsPool.currentOperands = new ArrayList<>(List.of(u));
         MipsReg r = getReg(u, true, false);
-        if (r != null) {
-            program.append(MipsInstr.genMove(r(a0), r));
-        } else {
+        if (r == null) {
+            r = r(a0);
             stack.loadUnit(u, r(a0));
         }
         // Use "new Reg()" to force allocate new stack memory for parameter.
         // Reference is thrown away for there's no future use of real parameter.
         // For now, push all params on stack.
-        stack.storeUnit(new Unit(new Reg(irParam.type)), r(a0)); // No one will remember you since, ever.
+        stack.storeUnit(new Unit(new Reg(irParam.type)), r); // No one will remember you since, ever.
     }
 
     private void fromIrCall(Instr irCall) {
@@ -413,8 +426,8 @@ public class MipsRealTranslator implements MipsTranslator {
 
         // Generate function tail.
         regsPool.flushToMem();
-//        if (!isMain)
-//            regsPool.restoreRegs();
+        if (!isMain)
+            regsPool.restoreRegs();
         program.append(MipsInstr.genMove(r(sp), r(fp)));
         program.append(MipsInstr.genMem(lw, r(fp), r(sp), new Const(-4)));
         program.append(MipsInstr.genJumpReg(r(ra)));
@@ -436,7 +449,12 @@ public class MipsRealTranslator implements MipsTranslator {
                         MipsReg rT = getReg(to, false);
                         program.append(MipsInstr.genCalc(andi, rT, rF, new Const(0xFF)));
                     } else {
-                        regsPool.attachToReg(to, rF);
+                        if (globalAlloc.query(to) != null) {
+                            MipsReg rT = getReg(to, false);
+                            program.append(MipsInstr.genMove(rT, rF));
+                        } else {
+                            regsPool.attachToReg(to, rF);
+                        }
                     }
                 } else {
                     stack.storeUnit(to, rF);
@@ -494,7 +512,7 @@ public class MipsRealTranslator implements MipsTranslator {
     both the registers and the linear main memory model. To represent a
     "unit" of this management, we may define a "Unit" here:
      */
-    private static final class Unit {
+    public static final class Unit {
         private enum Type { VAL, REF, ARR, REG, CON }
         private final Type type;
 
@@ -505,7 +523,7 @@ public class MipsRealTranslator implements MipsTranslator {
         the awaiting variables, increasing the flexibilities of multiple
         strategies.
         */
-        private final Operand operand;
+        public final Operand operand;
         private final Operand arrayIndex;
         private Unit(Operand operand) {
             this.operand = operand;
@@ -580,13 +598,6 @@ public class MipsRealTranslator implements MipsTranslator {
         }
     }
 
-    private static final class GlobalAlloc {
-        private final HashMap<Unit, MipsReg> map = new HashMap<>();
-        private MipsReg query(Unit unit) {
-            return map.get(unit);
-        }
-    }
-
     private final boolean regInfo = true;
     private final class RegsPool {
         // Note: "var" in this scope refers to IR operands, and "reg" are real MIPS registers.
@@ -604,19 +615,26 @@ public class MipsRealTranslator implements MipsTranslator {
             varsMap.clear();
             memValidation.clear();
         }
-        private final ArrayList<Unit> savedReg = new ArrayList<>();{
-            for (int i = 0; i < 10; i++) {
-                savedReg.add(new Unit(new Reg(i32)));
-            }
-        }
+        private ArrayList<Unit> savedUnit;
+        private ArrayList<MipsReg> savedRegs;
         private void saveRegs() {
-            for (int i = 0; i < regs.size(); i++) {
-                stack.storeUnit(savedReg.get(i), regs.get(i));
+            int nReg = curFunc.allocated.size();
+
+            savedUnit = new ArrayList<>();
+            for (int i = 0; i < nReg; i++) {
+                savedUnit.add(new Unit(new Reg(i32)));
+            }
+
+            savedRegs = new ArrayList<>(curFunc.allocated);
+            savedRegs.sort(Comparator.comparing(o -> o.id));
+            for (MipsReg reg : savedRegs) {
+                int i = savedRegs.indexOf(reg);
+                stack.storeUnit(savedUnit.get(i), reg);
             }
         }
         private void restoreRegs() {
-            for (int i = 0; i < regs.size(); i++) {
-                stack.loadUnit(savedReg.get(i), regs.get(i));
+            for (int i = 0; i < savedUnit.size(); i++) {
+                stack.loadUnit(savedUnit.get(i), savedRegs.get(i));
             }
         }
         private void flushToMem() {
@@ -923,13 +941,14 @@ public class MipsRealTranslator implements MipsTranslator {
                             if (rInd == null) {
                                 rInd = r(a0);
                                 stack.loadUnit(uInd, rInd);
+                            } else {
+                                program.append(MipsInstr.genMove(r(a0), rInd));
                             }
                             MipsReg rBase = getReg(uBase, true, false);
                             if (rBase == null) {
                                 rBase = r(gp);
                                 stack.loadUnit(uBase, rBase);
                             }
-                            program.append(MipsInstr.genMove(r(a0), rInd));
                             if (var.type == i32) {
                                 program.append(MipsInstr.genCalc(sll, r(a0), r(a0), new Const(2)));
                             }

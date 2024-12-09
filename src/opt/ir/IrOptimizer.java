@@ -12,7 +12,7 @@ public class IrOptimizer {
 
     public IrOptimizer(Ir ir, Log log) {
         this.ir = ir;
-        funcOptimizer = new IrFuncOptimizer(ir, log);
+        funcOptimizer = new IrFuncOptimizer(ir, globalAlloc, log);
     }
 
     public void optimize() throws IOException {
@@ -25,7 +25,9 @@ public class IrOptimizer {
         Label.resetInd(0);
         for (Function function : ir.module.functions) {
             funcOptimizer.injectInstr(function.genInstrs());
-            function.instrs = funcOptimizer.optimize(); // TODO
+            function.instrs = funcOptimizer.optimize();
         }
     }
+
+    public GlobalAlloc globalAlloc = new GlobalAlloc();
 }

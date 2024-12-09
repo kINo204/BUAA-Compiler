@@ -3,9 +3,12 @@ package opt.ir;
 import ir.datastruct.Instr;
 import ir.datastruct.Ir;
 import ir.datastruct.operand.*;
+import mips.datastruct.MipsReg;
 import opt.ir.datastruct.BBlock;
 import opt.ir.datastruct.Cfg;
+import opt.ir.datastruct.Net;
 import opt.ir.optimizer.TailRecursionEliminator;
+import opt.ir.optimizer.global_allocate.GlobalAllocator;
 import utils.Log;
 
 import java.io.IOException;
@@ -19,13 +22,15 @@ public class IrFuncOptimizer {
     private final Log log;
     private ArrayList<Instr> instrs;
     private ArrayList<Instr> optInstrs = new ArrayList<>();
+    private final GlobalAlloc globalAlloc;
     private Instr funcDefInstr;
     private String funcName;
     private int labelStartingInd;
 
-    public IrFuncOptimizer(Ir ir, Log log) {
+    public IrFuncOptimizer(Ir ir, GlobalAlloc globalAlloc, Log log) {
         this.ir = ir;
         this.log = log;
+        this.globalAlloc = globalAlloc;
     }
 
     public void injectInstr(ArrayList<Instr> instrs) {
@@ -48,10 +53,15 @@ public class IrFuncOptimizer {
         toCfg();
         trimCfg();
 
-        // Call optimizers. todo
+        // Call optimizers on CFG. todo
+
+        HashMap<Net, MipsReg> allocation = new GlobalAllocator(cfg).run();
+        globalAlloc.addAllocations(allocation);
+        ((FuncRef) funcDefInstr.res).allocated.addAll(allocation.values());
+
         new TailRecursionEliminator(cfg).run();
 
-        // Get optimized instrs.
+        // Regenerate instructions from CFG.
         regenerateInstrs(false);
         toBBlocks();
         toCfg();

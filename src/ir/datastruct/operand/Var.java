@@ -4,6 +4,7 @@ import frontend.datastruct.symbol.SymConstVar;
 import frontend.datastruct.symbol.SymVar;
 import frontend.datastruct.symbol.Symbol;
 import mips.datastruct.MipsOperand;
+import opt.ir.datastruct.Net;
 
 import static ir.datastruct.Instr.Type.i32;
 import static ir.datastruct.Instr.Type.i8;
@@ -25,6 +26,7 @@ public class Var extends Operand
     public final boolean isGlobal;
     public final boolean isArray;
     public int arrayLength = 0;
+    public Net net;
 
     // Compiler generated.
     public static Var compilerTempVar(String name) {

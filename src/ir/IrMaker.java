@@ -588,7 +588,13 @@ public class IrMaker {
      */
     private Operand fromLOrExp(AstLOrExp lOrExp, Function function) {
         if (lOrExp.lAndExps.size() == 1) {
-            return fromLAndExp(lOrExp.lAndExps.get(0), function);
+            Operand operand = fromLAndExp(lOrExp.lAndExps.get(0), function);
+            if (operand instanceof Var var) {
+                Reg temp = new Reg(var.type);
+                function.appendInstr(Instr.genMove(var, temp));
+                operand = temp;
+            }
+            return operand;
         } else {
             Label labelEnd = new Label("lorexp_end");
             Reg res = new Reg(i32);
@@ -611,7 +617,13 @@ public class IrMaker {
 
     private Operand fromLAndExp(AstLAndExp lAndExp, Function function) {
         if (lAndExp.eqExps.size() == 1) {
-            return fromEqExp(lAndExp.eqExps.get(0), function);
+            Operand operand = fromEqExp(lAndExp.eqExps.get(0), function);
+            if (operand instanceof Var var) {
+                Reg temp = new Reg(var.type);
+                function.appendInstr(Instr.genMove(var, temp));
+                operand = temp;
+            }
+            return operand;
         } else {
             Label labelEnd = new Label("landexp_end");
             Reg res = new Reg(i32);

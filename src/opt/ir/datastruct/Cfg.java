@@ -4,6 +4,7 @@ import ir.datastruct.Instr;
 import ir.datastruct.operand.FuncRef;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class Cfg {
     public final FuncRef funcRef;
@@ -20,6 +21,21 @@ public class Cfg {
         this.funcName = funcRef.funcName;
     }
 
+    /**
+     * High cost search! Use with caution.
+     */
+    public BBlock blockOfInstr(Instr instr) {
+        HashSet<BBlock> toSearch = new HashSet<>(blocks);
+        toSearch.add(entry);
+        toSearch.add(exit);
+        for (BBlock block : toSearch) {
+            if (block.instrs.contains(instr)) {
+                return block;
+            }
+        }
+        return null;
+    }
+
     public void connect(BBlock from, BBlock to) {
         from.nextSet.add(to);
         to.prevSet.add(from);
@@ -27,11 +43,13 @@ public class Cfg {
 
     public void connectTrue(BBlock from, BBlock to) {
         from.tarTrue = to;
+        from.nextSet.add(to);
         to.prevSet.add(from);
     }
 
     public void connectFalse(BBlock from, BBlock to) {
         from.tarFalse = to;
+        from.nextSet.add(to);
         to.prevSet.add(from);
     }
 
@@ -42,6 +60,7 @@ public class Cfg {
 
     public void disconnectTrue(BBlock from, BBlock to) {
         from.tarTrue = null;
+        from.nextSet.remove(to);
         if (from.tarFalse != to) {
             to.prevSet.remove(from);
         }
@@ -49,6 +68,7 @@ public class Cfg {
 
     public void disconnectFalse(BBlock from, BBlock to) {
         from.tarFalse = null;
+        from.nextSet.remove(to);
         if (from.tarTrue != to) {
             to.prevSet.remove(from);
         }

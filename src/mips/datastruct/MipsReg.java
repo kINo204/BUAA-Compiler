@@ -14,7 +14,7 @@ public class MipsReg implements MipsOperand {
         return regs.get(regId);
     }
 
-    private final RegId id;
+    public final RegId id;
 
     private MipsReg(RegId regId) {
         this.id = regId;
