@@ -1,9 +1,10 @@
 define fun main:
 	a_2 = alloc: i32
-	a_2: i32 = 10
-	%1: i32 = a_2
-	if false %1 goto  $L0
 	a_2: i32 = 1
-
-$L0:
-	ret: i32  a_2
+	b_2 = alloc: i32
+	b_2: i32 = a_2
+	c_2 = alloc: i32
+	c_2: i32 = b_2
+	d_2 = alloc: i32
+	d_2: i32 = c_2
+	ret: i32  d_2

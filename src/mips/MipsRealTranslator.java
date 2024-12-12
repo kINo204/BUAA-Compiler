@@ -6,6 +6,7 @@ import ir.datastruct.operand.*;
 import mips.datastruct.MipsInstr;
 import mips.datastruct.MipsProgram;
 import mips.datastruct.MipsReg;
+import opt.ir.datastruct.Unit;
 import opt.ir.GlobalAlloc;
 
 import java.util.*;
@@ -161,34 +162,97 @@ public class MipsRealTranslator implements MipsTranslator {
         copy(f, t);
     }
 
+    private boolean isSigned16Const(Operand o) {
+        if (!(o instanceof Const c)) return false;
+        int val = c.num != null ? c.num : c.ch;
+        return val >= -32768 && val < 32768;
+    }
 
     private void fromIrAdd(Instr irAdd) {
         Unit a = new Unit(irAdd.main), b = new Unit(irAdd.supl), x = new Unit(irAdd.res);
         regsPool.currentOperands = new ArrayList<>(Arrays.asList(a, b, x));
-        MipsReg rA = getReg(a, true);
-        MipsReg rB = getReg(b, true);
-        MipsReg rX = getReg(x, false);
-        program.append(MipsInstr.genCalc(addu, rX, rA, rB));
+
+        MipsInstr instr = null;
+        if (isSigned16Const(a.operand) && (getReg(a, true, false) == null)) {
+            MipsReg rB = getReg(b, true);
+            MipsReg rX = getReg(x, false);
+            instr = MipsInstr.genCalc(addi, rX, rB, (Const) a.operand);
+        } else if (isSigned16Const(b.operand) && (getReg(b, true, false) == null)) {
+            MipsReg rA = getReg(a, true);
+            MipsReg rX = getReg(x, false);
+            instr = MipsInstr.genCalc(addi, rX, rA, (Const) b.operand);
+        }
+
+        if (instr == null) {
+            MipsReg rA = getReg(a, true);
+            MipsReg rB = getReg(b, true);
+            MipsReg rX = getReg(x, false);
+            instr = MipsInstr.genCalc(addu, rX, rA, rB);
+        }
+
+        program.append(instr);
         invalidateMem(x);
     }
 
     private void fromIrSub(Instr irSub) {
         Unit a = new Unit(irSub.main), b = new Unit(irSub.supl), x = new Unit(irSub.res);
         regsPool.currentOperands = new ArrayList<>(Arrays.asList(a, b, x));
-        MipsReg rA = getReg(a, true);
-        MipsReg rB = getReg(b, true);
-        MipsReg rX = getReg(x, false);
-        program.append(MipsInstr.genCalc(subu, rX, rA, rB));
+        MipsInstr instr = null;
+
+        if (b.operand instanceof Const con) {
+            int val = con.num != null ? con.num : con.ch;
+            Const neg = new Const(-val);
+            if (isSigned16Const(neg)) {
+                MipsReg rA = getReg(a, true);
+                MipsReg rX = getReg(x, false);
+                instr = MipsInstr.genCalc(addi, rX, rA, neg);
+            }
+        }
+
+        if (instr == null) {
+            MipsReg rA = getReg(a, true);
+            MipsReg rB = getReg(b, true);
+            MipsReg rX = getReg(x, false);
+            instr = MipsInstr.genCalc(subu, rX, rA, rB);
+        }
+
+        program.append(instr);
         invalidateMem(x);
+    }
+
+    private Integer powOf2(Operand o) {
+        if (!(o instanceof Const c)) return null;
+        int val = c.num != null ? c.num : c.ch;
+        int ind = 0;
+        while (val % 2 == 0) {
+            val /= 2;
+            ind++;
+        }
+        if (val != 1) {
+            return null;
+        } else {
+            return ind < 32 ? ind : null;
+        }
     }
 
     private void fromIrMul(Instr irMul) {
         Unit a = new Unit(irMul.main), b = new Unit(irMul.supl), x = new Unit(irMul.res);
         regsPool.currentOperands = new ArrayList<>(Arrays.asList(a, b, x));
-        MipsReg rA = getReg(a, true);
-        MipsReg rB = getReg(b, true);
-        MipsReg rX = getReg(x, false);
-        program.append(MipsInstr.genCalc(mulu, rX, rA, rB));
+        Integer i;
+        if ((i = powOf2(a.operand)) != null) {
+            MipsReg rB = getReg(b, true);
+            MipsReg rX = getReg(x, false);
+            program.append(MipsInstr.genCalc(sll, rX, rB, new Const(i)));
+        } else if ((i = powOf2(b.operand)) != null) {
+            MipsReg rA = getReg(a, true);
+            MipsReg rX = getReg(x, false);
+            program.append(MipsInstr.genCalc(sll, rX, rA, new Const(i)));
+        } else {
+            MipsReg rA = getReg(a, true);
+            MipsReg rB = getReg(b, true);
+            MipsReg rX = getReg(x, false);
+            program.append(MipsInstr.genCalc(mulu, rX, rA, rB));
+        }
         invalidateMem(x);
     }
 
@@ -507,96 +571,6 @@ public class MipsRealTranslator implements MipsTranslator {
     }
 
     // 1. Memory Simulation Components: Regs & Stack
-
-    /* To produce memory motions within translations, we need to simulate
-    both the registers and the linear main memory model. To represent a
-    "unit" of this management, we may define a "Unit" here:
-     */
-    public static final class Unit {
-        private enum Type { VAL, REF, ARR, REG, CON }
-        private final Type type;
-
-        /* One of the main reasons for introducing "Unit" is, by tracking
-        the index of either array element or de-reference, we may treat
-        each element of a list individually. For example, when considering
-        allocating global registers, an array element may be included in
-        the awaiting variables, increasing the flexibilities of multiple
-        strategies.
-        */
-        public final Operand operand;
-        private final Operand arrayIndex;
-        private Unit(Operand operand) {
-            this.operand = operand;
-            if (operand instanceof Var v) {
-                if (!v.isArray) {
-                    if (!v.isReference) {
-                        type = Type.VAL;
-                    } else {
-                        type = Type.REF;
-                    }
-                } else {
-                    type = Type.ARR;
-                }
-            } else if (operand instanceof Reg) {
-                type = Type.REG;
-            } else {
-                type = Type.CON;
-            }
-            this.arrayIndex = null;
-        }
-        private Unit(Operand operand, Operand arrayIndex) {
-            this.operand = operand;
-            if (operand instanceof Var v) {
-                if (!v.isArray) {
-                    if (!v.isReference) {
-                        type = Type.VAL;
-                    } else {
-                        type = Type.REF;
-                    }
-                } else {
-                    type = Type.ARR;
-                }
-            } else if (operand instanceof Reg) {
-                type = Type.REG;
-            } else {
-                type = Type.CON;
-            }
-            this.arrayIndex = arrayIndex;
-        }
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Unit unit)) return false;
-
-            if (this.noRegAlloc() || unit.noRegAlloc()) return false;
-            if (arrayIndex == null && unit.arrayIndex != null) return false;
-            if (arrayIndex != null && unit.arrayIndex == null) return false;
-            if (arrayIndex != null && !arrayIndex.equals(unit.arrayIndex)) return false;
-            return operand.equals(unit.operand);
-        }
-        @Override
-        public int hashCode() {
-            int result = operand != null ? operand.hashCode() : 0;
-            result = 31 * result + (arrayIndex != null ? arrayIndex.hashCode() : 0);
-            return result;
-        }
-
-        /* Of course, we've not sure yet if this strategy would do good
-        to the performance or not, so there's a "switch" here to define
-        excluded types of units. Add the desired type here, and it will be
-        excluded from many strategies.
-         */
-        private boolean noRegAlloc() {
-            return
-                    arrayIndex != null && !(arrayIndex instanceof Const);
-        }
-
-        @Override
-        public String toString() {
-            return arrayIndex == null ? operand.toString() :
-                    operand.toString() + "[" + arrayIndex + "]";
-        }
-    }
 
     private final boolean regInfo = true;
     private final class RegsPool {

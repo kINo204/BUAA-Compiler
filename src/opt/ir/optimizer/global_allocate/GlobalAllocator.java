@@ -444,11 +444,9 @@ public class GlobalAllocator {
                 }
             }
             if (!success) {
-                // Abandon any one of the nets to alloc. Temporarily use a loop here.
-                for (Net abandoned : netToAlloc) {
-                    netToAlloc.remove(abandoned);
-                    break;
-                }
+                // Abandon any one of the nets to alloc.
+                int ind = (int) (netToAlloc.size() * Math.random());
+                netToAlloc.remove((Net) netToAlloc.toArray()[ind]);
             }
         }
 

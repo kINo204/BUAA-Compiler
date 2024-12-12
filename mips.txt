@@ -10,25 +10,21 @@ main:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
 	# a_2 = alloc: i32
-	# a_2: i32 = 10
-	# $t0 <= 10
-	li	$t0, 10
-	move	$s0, $t0
-	# %1: i32 = a_2
-	# $t1 <= %1
-	move	$t1, $s0
-	# if false %1 goto  $L0
-	sw	$t1, -12($fp)
-	beq	$t1, $zero, $L0
-
 	# a_2: i32 = 1
 	# $t0 <= 1
 	li	$t0, 1
 	move	$s0, $t0
-	# $L0:
-$L0:
-	# ret: i32  a_2
-	move	$v0, $s0
+	# b_2 = alloc: i32
+	# b_2: i32 = a_2
+	move	$s1, $s0
+	# c_2 = alloc: i32
+	# c_2: i32 = b_2
+	move	$s0, $s1
+	# d_2 = alloc: i32
+	# d_2: i32 = c_2
+	move	$s1, $s0
+	# ret: i32  d_2
+	move	$v0, $s1
 	move	$sp, $fp
 	lw	$fp, -4($sp)
 	jr	$ra

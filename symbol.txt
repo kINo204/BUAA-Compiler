@@ -1,1 +1,4 @@
 2 a Int
+2 b Int
+2 c Int
+2 d Int
