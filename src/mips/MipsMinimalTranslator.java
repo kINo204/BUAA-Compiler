@@ -256,10 +256,10 @@ public class MipsMinimalTranslator implements MipsTranslator {
             switch (irInstr.getOperator()) {
                 case GLOB -> fromIrGlobDecl(irInstr);
                 case ALLOC -> fromIrAlloc(irInstr);
-                case LOAD -> fromIrLoadArr(irInstr);
-                case STORE -> fromIrStoreArr(irInstr);
+                case LDARR -> fromIrLoadArr(irInstr);
+                case STARR -> fromIrStoreArr(irInstr);
                 case ADDR -> fromIrGetAddress(irInstr);
-                case DEREF -> fromIrDerefAndIndex(irInstr);
+                case LDREF -> fromIrDerefAndIndex(irInstr);
                 case STREF -> fromIrStrefAndIndex(irInstr);
                 // case REM_STACK -> fromIrRemStack();
                 // case LOD_STACK -> fromIrLoadStack();

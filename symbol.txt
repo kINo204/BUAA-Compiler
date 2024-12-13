@@ -1,4 +1,6 @@
-2 a Int
+1 f VoidFunc
+2 a IntArray
 2 b Int
-2 c Int
-2 d Int
+3 a IntArray
+3 b Int
+3 c Int

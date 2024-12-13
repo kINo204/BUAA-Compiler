@@ -8,6 +8,7 @@ import opt.ir.datastruct.BBlock;
 import opt.ir.datastruct.Cfg;
 import opt.ir.datastruct.Net;
 import opt.ir.optimizer.TailRecursionEliminator;
+import opt.ir.optimizer.const_propagation.ConstPropagator;
 import opt.ir.optimizer.global_allocate.GlobalAllocator;
 import utils.Log;
 
@@ -53,7 +54,8 @@ public class IrFuncOptimizer {
         toCfg();
         trimCfg();
 
-        // Call optimizers on CFG. todo
+        // Call optimizers on CFG.
+        new ConstPropagator(cfg).run();
 
         HashMap<Net, MipsReg> allocation = new GlobalAllocator(cfg).run();
         globalAlloc.addAllocations(allocation);
@@ -308,7 +310,7 @@ public class IrFuncOptimizer {
                 Var tVar = Var.compilerTempVar(funcName + "_B" + block.id);
                 Reg res = new Reg(i32);
                 regenerated.add(Instr.genCalc(ADD, res, tVar, new Const(1)));
-                regenerated.add(Instr.genStore(tVar, res));
+                regenerated.add(Instr.genMove(tVar, res));
 
             }
 

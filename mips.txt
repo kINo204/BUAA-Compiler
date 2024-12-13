@@ -4,27 +4,66 @@
         li      $v0, 17
         syscall
 
-	# define fun main:
+	# define fun f:
 .text
+f:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+	sw	$s0, -8($fp)
+	# *(a_2)[0]: i32 = 1
+	# $t0 <= 1
+	li	$t0, 1
+	# $t0 <= a_2[0]
+	# b_2 = alloc: i32
+	# %1: i32 = 1
+	# $t0 <= %1
+	# b_2: i32 = 1
+	move	$s0, $t0
+	# ret
+	lw	$gp, 4($fp)
+	sw	$t0, 0($gp)
+	sw	$t0, -16($fp)
+	lw	$s0, -8($fp)
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+	# define fun main:
 main:
 	sw	$fp, -4($sp)
 	move	$fp, $sp
-	# a_2 = alloc: i32
-	# a_2: i32 = 1
+	# a_3 = alloc: i32  2
+	# a_3[0]: i32 = 1
 	# $t0 <= 1
 	li	$t0, 1
+	# $t0 <= a_3[0]
+	# %1: &i32 = &(a_3)
+	# $t1 <= %1
+	addi	$t1, $fp, -12
+	# param: i32  %1
+	sw	$t0, -12($fp)
+	sw	$t1, -16($fp)
+	sw	$t1, -20($fp)
+	# call: void  f
+	addi	$sp, $fp, -24
+	sw	$ra, 0($sp)
+	jal	f
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -16
+	# b_3 = alloc: i32
+	# %2: i32 = a_3[0]
+	# $t0 <= a_3[0]
+	lw	$t0, -12($fp)
+	# $t0 <= %2
+	# b_3: i32 = %2
 	move	$s0, $t0
-	# b_2 = alloc: i32
-	# b_2: i32 = a_2
+	# c_3 = alloc: i32
+	# c_3: i32 = b_3
 	move	$s1, $s0
-	# c_2 = alloc: i32
-	# c_2: i32 = b_2
-	move	$s0, $s1
-	# d_2 = alloc: i32
-	# d_2: i32 = c_2
-	move	$s1, $s0
-	# ret: i32  d_2
+	# ret: i32  c_3
 	move	$v0, $s1
+	sw	$t0, -28($fp)
 	move	$sp, $fp
 	lw	$fp, -4($sp)
 	jr	$ra

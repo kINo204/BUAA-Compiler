@@ -279,10 +279,10 @@ public class IrMaker {
                     }
                     for (int i = 0; i < var.arrayLength; i++) {
                         if (i < initVals.size()) {
-                            function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                            function.appendInstr(Instr.genStoreArr(var, initVals.get(i), new Const(i)));
                         } else {
                             // For constArray, init other vals to 0.
-                            function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                            function.appendInstr(Instr.genStoreArr(var, new Const(0), new Const(i)));
                         }
                     }
                 } else { // string const
@@ -291,10 +291,10 @@ public class IrMaker {
                     initVals.addAll(charConsts);
                     for (int i = 0; i < var.arrayLength; i++) {
                         if (i < initVals.size()) {
-                            function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                            function.appendInstr(Instr.genStoreArr(var, initVals.get(i), new Const(i)));
                         } else {
                             // For constArray, init other vals to 0.
-                            function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                            function.appendInstr(Instr.genStoreArr(var, new Const(0), new Const(i)));
                         }
                     }
                 }
@@ -302,7 +302,7 @@ public class IrMaker {
                 function.appendInstr(Instr.genAlloc(var));
 
                 Operand initVal = fromConstExp(def.constInitVal.constExp, function);
-                function.appendInstr(Instr.genStore(var, initVal));
+                function.appendInstr(Instr.genMove(var, initVal));
             }
         }
     }
@@ -325,10 +325,10 @@ public class IrMaker {
                         }
                         for (int i = 0; i < var.arrayLength; i++) {
                             if (i < initVals.size()) {
-                                function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                                function.appendInstr(Instr.genStoreArr(var, initVals.get(i), new Const(i)));
                             } else {
                                 if (var.type == i8) {
-                                    function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                                    function.appendInstr(Instr.genStoreArr(var, new Const(0), new Const(i)));
                                 }
                             }
                         }
@@ -338,10 +338,10 @@ public class IrMaker {
                         initVals.addAll(charConsts);
                         for (int i = 0; i < var.arrayLength; i++) {
                             if (i < initVals.size()) {
-                                function.appendInstr(Instr.genStore(var, initVals.get(i), new Const(i)));
+                                function.appendInstr(Instr.genStoreArr(var, initVals.get(i), new Const(i)));
                             } else {
                                 // For constArray, init other vals to 0.
-                                function.appendInstr(Instr.genStore(var, new Const(0), new Const(i)));
+                                function.appendInstr(Instr.genStoreArr(var, new Const(0), new Const(i)));
                             }
                         }
                     }
@@ -351,7 +351,7 @@ public class IrMaker {
 
                 if (def.initVal != null) {
                     Operand initVal = fromExp(def.initVal.exp, function);
-                    function.appendInstr(Instr.genStore(var, initVal));
+                    function.appendInstr(Instr.genMove(var, initVal));
                 }
             }
         }
@@ -368,12 +368,12 @@ public class IrMaker {
             Var var = new Var(varSym);
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtAssign.lVal.exp, function);
-                function.appendInstr(Instr.genStore(var, value, arrayIndex));
+                function.appendInstr(Instr.genStoreArr(var, value, arrayIndex));
             } else if (var.isReference) {
                 Operand arrayIndex = fromExp(stmtAssign.lVal.exp, function);
                 function.appendInstr(Instr.genStoreRef(var, value, arrayIndex));
             } else {
-                function.appendInstr(Instr.genStore(var, value));
+                function.appendInstr(Instr.genMove(var, value));
             }
         } else if (stmt instanceof AstStmtBlock stmtBlock) {
             fromBlock(stmtBlock.block, function, true);
@@ -508,12 +508,12 @@ public class IrMaker {
             Var var = new Var(varSym);
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtGetint.lVal.exp, function);
-                function.appendInstr(Instr.genStore(var, res, arrayIndex));
+                function.appendInstr(Instr.genStoreArr(var, res, arrayIndex));
             } else if (var.isReference) {
                 Operand arrayIndex = fromExp(stmtGetint.lVal.exp, function);
                 function.appendInstr(Instr.genStoreRef(var, res, arrayIndex));
             } else {
-                function.appendInstr(Instr.genStore(var, res));
+                function.appendInstr(Instr.genMove(var, res));
             }
         } else if (stmt instanceof AstStmtGetchar stmtGetchar) {
             Reg res = new Reg(FuncRef.frGetchar().type);
@@ -523,12 +523,12 @@ public class IrMaker {
             Var var = new Var(varSym);
             if (var.isArray) {
                 Operand arrayIndex = fromExp(stmtGetchar.lVal.exp, function);
-                function.appendInstr(Instr.genStore(var, res, arrayIndex));
+                function.appendInstr(Instr.genStoreArr(var, res, arrayIndex));
             } else if (var.isReference) {
                 Operand arrayIndex = fromExp(stmtGetchar.lVal.exp, function);
                 function.appendInstr(Instr.genStoreRef(var, res, arrayIndex));
             } else {
-                function.appendInstr(Instr.genStore(var, res));
+                function.appendInstr(Instr.genMove(var, res));
             }
         }
     }
@@ -549,12 +549,12 @@ public class IrMaker {
         Var var = new Var(varSym);
         if (var.isArray) {
             Operand arrayIndex = fromExp(forStmt.lVal.exp, function);
-            function.appendInstr(Instr.genStore(var, value, arrayIndex));
+            function.appendInstr(Instr.genStoreArr(var, value, arrayIndex));
         } else if (var.isReference) {
             Operand arrayIndex = fromExp(forStmt.lVal.exp, function);
             function.appendInstr(Instr.genStoreRef(var, value, arrayIndex));
         } else {
-            function.appendInstr(Instr.genStore(var, value));
+            function.appendInstr(Instr.genMove(var, value));
         }
     }
 
@@ -591,7 +591,7 @@ public class IrMaker {
             Operand operand = fromLAndExp(lOrExp.lAndExps.get(0), function);
             if (operand instanceof Var var) {
                 Reg temp = new Reg(var.type);
-                function.appendInstr(Instr.genMove(var, temp));
+                function.appendInstr(Instr.genMove(temp, var));
                 operand = temp;
             }
             return operand;
@@ -599,7 +599,7 @@ public class IrMaker {
             Label labelEnd = new Label("lorexp_end");
             Reg res = new Reg(i32);
 
-            function.appendInstr(Instr.genMove(new Const(1), res));
+            function.appendInstr(Instr.genMove(res, new Const(1)));
 
             for (AstLAndExp lAndExp : lOrExp.lAndExps) {
                 Operand operand = fromLAndExp(lAndExp, function);
@@ -607,7 +607,7 @@ public class IrMaker {
                 function.appendInstr(instrGoif);
             }
 
-            function.appendInstr(Instr.genMove(new Const(0), res));
+            function.appendInstr(Instr.genMove(res, new Const(0)));
 
             function.appendInstr(Instr.genLabelDecl(labelEnd));
 
@@ -620,7 +620,7 @@ public class IrMaker {
             Operand operand = fromEqExp(lAndExp.eqExps.get(0), function);
             if (operand instanceof Var var) {
                 Reg temp = new Reg(var.type);
-                function.appendInstr(Instr.genMove(var, temp));
+                function.appendInstr(Instr.genMove(temp, var));
                 operand = temp;
             }
             return operand;
@@ -628,7 +628,7 @@ public class IrMaker {
             Label labelEnd = new Label("landexp_end");
             Reg res = new Reg(i32);
 
-            function.appendInstr(Instr.genMove(new Const(0), res));
+            function.appendInstr(Instr.genMove(res, new Const(0)));
 
             for (AstEqExp eqExp : lAndExp.eqExps) {
                 Operand operand = fromEqExp(eqExp, function);
@@ -636,7 +636,7 @@ public class IrMaker {
                 function.appendInstr(instrGont);
             }
 
-            function.appendInstr(Instr.genMove(new Const(1), res));
+            function.appendInstr(Instr.genMove(res, new Const(1)));
 
             function.appendInstr(Instr.genLabelDecl(labelEnd));
 
@@ -802,7 +802,7 @@ public class IrMaker {
                 return fromNumber(primaryExp.number);
             } else {
                 Reg res = new Reg(i32);
-                function.appendInstr(Instr.genMove(fromNumber(primaryExp.number), res));
+                function.appendInstr(Instr.genMove(res, fromNumber(primaryExp.number)));
                 return res;
             }
         } else if (primaryExp.character != null) {
@@ -810,7 +810,7 @@ public class IrMaker {
                 return fromCharacter(primaryExp.character);
             } else {
                 Reg res = new Reg(i8);
-                function.appendInstr(Instr.genMove(fromCharacter(primaryExp.character), res));
+                function.appendInstr(Instr.genMove(res, fromCharacter(primaryExp.character)));
                 return res;
             }
         } else if (primaryExp.lVal != null) {
@@ -825,7 +825,7 @@ public class IrMaker {
                 } else { // Load of array
                     Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
                     Reg res = new Reg(var.type);
-                    function.appendInstr(Instr.genLoad(res, var, arrayIndex));
+                    function.appendInstr(Instr.genLoadArr(res, var, arrayIndex));
                     return res;
                 }
             } else if (var.isReference) {
@@ -834,13 +834,13 @@ public class IrMaker {
                         return var;
                     } else {
                         Reg res = new Reg(i32);
-                        function.appendInstr(Instr.genLoad(res, var));
+                        function.appendInstr(Instr.genMove(res, var));
                         return res;
                     }
                 } else { // Dereference of array base addr
                     Operand arrayIndex = fromExp(primaryExp.lVal.exp, function);
                     Reg res = new Reg(var.type);
-                    function.appendInstr(Instr.genDeref(res, var, arrayIndex));
+                    function.appendInstr(Instr.genLoadRef(res, var, arrayIndex));
                     return res;
                 }
             } else {
@@ -848,7 +848,7 @@ public class IrMaker {
                     return var;
                 } else {
                     Reg res = new Reg(var.type);
-                    function.appendInstr(Instr.genLoad(res, var));
+                    function.appendInstr(Instr.genMove(res, var));
                     return res;
                 }
             }

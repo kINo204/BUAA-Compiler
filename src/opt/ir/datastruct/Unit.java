@@ -69,7 +69,7 @@ public class Unit {
         if (this == o) return true;
         if (!(o instanceof Unit unit)) return false;
 
-        if (this.noRegAlloc() || unit.noRegAlloc()) return false;
+        if (this.uncertain() || unit.uncertain()) return false;
         if (arrayIndex == null && unit.arrayIndex != null) return false;
         if (arrayIndex != null && unit.arrayIndex == null) return false;
         if (arrayIndex != null && !arrayIndex.equals(unit.arrayIndex)) return false;
@@ -88,13 +88,14 @@ public class Unit {
     excluded types of units. Add the desired type here, and it will be
     excluded from many strategies.
      */
-    public boolean noRegAlloc() {
+    public boolean uncertain() {
         return
                 arrayIndex != null && !(arrayIndex instanceof Const);
     }
 
     @Override
     public String toString() {
+        assert operand != null;
         return arrayIndex == null ? operand.toString() :
                 operand.toString() + "[" + arrayIndex + "]";
     }

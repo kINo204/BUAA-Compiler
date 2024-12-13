@@ -46,10 +46,10 @@ public class MipsRealTranslator implements MipsTranslator {
             switch (irInstr.getOperator()) {
                 case GLOB -> fromIrGlobDecl(irInstr);
                 case ALLOC -> fromIrAlloc(irInstr);
-                case LOAD -> fromIrLoad(irInstr);
-                case STORE -> fromIrStore(irInstr);
+                case LDARR -> fromIrLoad(irInstr);
+                case STARR -> fromIrStore(irInstr);
                 case ADDR -> fromIrGetAddress(irInstr);
-                case DEREF -> fromIrDerefAndIndex(irInstr);
+                case LDREF -> fromIrDerefAndIndex(irInstr);
                 case STREF -> fromIrStrefAndIndex(irInstr);
                 case ADD -> fromIrAdd(irInstr);
                 case SUB -> fromIrSub(irInstr);
@@ -224,7 +224,7 @@ public class MipsRealTranslator implements MipsTranslator {
         if (!(o instanceof Const c)) return null;
         int val = c.num != null ? c.num : c.ch;
         int ind = 0;
-        while (val % 2 == 0) {
+        while (val != 0 && val % 2 == 0) {
             val /= 2;
             ind++;
         }
@@ -461,7 +461,7 @@ public class MipsRealTranslator implements MipsTranslator {
         if (irCall.res != null) {
             Unit u = new Unit(irCall.res);
             regsPool.currentOperands = new ArrayList<>(List.of(u));
-            if (!u.noRegAlloc()) {
+            if (!u.uncertain()) {
                 MipsReg rT = getReg(u, false);
                 if (u.operand.type == i8) {
                     program.append(MipsInstr.genCalc(andi, rT, r(v0), new Const(0xFF)));
@@ -505,10 +505,10 @@ public class MipsRealTranslator implements MipsTranslator {
 
     private void copy(Unit from, Unit to) {
         regsPool.currentOperands = new ArrayList<>(Arrays.asList(from, to));
-        if (!from.noRegAlloc()) {
+        if (!from.uncertain()) {
             MipsReg rF = getReg(from, true);
             if (isTempReg(rF)) { // Temp alloc, in some reg
-                if (!to.noRegAlloc()) {
+                if (!to.uncertain()) {
                     if (from.operand.type == i32 && to.operand.type == i8) {
                         MipsReg rT = getReg(to, false);
                         program.append(MipsInstr.genCalc(andi, rT, rF, new Const(0xFF)));
@@ -524,7 +524,7 @@ public class MipsRealTranslator implements MipsTranslator {
                     stack.storeUnit(to, rF);
                 }
             } else { // Glob alloc, in some reg
-                if (!to.noRegAlloc()) {
+                if (!to.uncertain()) {
                     MipsReg rT = getReg(to, false);
                     if (from.operand.type == i32 && to.operand.type == i8) {
                         program.append(MipsInstr.genCalc(andi, rT, rF, new Const(0xFF)));
@@ -536,7 +536,7 @@ public class MipsRealTranslator implements MipsTranslator {
                 }
             }
         } else {
-            if (!to.noRegAlloc()) {
+            if (!to.uncertain()) {
                 MipsReg rT = getReg(to, false);
                 stack.loadUnit(from, rT);
             } else {
@@ -552,7 +552,7 @@ public class MipsRealTranslator implements MipsTranslator {
     }
 
     private MipsReg getReg(Unit unit, boolean isRead, boolean alloc) {
-        assert !unit.noRegAlloc();
+        assert !unit.uncertain();
 
         // Search for any allocated global register.
         MipsReg globalReg = globalAlloc.query(unit);

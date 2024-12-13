@@ -57,7 +57,7 @@ public class TailRecursionEliminator {
                         Var fp = cfg.funcRef.params.get(i);
                         Operand rp = rParams.get(rParams.size() - 1 - i);
                         if (!fp.equals(rp))
-                            block.instrs.add(Instr.genStore(fp, rp));
+                            block.instrs.add(Instr.genMove(fp, rp));
                     }
                 }
 

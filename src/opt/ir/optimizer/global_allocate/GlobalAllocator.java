@@ -68,7 +68,7 @@ public class GlobalAllocator {
 
     public HashMap<Net, MipsReg> run() {
         for (Var var : cfg.funcRef.params) {
-            cfg.entry.instrs.add(Instr.genStore(var, new Const(0)));
+            cfg.entry.instrs.add(Instr.genMove(var, new Const(0)));
         }
 
         final ArrayList<BBlock> bBlocks = new ArrayList<>(cfg.blocks);
@@ -462,6 +462,8 @@ public class GlobalAllocator {
             assert !color.isEmpty();
             allocation.put(netToColor, (MipsReg) color.toArray()[0]);
         }
+
+        cfg.entry.instrs.clear();
 
         return allocation;
     }

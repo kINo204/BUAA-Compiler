@@ -3,7 +3,7 @@ package ir.datastruct;
 import ir.datastruct.operand.*;
 
 public class Instr {
-    public final Operator op;
+    public Operator op;
     public Type type = null;
     public Operand res = null, main = null, supl = null;
 
@@ -19,16 +19,24 @@ public class Instr {
         this.supl = supl;
     }
 
+    @Deprecated
     public static Instr genRemStack() {
         return new Instr(Operator.REM_STACK);
     }
 
+    @Deprecated
     public static Instr genLoadStack() {
         return new Instr(Operator.LOD_STACK);
     }
 
+    @Deprecated
     public static Instr genPopStack() {
         return new Instr(Operator.POP_STACK);
+    }
+
+    @Deprecated
+    public static Instr genUseStub(Var var) {
+        return new Instr(Operator.USE, null, null, var, null);
     }
 
     public static Instr genGlobDecl(Var var, GlobInitVals initVals) {
@@ -37,10 +45,6 @@ public class Instr {
                 !var.isArray ? null : new Const(var.arrayLength),
                 initVals
         );
-    }
-
-    public static Instr genUseStub(Var var) {
-        return new Instr(Operator.USE, null, null, var, null);
     }
 
     public static Instr genFuncDef(FuncRef funcRef) {
@@ -75,30 +79,43 @@ public class Instr {
         }
     }
 
+    @Deprecated
     public static Instr genLoad(Reg reg, Var var) {
         return new Instr(
-                Operator.LOAD, reg.type, reg, var, null
+                Operator.LDARR, reg.type, reg, var, null
         );
     }
 
+    @Deprecated
     public static Instr genStore(Var var, Operand value) {
         return new Instr(
-                Operator.STORE, var.type, var, value, null
+                Operator.STARR, var.type, var, value, null
         );
     }
 
-    public static Instr genLoad(Reg reg, Var var, Operand arrayIndex) {
+    public static Instr genLoadArr(Reg reg, Var var, Operand arrayIndex) {
         return new Instr(
-                Operator.LOAD, reg.type, reg, var, arrayIndex
+                Operator.LDARR, reg.type, reg, var, arrayIndex
         );
     }
 
-    public static Instr genStore(Var var, Operand value, Operand arrayIndex) {
+    public static Instr genStoreArr(Var var, Operand value, Operand arrayIndex) {
         return new Instr(
-                Operator.STORE, var.type, var, value, arrayIndex
+                Operator.STARR, var.type, var, value, arrayIndex
         );
     }
 
+    public static Instr genLoadRef(Reg res, Var var, Operand arrayIndex) {
+        return new Instr(
+                Operator.LDREF, var.type, res, var, arrayIndex
+        );
+    }
+
+    public static Instr genStoreRef(Var var, Operand data, Operand arrayIndex) {
+        return new Instr(
+                Operator.STREF, var.type, var, data, arrayIndex
+        );
+    }
 
     public static Instr genGoto(Label label) {
         return new Instr(
@@ -142,7 +159,7 @@ public class Instr {
         );
     }
 
-    public static Instr genMove(Operand from, Operand to) {
+    public static Instr genMove(Operand to, Operand from) {
         return new Instr(
                 Operator.MOVE, to.type, to, from, null
         );
@@ -151,18 +168,6 @@ public class Instr {
     public static Instr genGetAddr(Operand res, Var var) {
         return new Instr(
                 Operator.ADDR, Type.i32, res, var, null
-        );
-    }
-
-    public static Instr genDeref(Reg res, Var var, Operand arrayIndex) {
-        return new Instr(
-                Operator.DEREF, var.type, res, var, arrayIndex
-        );
-    }
-
-    public static Instr genStoreRef(Var var, Operand data, Operand arrayIndex) {
-        return new Instr(
-                Operator.STREF, var.type, var, data, arrayIndex
         );
     }
 
@@ -182,13 +187,13 @@ public class Instr {
             return "\t" + res + ": " + type + " = " + main;
         } else if (op == Operator.LABEL) {
             return "\n" + res + ":";
-        } else if (op == Operator.LOAD) {
+        } else if (op == Operator.LDARR) {
             String str = String.format("\t%s: %s = %s", res, type, main);
             if (supl != null) {
                 str += String.format("[%s]", supl);
             }
             return str;
-        } else if (op == Operator.STORE) {
+        } else if (op == Operator.STARR) {
             if (supl != null) {
                 return String.format("\t%s[%s]: %s = %s", res, supl, type, main);
             } else {
@@ -196,7 +201,7 @@ public class Instr {
             }
         } else if (op == Operator.ADDR) {
             return String.format("\t%s: &%s = &(%s)", res, type, main);
-        } else if (op == Operator.DEREF) {
+        } else if (op == Operator.LDREF) {
             return String.format("\t%s: %s = *(%s)[%s]", res, type, main, supl);
         } else if (op == Operator.STREF) {
             return String.format("\t*(%s)[%s]: %s = %s", res, supl, type, main);
@@ -285,10 +290,10 @@ public class Instr {
         // Memory
         GLOB,
         ALLOC,
-        LOAD,
-        STORE,
+        LDARR,
+        STARR,
         ADDR,
-        DEREF,
+        LDREF,
         STREF,
         REM_STACK,
         LOD_STACK,
