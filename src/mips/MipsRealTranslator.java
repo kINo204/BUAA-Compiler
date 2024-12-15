@@ -11,6 +11,7 @@ import opt.ir.GlobalAlloc;
 
 import java.util.*;
 
+import static ir.datastruct.Instr.Operator.CALL;
 import static ir.datastruct.Instr.Type.i32;
 import static ir.datastruct.Instr.Type.i8;
 import static mips.datastruct.MipsInstr.MipsOperator.*;
@@ -416,62 +417,94 @@ public class MipsRealTranslator implements MipsTranslator {
         }
     }
 
+    private int lastSyscall = -1;
     private void fromIrParam(Instr irParam) {
-        if (firstParam) {
-            regsPool.flushToMem(); // checkme
-            firstParam = false;
-            stack.recordTop();
-            stack.alignMem(4); // To ensure same memory layout in caller & callee.
-        }
+        Instr next = irInstrs.get(irInstrs.indexOf(irParam) + 1);
+        if (next.op == CALL
+                && List.of("putint", "putchar").contains(((FuncRef) next.main).funcName)) {
+            Unit u = new Unit(irParam.main);
+            regsPool.currentOperands = new ArrayList<>(List.of(u));
+            MipsReg r = getReg(u, true, false);
+            if (r == null) {
+                stack.loadUnit(u, r(a0));
+            } else {
+                program.append(MipsInstr.genMove(r(a0), r));
+            }
+            switch (((FuncRef) next.main).funcName) {
+                case "putchar" -> {
+                    if (lastSyscall != 11)
+                        program.append(MipsInstr.genLi(r(v0), new Const(11)));
+                    lastSyscall = 11;
+                }
+                case "putint" -> {
+                    if (lastSyscall != 1)
+                        program.append(MipsInstr.genLi(r(v0), new Const(1)));
+                    lastSyscall = 1;
+                }
+                default -> { assert false; }
+            }
+        } else {
+            if (firstParam) {
+                regsPool.flushToMem(); // checkme
+                firstParam = false;
+                stack.recordTop();
+                stack.alignMem(4); // To ensure same memory layout in caller & callee.
+            }
 
-        // Push param.
-        Unit u = new Unit(irParam.main);
-        regsPool.currentOperands = new ArrayList<>(List.of(u));
-        MipsReg r = getReg(u, true, false);
-        if (r == null) {
-            r = r(a0);
-            stack.loadUnit(u, r(a0));
+            // Push param.
+            Unit u = new Unit(irParam.main);
+            regsPool.currentOperands = new ArrayList<>(List.of(u));
+            MipsReg r = getReg(u, true, false);
+            if (r == null) {
+                r = r(a0);
+                stack.loadUnit(u, r(a0));
+            }
+            // Use "new Reg()" to force allocate new stack memory for parameter.
+            // Reference is thrown away for there's no future use of real parameter.
+            // For now, push all params on stack.
+            stack.storeUnit(new Unit(new Reg(irParam.type)), r); // No one will remember you since, ever.
         }
-        // Use "new Reg()" to force allocate new stack memory for parameter.
-        // Reference is thrown away for there's no future use of real parameter.
-        // For now, push all params on stack.
-        stack.storeUnit(new Unit(new Reg(irParam.type)), r); // No one will remember you since, ever.
     }
 
     private void fromIrCall(Instr irCall) {
-        if (firstParam) { // If no param, falls here.
-            regsPool.flushToMem(); // checkme
-            firstParam = false;
-            stack.recordTop();
-            stack.alignMem(4); // To ensure same memory layout in caller & callee.
-        }
+        if (List.of("putint", "putchar").contains(((FuncRef) irCall.main).funcName)) {
+            program.append(MipsInstr.genSyscall());
+        } else {
 
-        stack.allocMem(4);
-        program.append(MipsInstr.genCalc(addi, r(sp), r(fp), new Const(stack.top)));
-        program.append(MipsInstr.genMem(sw, r(ra), r(sp), new Const(0)));
-        program.append(MipsInstr.genJal((FuncRef) irCall.main));
-        program.append(MipsInstr.genMem(lw, r(ra), r(sp), new Const(0)));
-
-        // Recover param status.
-        program.append(MipsInstr.genCalc(addi, r(sp), r(fp), new Const(stack.record)));
-        firstParam = true;
-        stack.restoreTop();
-        regsPool.reset();
-
-        if (irCall.res != null) {
-            Unit u = new Unit(irCall.res);
-            regsPool.currentOperands = new ArrayList<>(List.of(u));
-            if (!u.uncertain()) {
-                MipsReg rT = getReg(u, false);
-                if (u.operand.type == i8) {
-                    program.append(MipsInstr.genCalc(andi, rT, r(v0), new Const(0xFF)));
-                } else {
-                    program.append(MipsInstr.genMove(rT, r(v0)));
-                }
-            } else {
-                stack.storeUnit(u, r(v0));
+            if (firstParam) { // If no param, falls here.
+                regsPool.flushToMem(); // checkme
+                firstParam = false;
+                stack.recordTop();
+                stack.alignMem(4); // To ensure same memory layout in caller & callee.
             }
-            invalidateMem(u);
+
+            stack.allocMem(4);
+            program.append(MipsInstr.genCalc(addi, r(sp), r(fp), new Const(stack.top)));
+            program.append(MipsInstr.genMem(sw, r(ra), r(sp), new Const(0)));
+            program.append(MipsInstr.genJal((FuncRef) irCall.main));
+            program.append(MipsInstr.genMem(lw, r(ra), r(sp), new Const(0)));
+
+            // Recover param status.
+            program.append(MipsInstr.genCalc(addi, r(sp), r(fp), new Const(stack.record)));
+            firstParam = true;
+            stack.restoreTop();
+            regsPool.reset();
+
+            if (irCall.res != null) {
+                Unit u = new Unit(irCall.res);
+                regsPool.currentOperands = new ArrayList<>(List.of(u));
+                if (!u.uncertain()) {
+                    MipsReg rT = getReg(u, false);
+                    if (u.operand.type == i8) {
+                        program.append(MipsInstr.genCalc(andi, rT, r(v0), new Const(0xFF)));
+                    } else {
+                        program.append(MipsInstr.genMove(rT, r(v0)));
+                    }
+                } else {
+                    stack.storeUnit(u, r(v0));
+                }
+                invalidateMem(u);
+            }
         }
     }
 
@@ -612,6 +645,7 @@ public class MipsRealTranslator implements MipsTranslator {
             }
         }
         private void flushToMem() {
+            lastSyscall = -1;
             for (MipsReg reg : regs) {
                 for (Unit unit : regsMap.get(reg)) {
                     if (!memValidation.get(unit)) {

@@ -8,6 +8,7 @@ import opt.ir.datastruct.BBlock;
 import opt.ir.datastruct.Cfg;
 import opt.ir.datastruct.Net;
 import opt.ir.optimizer.TailRecursionEliminator;
+import opt.ir.optimizer.const_folding.ConstFolder;
 import opt.ir.optimizer.const_propagation.ConstPropagator;
 import opt.ir.optimizer.dc_elimination.DeadCodeEliminator;
 import opt.ir.optimizer.global_allocate.GlobalAllocator;
@@ -56,15 +57,16 @@ public class IrFuncOptimizer {
         trimCfg();
 
         // Call optimizers on CFG.
-        boolean m_cp, m_dce;
+        boolean m_cp, m_cf, m_dce;
         do {
             m_cp = new ConstPropagator(cfg).run();
+            m_cf = new ConstFolder(cfg).run();
             m_dce = new DeadCodeEliminator(cfg).run();
             regenerateInstrs(false); // Regenerate once here to eliminate following block fragments.
             toBBlocks();
             toCfg();
             trimCfg();
-        } while (m_cp || m_dce);
+        } while (m_cp || m_cf || m_dce);
 
         HashMap<Net, MipsReg> allocation = new GlobalAllocator(cfg).run();
         globalAlloc.addAllocations(allocation);

@@ -7,11 +7,11 @@ public class Instr {
     public Type type = null;
     public Operand res = null, main = null, supl = null;
 
-    Instr(Operator op) {
+    private Instr(Operator op) {
         this.op = op;
     }
 
-    Instr(Operator operator, Type type, Operand res, Operand main, Operand supl) {
+    private Instr(Operator operator, Type type, Operand res, Operand main, Operand supl) {
         this.op = operator;
         this.type = type;
         this.res = res;
@@ -288,41 +288,25 @@ public class Instr {
 
     public enum Operator {
         // Memory
-        GLOB,
-        ALLOC,
-        LDARR,
-        STARR,
+        GLOB, ALLOC,
+        LDARR, STARR,
         ADDR,
-        LDREF,
-        STREF,
-        REM_STACK,
-        LOD_STACK,
-        POP_STACK,
+        LDREF, STREF,
+        REM_STACK, LOD_STACK, POP_STACK,
 
         // Arithmetic
-        ADD,
-        SUB,
-        MUL,
-        DIV,
-        MOD,
-        OR,
-        AND,
         MOVE,
+        ADD, SUB, MUL, DIV, MOD,
+        OR, AND,
 
         // Comparison
         LSS, LEQ, GRE, GEQ, EQL, NEQ,
 
         // Jumping
-        LABEL,
-        GOTO,
-        GOIF,
-        GONT,
+        LABEL, GOTO, GOIF, GONT,
 
         // Procedural
-        FUNC, // function def
-        PARAM, // push param
-        CALL,
-        RET,
+        FUNC, PARAM, CALL, RET,
 
         // Dataflow Stubs
         USE,

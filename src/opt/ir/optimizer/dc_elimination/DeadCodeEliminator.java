@@ -1,13 +1,11 @@
 package opt.ir.optimizer.dc_elimination;
 
 import ir.datastruct.Instr;
-import ir.datastruct.operand.Const;
 import ir.datastruct.operand.Operand;
 import ir.datastruct.operand.Reg;
 import ir.datastruct.operand.Var;
 import opt.ir.datastruct.BBlock;
 import opt.ir.datastruct.Cfg;
-import opt.ir.datastruct.Unit;
 
 import java.util.*;
 
@@ -242,6 +240,21 @@ public class DeadCodeEliminator {
 
         for (BBlock block : cfg.blocks) {
             mod |= block.instrs.removeIf(instr -> !marked.contains(instr));
+        }
+
+        final HashSet<Var> usedVar = new HashSet<>();
+        for (BBlock block : cfg.blocks) {
+            for (Instr instr : block.instrs) {
+                if (instr.op == Instr.Operator.ALLOC) continue;
+                if (instr.res  instanceof Var vr) usedVar.add(vr);
+                if (instr.main instanceof Var vm) usedVar.add(vm);
+                if (instr.supl instanceof Var vs) usedVar.add(vs);
+            }
+        }
+
+        for (BBlock block : cfg.blocks) {
+            block.instrs.removeIf(instr ->
+                    instr.op == Instr.Operator.ALLOC && !usedVar.contains((Var) instr.res));
         }
 
         return mod;

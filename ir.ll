@@ -1,270 +1,140 @@
-global a1_1[10]: i32 = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+global N_1: i32 = 10
 
-global a2_1[5]: i32 = 0, 0, 0, 0, 0
+global a_1[10]: i32 = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 
-global a3_1[5]: i32 = 0, 0, 0, 0, 0
-
-global a4_1[5]: i32 = 1, 2, 3, 0, 0
-
-global c1_1[10]: i8 = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
-global c2_1[5]: i8 = 0, 0, 0, 0, 0
-
-global c3_1[5]: i8 = 0, 0, 0, 0, 0
-
-global c4_1[5]: i8 = 104, 101, 121, 0, 0
-
-global c5_1[10]: i8 = 104, 101, 108, 108, 111, 0, 0, 0, 0, 0
-
-define fun f1:
-	sum_2 = alloc: i32
-	sum_2: i32 = 0
-	i_2 = alloc: i32
-	i_2: i32 = 0
-
-$L0_for_cond:
-	%1: i32 = i_2 < len_2
-	if false %1 goto  $L2_for_end
-	%2: i32 = *(a_2)[i_2]
-	%3: i32 = sum_2 + %2
-	sum_2: i32 = %3
-
-$L1_for_motion:
-	%4: i32 = i_2 + 1
-	i_2: i32 = %4
-	goto  $L0_for_cond
-
-$L2_for_end:
-	ret: i32  sum_2
-
-define fun f2:
-	%1: i32 = n_4 == 1
-	if false %1 goto  $L3_if_else
+define fun fib:
+	%1: i32 = i_2 == 1
+	if false %1 goto  $L0_if_end
 	ret: i32  1
-	goto  $L4_if_end
 
-$L3_if_else:
-	%2: i32 = n_4 == 2
-	if false %2 goto  $L5_if_else
-	ret: i32  1
-	goto  $L6_if_end
+$L0_if_end:
+	%2: i32 = i_2 == 2
+	if false %2 goto  $L1_if_end
+	ret: i32  2
 
-$L5_if_else:
-	%3: i32 = n_4 - 1
+$L1_if_end:
+	%3: i32 = i_2 - 1
 	param: i32  %3
-	%4 = call: i32  f2
-	%5: i32 = n_4 - 2
+	%4 = call: i32  fib
+	%5: i32 = i_2 - 2
 	param: i32  %5
-	%6 = call: i32  f2
+	%6 = call: i32  fib
 	%7: i32 = %4 + %6
 	ret: i32  %7
 
-$L6_if_end:
-
-$L4_if_end:
-	ret: i32  -1
-
-define fun f3:
-	%1: i8 = *(s_5)[0]
-	param: i8  %1
-	call: void  putchar
-	param: i8  10
-	call: void  putchar
-	ret
-
-define fun f4:
-	i_6 = alloc: i32
-	sum_6 = alloc: i32
-	sum_6: i32 = 0
-	i_6: i32 = 0
-
-$L7_for_cond:
-	%1: i32 = i_6 < len_6
-	if false %1 goto  $L9_for_end
-	%2: i32 = *(a_6)[i_6]
-	%3: i32 = *(b_6)[i_6]
-	%4: i32 = %2 * %3
-	%5: i32 = sum_6 + %4
-	sum_6: i32 = %5
-
-$L8_for_motion:
-	%6: i32 = i_6 + 1
-	i_6: i32 = %6
-	goto  $L7_for_cond
-
-$L9_for_end:
-	ret: i32  sum_6
-
 define fun main:
-	n_8 = alloc: i32
-	param: i8  50
-	call: void  putchar
-	param: i8  49
-	call: void  putchar
-	param: i8  51
-	call: void  putchar
-	param: i8  55
-	call: void  putchar
-	param: i8  52
-	call: void  putchar
-	param: i8  50
-	call: void  putchar
-	param: i8  55
-	call: void  putchar
-	param: i8  53
-	call: void  putchar
-	param: i8  10
-	call: void  putchar
-	a4_1[3]: i32 = 4
-	a4_1[4]: i32 = 5
-	sum_8 = alloc: i32
-	%1: &i32 = &(a4_1)
-	param: i32  %1
+	i_5 = alloc: i32
+	i_5: i32 = 2
+	j_5 = alloc: i32
+	j_5: i32 = 5
+	a1_5 = alloc: i32
+	a1_5: i32 = 1
+	a2_5 = alloc: i32
+	a2_5: i32 = 2
+	%1 = call: i32  getint
+	i_5: i32 = %1
+	%2 = call: i32  getint
+	j_5: i32 = %2
+	%3: i32 = i_5 * j_5
+	%4: i32 = 0 - %3
+	param: i32  4
+	%5 = call: i32  fib
+	%6: i32 = %4 * %5
+	%7: i32 = a_1[1]
+	%8: i32 = %7 * 1
+	%9: i32 = 1 / 2
+	%10: i32 = %6 + 0
+	%11: i32 = %10 + %8
+	%12: i32 = %11 - %9
+	%13: i32 = %12 / 5
+	i_5: i32 = %13
+	%14: i32 = 7 * 5923
+	%15: i32 = %14 % 56
+	%16: i32 = %15 * 57
 	param: i32  5
-	%2 = call: i32  f1
-	sum_8: i32 = %2
-	param: i8  115
-	call: void  putchar
-	param: i8  117
-	call: void  putchar
-	param: i8  109
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  61
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i32  sum_8
-	call: void  putint
-	param: i8  10
-	call: void  putchar
-	%3: i8 = c4_1[0]
-	param: i8  99
-	call: void  putchar
-	param: i8  52
-	call: void  putchar
-	param: i8  91
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
-	param: i8  93
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  61
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  %3
-	call: void  putchar
-	param: i8  10
-	call: void  putchar
-	%4: i8 = c5_1[0]
-	param: i8  99
-	call: void  putchar
-	param: i8  53
-	call: void  putchar
-	param: i8  91
-	call: void  putchar
-	param: i8  48
-	call: void  putchar
-	param: i8  93
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  61
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  %4
-	call: void  putchar
-	param: i8  10
-	call: void  putchar
-	t_8 = alloc: i32
-	t_8: i32 = 100
-	%5: i32 = t_8 + 1
-	%6: i32 = %5 % 25
-	%7: i32 = %6 * 5
-	%8: i32 = 3 / 2
-	%9: i32 = %7 - %8
-	t_8: i32 = %9
-	param: i8  116
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  61
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i32  t_8
-	call: void  putint
-	param: i8  10
-	call: void  putchar
-	param: i32  10
-	%10 = call: i32  f2
-	t_8: i32 = %10
-	param: i32  t_8
-	call: void  putint
-	param: i8  10
-	call: void  putchar
-	s_8 = alloc: i8  10
-	s_8[0]: i8 = 49
-	s_8[1]: i8 = 50
-	s_8[2]: i8 = 51
-	s_8[3]: i8 = 52
-	s_8[4]: i8 = 53
-	s_8[5]: i8 = 54
-	s_8[6]: i8 = 0
-	s_8[7]: i8 = 0
-	s_8[8]: i8 = 0
-	s_8[9]: i8 = 0
-	%11: &i32 = &(s_8)
-	param: i32  %11
-	call: void  f3
-	%12: &i32 = &(c4_1)
-	param: i32  %12
-	call: void  f3
-	%13: &i32 = &(c5_1)
-	param: i32  %13
-	call: void  f3
-	a5_8 = alloc: i32  3
-	a5_8[0]: i32 = 2
-	a5_8[1]: i32 = 3
-	a5_8[2]: i32 = 4
-	a6_8 = alloc: i32  3
-	a6_8[0]: i32 = 1
-	a6_8[1]: i32 = 5
-	a6_8[2]: i32 = 7
-	%14: &i32 = &(a5_8)
-	%15: &i32 = &(a6_8)
-	%16: i32 = a5_8[1]
-	param: i32  %14
-	param: i32  %15
-	param: i32  %16
-	%17 = call: i32  f4
-	%18: i32 = %17 + 1
-	param: i8  115
-	call: void  putchar
-	param: i8  117
-	call: void  putchar
-	param: i8  109
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  43
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  49
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
-	param: i8  61
-	call: void  putchar
-	param: i8  32
-	call: void  putchar
+	%17 = call: i32  fib
+	%18: i32 = %17 + 2
 	param: i32  %18
+	%19 = call: i32  fib
+	%20: i32 = %16 - %19
+	%21: i32 = %20 + -10091
+	j_5: i32 = %21
+	k_5 = alloc: i32
+	k_5: i32 = -6
+	%22: i32 = a_1[0]
+	%23: i32 = i_5 * i_5
+	%24: i32 = %22 + %23
+	a_1[0]: i32 = %24
+	%25: i32 = a_1[1]
+	%26: i32 = i_5 * i_5
+	%27: i32 = %25 + %26
+	a_1[1]: i32 = %27
+	%28: i32 = a_1[2]
+	%29: i32 = i_5 * i_5
+	%30: i32 = %28 + %29
+	a_1[2]: i32 = %30
+	%31: i32 = a_1[3]
+	%32: i32 = i_5 * i_5
+	%33: i32 = %31 + %32
+	a_1[3]: i32 = %33
+	%34: i32 = a_1[4]
+	%35: i32 = i_5 * i_5
+	%36: i32 = %34 + %35
+	a_1[4]: i32 = %36
+	%37: i32 = a_1[5]
+	%38: i32 = i_5 * i_5
+	%39: i32 = %37 + %38
+	a_1[5]: i32 = %39
+	%40: i32 = a_1[6]
+	%41: i32 = i_5 * i_5
+	%42: i32 = %40 + %41
+	a_1[6]: i32 = %42
+	%43: i32 = a_1[7]
+	%44: i32 = i_5 * i_5
+	%45: i32 = %43 + %44
+	a_1[7]: i32 = %45
+	%46: i32 = a_1[8]
+	%47: i32 = i_5 * i_5
+	%48: i32 = %46 + %47
+	a_1[8]: i32 = %48
+	%49: i32 = a_1[9]
+	%50: i32 = i_5 * i_5
+	%51: i32 = %49 + %50
+	a_1[9]: i32 = %51
+	i_5: i32 = 0
+
+$L2_for_cond:
+	%52: i32 = i_5 < 10
+	if false %52 goto  $L4_for_end
+	%53: i32 = a_1[i_5]
+	param: i32  %53
+	call: void  putint
+	param: i8  44
+	call: void  putchar
+	param: i8  32
+	call: void  putchar
+	%54: i32 = i_5 + 1
+	i_5: i32 = %54
+
+$L3_for_motion:
+	goto  $L2_for_cond
+
+$L4_for_end:
+	param: i8  10
+	call: void  putchar
+	param: i32  i_5
+	call: void  putint
+	param: i8  44
+	call: void  putchar
+	param: i8  32
+	call: void  putchar
+	param: i32  j_5
+	call: void  putint
+	param: i8  44
+	call: void  putchar
+	param: i8  32
+	call: void  putchar
+	param: i32  k_5
 	call: void  putint
 	param: i8  10
 	call: void  putchar

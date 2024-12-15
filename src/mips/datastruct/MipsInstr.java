@@ -130,6 +130,12 @@ public class MipsInstr {
         return instr;
     }
 
+    public static MipsInstr genSyscall() {
+        MipsInstr instr = new MipsInstr(CALC);
+        instr.operator = MipsOperator.syscall;
+        return instr;
+    }
+
     @Override
     public String toString() {
         if (type == COMMENT) {
@@ -204,6 +210,7 @@ public class MipsInstr {
 
     public enum MipsOperator {
         move,
+        syscall,
         addu, addi, subu, subiu, mulu, div, sll, andi,
         mfhi, mflo,
         li, la,
