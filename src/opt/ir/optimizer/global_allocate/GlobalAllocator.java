@@ -368,7 +368,7 @@ public class GlobalAllocator {
                 for (Instr def : n1.defs) {
                     BBlock block = cfg.blockOfInstr(def);
                     boolean lvN2 = LVOut.get(block).contains(n2);
-                    for (int k = block.instrs.size() - 1; k >=/* todo Is b = a conflict? */ block.instrs.indexOf(def); k--) {
+                    for (int k = block.instrs.size() - 1; k >/* todo Is b = a conflict? */ block.instrs.indexOf(def); k--) {
                         Instr instr = block.instrs.get(k);
                         if (n2.defs.contains(instr)) lvN2 = false;
                         if (n2.usages.contains(instr)) lvN2 = true;
@@ -384,7 +384,7 @@ public class GlobalAllocator {
                 for (Instr def : n2.defs) {
                     BBlock block = cfg.blockOfInstr(def);
                     boolean lvN1 = LVOut.get(block).contains(n1);
-                    for (int k = block.instrs.size() - 1; k >=/* todo Is b = a conflict? */ block.instrs.indexOf(def); k--) {
+                    for (int k = block.instrs.size() - 1; k >/* todo Is b = a conflict? */ block.instrs.indexOf(def); k--) {
                         Instr instr = block.instrs.get(k);
                         if (n1.defs.contains(instr)) lvN1 = false;
                         if (n1.usages.contains(instr)) lvN1 = true;
@@ -430,23 +430,33 @@ public class GlobalAllocator {
             }
         }
 
-        final HashSet<Net> netToAlloc = new HashSet<>(conflictsList.keySet());
+        final HashSet<Net> nodes = new HashSet<>(conflictsList.keySet());
         final Stack<Net> stack = new Stack<>();
-        while (!netToAlloc.isEmpty()) {
+        while (!nodes.isEmpty()) {
             boolean success = false;
             for (Net net : nets) {
-                if (!netToAlloc.contains(net)) continue;
-                if (conflictsList.get(net).size() < nRegs) {
-                    netToAlloc.remove(net);
-                    stack.push(net);
+                if (!nodes.contains(net)) continue; // Actually traversing all `nodes` here.
+                int nConflicts = 0;
+                for (Net neighbour : conflictsList.get(net)) {
+                    if (nodes.contains(neighbour)) { nConflicts++; }
+                }
+                if (nConflicts < nRegs) {
                     success = true;
+                    nodes.remove(net);
+                    stack.push(net);
                     break;
                 }
             }
             if (!success) {
                 // Abandon any one of the nets to alloc.
-                int ind = (int) (netToAlloc.size() * Math.random());
-                netToAlloc.remove((Net) netToAlloc.toArray()[ind]);
+                int ind = (int) (nodes.size() * Math.random());
+                Net toRemove = (Net) nodes.toArray()[ind];
+                nodes.remove(toRemove);
+                // Remove this node from the `conflictsList` as well.
+                for (Net neighbour : conflictsList.get(toRemove)) {
+                    conflictsList.get(neighbour).remove(toRemove);
+                }
+                conflictsList.remove(toRemove);
             }
         }
 
@@ -461,6 +471,13 @@ public class GlobalAllocator {
             }
             assert !color.isEmpty();
             allocation.put(netToColor, (MipsReg) color.toArray()[0]);
+        }
+
+        if (false) {
+            for (Net net : allocation.keySet()) {
+                MipsReg globReg = allocation.get(net);
+                System.out.printf("%s <=> %s\n", net , globReg);
+            }
         }
 
         cfg.entry.instrs.clear();

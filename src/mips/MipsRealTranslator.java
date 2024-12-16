@@ -605,7 +605,7 @@ public class MipsRealTranslator implements MipsTranslator {
 
     // 1. Memory Simulation Components: Regs & Stack
 
-    private final boolean regInfo = true;
+    private final boolean regInfo = false;
     private final class RegsPool {
         // Note: "var" in this scope refers to IR operands, and "reg" are real MIPS registers.
         private final ArrayList<MipsReg> regs = new ArrayList<>(Arrays.asList(
