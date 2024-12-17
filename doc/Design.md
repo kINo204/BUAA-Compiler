@@ -26,9 +26,9 @@ The lexical analysis section of the compiler provides several modules: I/O handl
 
 | Class          | Function          | Description                                                  |
 | -------------- | ----------------- | ------------------------------------------------------------ |
-| datastruct.ast.Token | Datatype of token | Restore all information of a token, including token type `tokenId`, literal string `literal` and attributes `val`. |
+| frontend.datastruct.ast.Token | Datatype of token | Restore all information of a token, including token type `tokenId`, literal string `literal` and attributes `val`. |
 | frontend.Lexer | Lexical analyzer  | Use a `BufferedReader` of `System.in` for input, and provide `read()` for fetching the next token. Each contains two loggers `stdout` and `stderr` generating output info in `read()` process. |
-| io.Log         | Log output        | This is a reusable logger class. Contains a table of writers to put the same info to various output. Provide `addWriter`, `addFilewriter` and `configureWriter` for writer configurations. |
+| utils.Log         | Log output        | This is a reusable logger class. Contains a table of writers to put the same info to various output. Provide `addWriter`, `addFilewriter` and `configureWriter` for writer configurations. |
 
 ![design lexer init](./img/design_lexer_init.png)
 
@@ -56,7 +56,7 @@ A new list `readTokens` stores the tokens already parsed out by `parseToken()`. 
 
 #### 2.2.2 Extracting input source
 
-The original input for Lexer is initialized within the Lexer class. However, a lexer should not only be able to be called once, and handle only the source program passed in at the very begenning; it should also be able to create several instances, each handling different piece of source input, even at the same time. So the new design provides 2 ways of setting the lexer's input: by passing in a `Reader` or by directly passing in a `String` to tokenize.
+The original input for Lexer is initialized within the Lexer class. However, a lexer should not only be able to be called once, and handle only the source ir passed in at the very begenning; it should also be able to create several instances, each handling different piece of source input, even at the same time. So the new design provides 2 ways of setting the lexer's input: by passing in a `Reader` or by directly passing in a `String` to tokenize.
 
 ## 3. Syntax anaysis
 
@@ -122,11 +122,63 @@ Scope {
 
 ### 4.3 The AST validator
 
-In semantic analysis phase, an AST provided by the parser is passed to an "validator", who will **validate semantics, reporting any error it encounters, and try performing certain error recovery operations on the AST.** A program with semantic errors may be compiled with recoveries or be refused by the compiler, based on design choices within the validator; however, a validator **ensures the "translator" in the later compiling stage always gets a valid AST, and only need to perform translation operations.**
+In semantic analysis phase, an AST provided by the parser is passed to an "validator", who will **validate semantics, reporting any error it encounters, and try performing certain error recovery operations on the AST.** A ir with semantic errors may be compiled with recoveries or be refused by the compiler, based on design choices within the validator; however, a validator **ensures the "translator" in the later compiling stage always gets a valid AST, and only need to perform translation operations.**
 
 ## 5. Error handling
 
 ## 6. Code gen
+
+### 6.1 Intro
+
+The code generation phase generate from the parse tree of the source program, to get the AST of the IR. This AST can be transformed into the form of *a linear instructions list*, which is handled to the MIPS generator, who generate target codes for each instruction in the list.
+
+### 6.2 IR
+
+#### 6.2.1 AST: the data structure
+
+The data structure hierarchy of IR is as follows:
+
+```
+Ir
+L Module
+	|- GlobalDecl
+	L Function
+		L BasicBlock
+			L Instr
+```
+
+The instruction structure:
+
+```
+Instr(Operator, Type, Operand, Operand, Operand)
+
+Operand
+=> Const
+=> Reg
+=> Var
+=> Label
+```
+
+##### 6.2.1.1 Dividing optimization and target code generation
+
+The implementation tends to achieve transparency of target code generation process in optimization phase, and vice versa. In detail, this is achieved by the following means.
+
+Firstly, a `BasicBlock` does not contains its jumping instruction, but only contains other instructions in its body. **Any jumping instruction representing the behavior of basic block is automatically generated** during the *instruction linearization phase* by analyzing the recorded jumping target of that basic block, and the sequence of basic blocks in the function. Thus, altering in sequence of basic blocks can be made without concerning code generation within optimization phase. Similarly, **any function head and tail info** is also generated in that linearization phase.
+
+Secondly, there tends to be a contract between IR and MIPS generator that, for a linear IR sequence, each instruction can be processed **individually and in that given order** to form the target code.
+
+#### 6.2.2 Generate IR from source program
+
+#### 6.2.3 IR language specifications
+
+### 6.3 Target code
+
+Targe code generation goals:
+
+- Pretty use of memory hierarchy;
+- Minimizing pipeline stalls;
+
+
 
 ## 7. Tests
 

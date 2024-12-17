@@ -1,12 +1,12 @@
 package frontend;
 
-import datastruct.ast.Token;
-import io.Log;
+import frontend.datastruct.ast.Token;
+import utils.Log;
 
 import java.io.*;
 import java.util.*;
 
-import static datastruct.ast.Token.TokenId.*;
+import static frontend.datastruct.ast.Token.TokenId.*;
 
 
 public class Lexer {
@@ -69,7 +69,7 @@ public class Lexer {
             t = parseToken();
             currentLine = parsingLineNo;
         }
-        loggerOut.println(t);
+        loggerOut.println(t.output());
         return t;
     }
 
@@ -136,14 +136,18 @@ public class Lexer {
                         }
                     } while (ich != '\n' && ich != -1);
                 } else if (ch == '*') {
-                    do {
+                    while (true) {
+                        do {
+                            ch = (char) input.read();
+                            if (ch == '\n') {
+                                parsingLineNo++;
+                            }
+                        } while (ch != '*');
+                        input.mark(1);
                         ch = (char) input.read();
-                        if (ch == '\n') {
-                            parsingLineNo++;
-                        }
-                    } while (ch != '*');
-                    ch = (char) input.read();
-                    assert ch == '/';
+                        if (ch == '/') break;
+                        input.reset();
+                    }
                 } else {
                     input.reset();
                     ch = '/';
@@ -237,7 +241,7 @@ public class Lexer {
                     token = new Token(OR, "||", parsingLineNo);
                 } else {
                     input.reset();
-                    token = new Token(OR, "&&", parsingLineNo);
+                    token = new Token(OR, "||", parsingLineNo);
                     loggerErr.error(parsingLineNo, "a");
                 }
                 break;
@@ -271,7 +275,18 @@ public class Lexer {
                 do {
                     ch = (char) input.read();
                     str.append(ch);
-                } while (ch != '"');
+                    if (escape) {
+                        assert Arrays.asList( // Escaping characters supported in Char.
+                                'a', 'b', 't', 'n', 'v', 'f', '"', '\'', '\\', '0'
+                        ).contains(ch);
+                        escape = false; // Consume escape env.
+                    } else {
+                        if (ch == '\\') // Enter escaping mode.
+                            escape = true;
+                        if (ch == '\"') // Exit.
+                            break;
+                    }
+                } while (true);
                 yield new Token(STRCON, String.valueOf(str), parsingLineNo);
             }
             default -> null;

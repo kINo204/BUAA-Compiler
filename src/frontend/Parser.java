@@ -1,13 +1,13 @@
 package frontend;
 
-import datastruct.ast.Token;
-import datastruct.ast.*;
-import io.Log;
+import frontend.datastruct.ast.Token;
+import frontend.datastruct.ast.*;
+import utils.Log;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import static datastruct.ast.Token.TokenId.*;
+import static frontend.datastruct.ast.Token.TokenId.*;
 
 public class Parser {
     private final Lexer lexer;
@@ -433,7 +433,7 @@ public class Parser {
             expectTokenId(SEMICN, "i");
         } else {
             assert lexer.lookAhead(0).getTokenId() == SEMICN;
-            lexer.read(); // TODO expect?
+            lexer.read();
         }
 
         loggerOut.println(stmtSingleExp.output());
@@ -519,7 +519,18 @@ public class Parser {
         AstStmtReturn stmtReturn = new AstStmtReturn();
         assert lexer.lookAhead(0).getTokenId() == RETURNTK;
 		stmtReturn.returnTk = lexer.read();
-        if (lexer.lookAhead(0).getTokenId() != SEMICN) {
+        // Read till EOL.
+        boolean hasExp = false;
+        for (int i = 0; ; i++) {
+            Token read = lexer.lookAhead(i);
+            if (read.lineNo > stmtReturn.returnTk.lineNo) break;
+            if (read.tokenId == SEMICN) {
+                break;
+            } else {
+                hasExp = true;
+            }
+        }
+        if (hasExp) {
             stmtReturn.setExp(parseExp());
         }
         expectTokenId(SEMICN, "i");
@@ -598,14 +609,14 @@ public class Parser {
 
     private AstExp parseExp() throws IOException {
         AstExp exp = new AstExp();
-        exp.setAstAddExp(parseAddExp());
+        exp.setAddExp(parseAddExp());
         loggerOut.println(exp.output());
         return exp;
     }
 
     private AstConstExp parseConstExp() throws IOException {
         AstConstExp constExp = new AstConstExp();
-        constExp.setAstAddExp(parseAddExp());
+        constExp.setAddExp(parseAddExp());
         loggerOut.println(constExp.output());
         return constExp;
     }
@@ -640,7 +651,7 @@ public class Parser {
         while (Arrays.asList(EQL, NEQ)
                 .contains(lexer.lookAhead(0).getTokenId())) {
             loggerOut.println(eqExp.output());
-            lexer.read();
+            eqExp.addOperator(lexer.read());
             eqExp.addRelExp(parseRelExp());
         }
         loggerOut.println(eqExp.output());
@@ -653,7 +664,7 @@ public class Parser {
         while (Arrays.asList(GRE, GEQ, LSS, LEQ)
                 .contains(lexer.lookAhead(0).getTokenId())) {
             loggerOut.println(relExp.output());
-            lexer.read();
+            relExp.addOperator(lexer.read());
             relExp.addAddExp(parseAddExp());
         }
         loggerOut.println(relExp.output());
@@ -666,7 +677,7 @@ public class Parser {
         while (Arrays.asList(PLUS, MINU)
                 .contains(lexer.lookAhead(0).getTokenId())) {
             loggerOut.println(addExp.output());
-            lexer.read();
+            addExp.addOperator(lexer.read());
             addExp.addMulExp(parseMulExp());
         }
         loggerOut.println(addExp.output());
@@ -679,7 +690,7 @@ public class Parser {
         while (Arrays.asList(MULT, DIV, MOD)
                 .contains(lexer.lookAhead(0).getTokenId())) {
             loggerOut.println(mulExp.output());
-            lexer.read();
+            mulExp.addOperator(lexer.read());
             mulExp.addUnaryExp(parseUnaryExp());
         }
         loggerOut.println(mulExp.output());

@@ -1,0 +1,24 @@
+Thoughts
+
+- Considerations of translation + optimization.
+	- Traverse the IR hierachy to get a INSTRUCTION LIST, and translate this into target codes.
+	- Altering can be achieved easily by altering the sequence of basic blocks (or other Value hierachy) without changing the content of the instruction.
+	- On encountering a BasicBlock, a branch instruction may be generated to indicate control flow target of the block.
+	- So far, IN-FUNCTION OPTIMIZATIONS ONLY. That is, in-bb & between bb.
+
+- Typed / Non-typed
+	- What does this mean?
+
+- Diff between calling & control-flow
+	- 
+
+- "Compiling" design
+	- If we impl A->B, then we can use A to design.
+
+- Function para: push&pop ?
+
+- Return design?
+	- locally / jumping?
+
+- Target code gen
+	- If no var on stack mem: no $sp operations
