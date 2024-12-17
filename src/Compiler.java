@@ -5,6 +5,7 @@ import frontend.Validator;
 import mips.MipsRealTranslator;
 import opt.ir.IrOptUtils;
 import opt.ir.IrOptimizer;
+import opt.mips.MipsOptimizer;
 import utils.Log;
 import ir.datastruct.Ir;
 import ir.IrMaker;
@@ -71,6 +72,12 @@ public class Compiler {
         /* Backend. */
         MipsTranslator translator = optOn ? new MipsRealTranslator(ir, irOptimizer.globalAlloc) : new MipsMinimalTranslator(ir);
         MipsProgram program = translator.translate();
+
+        MipsOptimizer mipsOptimizer = new MipsOptimizer(program);
+        if (optOn) {
+            mipsOptimizer.optimize();
+        }
+
         programOut.print(program);
         programOut.close();
 

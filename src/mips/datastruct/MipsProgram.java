@@ -5,7 +5,7 @@ import mips.MipsUtils;
 import java.util.ArrayList;
 
 public class MipsProgram {
-    private final ArrayList<MipsInstr> instrs = new ArrayList<>();
+    public final ArrayList<MipsInstr> instrs = new ArrayList<>();
 
     public void append(MipsInstr instr) {
         instrs.add(instr);

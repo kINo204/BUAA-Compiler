@@ -25,6 +25,19 @@ public class MipsReg implements MipsOperand {
         return "$" + id.toString().toLowerCase();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MipsReg reg)) return false;
+
+        return id == reg.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
     public enum RegId{
         zero,
         at,

@@ -8,9 +8,9 @@ import static mips.datastruct.MipsInstr.MipsType.*;
 
 public class MipsInstr {
     // Main fields.
-    private final MipsType type;
-    private MipsOperator operator = null;
-    private MipsOperand res = null, first = null, second = null;
+    public final MipsType type;
+    public MipsOperator operator = null;
+    public MipsOperand res = null, first = null, second = null;
 
     // Supl fields.
     private String labelString = null;

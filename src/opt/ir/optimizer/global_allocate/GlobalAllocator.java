@@ -417,7 +417,7 @@ public class GlobalAllocator {
                     System.out.print(conflictsMat[i][j] + "\t");
                 }
                 System.out.println();
-        }
+            }
         }
 
         final HashMap<Net, HashSet<Net>> conflictsList = new HashMap<>();

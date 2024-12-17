@@ -19,7 +19,6 @@ main:
 	lw	$t0, 0($gp)
 	move	$s0, $t0
 	# a_2: i32 = b_2
-	move	$s0, $s0
 	# ret: i32  a_2
 	move	$v0, $s0
 	move	$sp, $fp
