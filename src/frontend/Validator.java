@@ -495,6 +495,13 @@ public class Validator {
                         }
                     }
                 }
+            } else {
+                SymFunc sym = (SymFunc) symTbl.searchSym(s.funcIdent);
+                if (sym != null) {
+                    if (!sym.paramTypes.isEmpty()) {
+                        loggerErr.error(s.funcIdent.lineNo, "d");
+                    }
+                }
             }
 
             if (identStatus) {
