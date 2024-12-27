@@ -10,6 +10,13 @@ public class AstFuncDef extends AstNode{
     public AstFuncFParams funcFParams = null;
     public AstBlock block;
 
+    @Override
+    public String toString() {
+        return String.format("%s %s(%s) %s",
+                funcType, ident, funcFParams != null ? funcFParams : "", block
+        );
+    }
+
     public void setFuncType(AstFuncType funcType) {
         this.funcType = funcType;
     }

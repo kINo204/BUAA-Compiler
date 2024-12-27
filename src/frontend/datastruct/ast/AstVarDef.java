@@ -10,6 +10,18 @@ public class AstVarDef extends AstNode {
     public AstConstExp constExp = null;
     public AstInitVal initVal = null;
 
+    @Override
+    public String toString() {
+        String s = ident.toString();
+        if (constExp != null) {
+            s += String.format("[%s]", constExp);
+        }
+        if (initVal != null) {
+            s += " = " + initVal;
+        }
+        return s;
+    }
+
     public void setIdent(Token ident) {
         this.ident = ident;
     }

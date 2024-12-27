@@ -7,6 +7,11 @@ public class AstCond extends AstNode {
 
     public AstLOrExp lOrExp;
 
+    @Override
+    public String toString() {
+        return lOrExp.toString();
+    }
+
     public void setlOrExp(AstLOrExp lOrExp) {
         this.lOrExp = lOrExp;
     }

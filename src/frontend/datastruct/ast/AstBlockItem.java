@@ -7,6 +7,11 @@ public class AstBlockItem extends AstNode {
 
     public AstNode content;
 
+    @Override
+    public String toString() {
+        return content.toString();
+    }
+
     public void setContent(AstNode content) {
         this.content = content;
     }

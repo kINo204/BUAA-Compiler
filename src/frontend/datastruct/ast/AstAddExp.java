@@ -21,11 +21,18 @@ public class AstAddExp extends AstNode {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        for (AstMulExp mulExp : mulExps) {
-            str.append(mulExp.toString());
-            str.append("+");
+        str.append(mulExps.get(0).toString());
+        for (int i = 1; i < mulExps.size(); i++) {
+            str.append(switch (operators.get(i - 1)) {
+                case PLUS -> " + ";
+                case MINU -> " - ";
+                default -> {
+                    assert false;
+                    yield "";
+                }
+            });
+            str.append(mulExps.get(i).toString());
         }
-        str.deleteCharAt(str.length() - 1);
         return str.toString();
     }
 

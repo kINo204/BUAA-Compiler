@@ -1,6 +1,7 @@
 package frontend.datastruct.ast;
 
 import java.util.ArrayList;
+import java.util.StringJoiner;
 
 public class AstFuncRParams extends AstNode {
     public AstFuncRParams() {
@@ -15,12 +16,11 @@ public class AstFuncRParams extends AstNode {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringJoiner sj = new StringJoiner(", ");
         for (AstExp exp : exps) {
-            stringBuilder.append(exp).append(",");
+            sj.add(exp.toString());
         }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        return stringBuilder.toString();
+        return sj.toString();
     }
 
     @Override

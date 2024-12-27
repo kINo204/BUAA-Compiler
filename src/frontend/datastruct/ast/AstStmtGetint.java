@@ -8,6 +8,11 @@ public class AstStmtGetint extends AstStmt {
     }
 
     @Override
+    public String toString() {
+        return lVal + " = getint();";
+    }
+
+    @Override
     public String buildTreeBrack() {
         return null;
     }

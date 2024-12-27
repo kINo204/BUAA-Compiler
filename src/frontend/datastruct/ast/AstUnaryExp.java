@@ -2,7 +2,7 @@ package frontend.datastruct.ast;
 
 import frontend.datastruct.symbol.Symbol;
 
-public class AstUnaryExp extends AstNode {
+public abstract class AstUnaryExp extends AstNode {
     public Symbol.SymId type = null;
 
     public AstUnaryExp() {

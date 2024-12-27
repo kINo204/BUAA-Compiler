@@ -7,6 +7,11 @@ public class AstFuncType extends AstNode {
 
     public Token type;
 
+    @Override
+    public String toString() {
+        return type.toString();
+    }
+
     public void setType(Token type) {
         this.type = type;
     }

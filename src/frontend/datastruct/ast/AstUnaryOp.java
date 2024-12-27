@@ -7,6 +7,11 @@ public class AstUnaryOp extends AstNode {
 
     public Token op;
 
+    @Override
+    public String toString() {
+        return op.toString();
+    }
+
     public void setOp(Token op) {
         this.op = op;
     }

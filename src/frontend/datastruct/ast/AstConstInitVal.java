@@ -1,6 +1,7 @@
 package frontend.datastruct.ast;
 
 import java.util.ArrayList;
+import java.util.StringJoiner;
 
 public class AstConstInitVal extends AstNode{
     public AstConstInitVal() {
@@ -9,7 +10,22 @@ public class AstConstInitVal extends AstNode{
 
     public AstConstExp constExp = null;
     public final ArrayList<AstConstExp> constExps = new ArrayList<>();
-    public Token stringConst;
+    public Token stringConst = null;
+
+    @Override
+    public String toString() {
+        if (constExp != null) {
+            return constExps.toString();
+        } else if (stringConst != null) {
+            return stringConst.toString(); // Including the "" symbols.
+        } else {
+            StringJoiner sj = new StringJoiner(", ");
+            for (AstConstExp e : constExps) {
+                sj.add(e.toString());
+            }
+            return sj.toString();
+        }
+    }
 
     public void setConstExp(AstConstExp constExp) {
         this.constExp = constExp;

@@ -6,6 +6,15 @@ public class AstStmtFor extends AstStmt {
     public AstForStmt thirdForStmt = null;
     public AstStmt stmt;
 
+    @Override
+    public String toString() {
+        return String.format("for (%s; %s; %s) %s",
+                firstForStmt != null ? firstForStmt : "",
+                cond != null ? cond : "",
+                thirdForStmt != null ? thirdForStmt : "",
+                stmt);
+    }
+
     public void setFirstForStmt(AstForStmt firstForStmt) {
         this.firstForStmt = firstForStmt;
     }

@@ -1,6 +1,7 @@
 package frontend.datastruct.ast;
 
 import java.util.ArrayList;
+import java.util.StringJoiner;
 
 public class AstConstDecl extends AstNode {
     public AstConstDecl() {
@@ -9,6 +10,15 @@ public class AstConstDecl extends AstNode {
 
     public Token type;
     public final ArrayList<AstConstDef> constDefs = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner(", ");
+        for (AstConstDef constDef : constDefs) {
+            sj.add(constDef.toString());
+        }
+        return String.format("const %s %s;", type, sj);
+    }
 
     public void setType(Token type) {
         this.type = type;
