@@ -20,7 +20,35 @@ main:
 	li	$v0, 1
 	# call: void  putint
 	syscall	
+	# %2: i32 = 3
+	li	$t0, 3
+	# if false %2 goto  $L0
+	sw	$t0, -12($fp)
+	beq	$t0, $zero, $L0
+
+	# param: i32  3
+	li	$a0, 3
+	li	$v0, 1
+	# call: void  putint
+	syscall	
+	# c_6 = alloc: i8
+	# %3 = call: i8  getchar
+	addi	$sp, $fp, -20
+	sw	$ra, 0($sp)
+	jal	getchar
+
+	lw	$ra, 0($sp)
+	addi	$sp, $fp, -13
+	andi	$t0, $v0, 255
+	# c_6: i8 = %3
+	move	$s0, $t0
+	# param: i8  c_6
+	move	$a0, $s0
+	li	$v0, 11
+	# call: void  putchar
+	syscall	
 	# $L0:
+	sb	$t0, -14($fp)
 $L0:
 	# ret: i32  0
 	li	$v0, 0
