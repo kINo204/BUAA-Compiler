@@ -15,6 +15,8 @@ import mips.datastruct.MipsProgram;
 
 import java.io.*;
 
+import static frontend.datastruct.ast.AstNode.AstNodeId.CompUnit;
+
 public class Compiler {
     private static final boolean debugInfo = true;
 
@@ -38,7 +40,7 @@ public class Compiler {
         /* Frontend. */
         Lexer lexer = new Lexer(sourceProgram, parserOut, errOut);
 
-        Parser parser = new Parser(lexer, "CompUnit", parserOut, errOut);
+        Parser parser = new Parser(lexer, CompUnit, parserOut, errOut);
         AstCompUnit ast = (AstCompUnit) parser.parse();
         sourceProgram.close();
         parserOut.close();

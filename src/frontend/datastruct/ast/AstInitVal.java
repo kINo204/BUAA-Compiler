@@ -16,7 +16,7 @@ public class AstInitVal extends AstNode {
     @Override
     public String toString() {
         if (exp != null) {
-            return exps.toString();
+            return exp.toString();
         } else if (stringConst != null) {
             return stringConst.toString(); // Including the "" symbols.
         } else {

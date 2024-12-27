@@ -5,7 +5,9 @@ import frontend.datastruct.ast.*;
 import utils.Log;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Arrays;
+import java.util.List;
 
 import static frontend.datastruct.ast.Token.TokenId.*;
 
@@ -15,9 +17,9 @@ public class Parser {
     private final Log loggerOut;
     private final Log loggerErr;
 
-    public Parser(Lexer lexer, String topLevel, Log o, Log e) {
+    public Parser(Lexer lexer, AstNode.AstNodeId topLevel, Log o, Log e) {
         this.lexer = lexer;
-        this.topLevel = AstNode.AstNodeId.valueOf(topLevel);
+        this.topLevel = topLevel;
         loggerOut = o;
         loggerErr = e;
     }
@@ -447,7 +449,7 @@ public class Parser {
         return stmtBlock;
     }
 
-    private AstStmtIf parseStmtIf() throws IOException { // j
+    private AstStmt parseStmtIf() throws IOException { // j
         AstStmtIf stmtIf = new AstStmtIf();
 
         assert lexer.lookAhead(0).getTokenId() == IFTK;
@@ -456,18 +458,46 @@ public class Parser {
         assert lexer.lookAhead(0).getTokenId() == LPARENT;
 		lexer.read();
 
-        stmtIf.setCond(parseCond());
+        if (List.of(INTTK, CHARTK)
+                .contains(lexer.lookAhead(0).tokenId)) {
+            AstVarDecl varDecl = new AstVarDecl();
+            varDecl.setType(lexer.read());
+            varDecl.addVarDef(parseVarDef(varDecl.type));
+            while (lexer.lookAhead(0).getTokenId() == COMMA) {
+                lexer.read();
+                varDecl.addVarDef(parseVarDef(varDecl.type));
+            }
 
-        expectTokenId(RPARENT, "j");
+            expectTokenId(RPARENT, "j");
+            stmtIf.setIfStmt(parseStmt());
+            if (lexer.lookAhead(0).getTokenId() == ELSETK) {
+                lexer.read();
+                stmtIf.setElseStmt(parseStmt());
+            }
 
-        stmtIf.setIfStmt(parseStmt());
-        if (lexer.lookAhead(0).getTokenId() == ELSETK) {
-            lexer.read();
-            stmtIf.setElseStmt(parseStmt());
+            String lowered = String.format("{ %s if (%s) %s",
+                    varDecl, varDecl.varDefs.get(0).ident, stmtIf.ifStmt);
+            if (stmtIf.elseStmt != null) {
+                lowered += " " + stmtIf.elseStmt + " }";
+            } else {
+                lowered += " }";
+            }
+            Lexer l = new Lexer(new StringReader(lowered), loggerOut, loggerErr);
+            Parser p = new Parser(l, AstNode.AstNodeId.Stmt, loggerOut, loggerErr);
+            return (AstStmtBlock) p.parse();
+        } else {
+            stmtIf.setCond(parseCond());
+
+            expectTokenId(RPARENT, "j");
+            stmtIf.setIfStmt(parseStmt());
+            if (lexer.lookAhead(0).getTokenId() == ELSETK) {
+                lexer.read();
+                stmtIf.setElseStmt(parseStmt());
+            }
+
+            loggerOut.println(stmtIf.output());
+            return stmtIf;
         }
-
-        loggerOut.println(stmtIf.output());
-        return stmtIf;
     }
 
     private AstStmtFor parseStmtFor() throws IOException {

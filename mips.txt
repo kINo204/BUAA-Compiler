@@ -1,0 +1,86 @@
+        # [compiler-generated](os-wrapper)
+        jal     main
+        move    $a0, $v0
+        li      $v0, 17
+        syscall
+
+	# define fun main:
+.text
+main:
+	sw	$fp, -4($sp)
+	move	$fp, $sp
+	# %1: i32 = 1
+	li	$t0, 1
+	# if false %1 goto  $L0
+	sw	$t0, -8($fp)
+	beq	$t0, $zero, $L0
+
+	# param: i32  4
+	li	$a0, 4
+	li	$v0, 1
+	# call: void  putint
+	syscall	
+	# $L0:
+$L0:
+	# ret: i32  0
+	li	$v0, 0
+	move	$sp, $fp
+	lw	$fp, -4($sp)
+	jr	$ra
+
+
+        # [compiler-generated](lib_io)
+.text
+putchar:
+        sw	$fp, -4($sp)
+        move	$fp, $sp
+        addi	$sp, $sp, -4
+
+        lb  $a0, 7($fp)
+        li  $v0, 11
+        syscall
+
+        move	$sp, $fp
+        lw	$fp, -4($sp)
+        jr  $ra
+
+        # [compiler-generated](lib_io)
+putint:
+        sw	$fp, -4($sp)
+        move	$fp, $sp
+        addi	$sp, $sp, -4
+
+        lw  $a0, 4($fp)
+        li  $v0, 1
+        syscall
+
+        move	$sp, $fp
+        lw	$fp, -4($sp)
+        jr  $ra
+
+        # [compiler-generated](lib_io)
+getchar:
+        sw	$fp, -4($sp)
+        move	$fp, $sp
+        addi	$sp, $sp, -4
+
+        li  $v0, 12
+        syscall
+
+        move	$sp, $fp
+        lw	$fp, -4($sp)
+        jr  $ra
+
+        # [compiler-generated](lib_io)
+getint:
+        sw      $fp, -4($sp)
+        move    $fp, $sp
+        addi    $sp, $sp, -4
+
+        li  $v0, 5
+        syscall
+
+        move	$sp, $fp
+        lw  $fp, -4($sp)
+        jr  $ra
+

@@ -3,23 +3,23 @@ setlocal
 
 cd ..
 
-echo.
-echo [unoptimized + plain-trans]
-java -jar target/unoptimized.jar>nul
-if %errorlevel% neq 0 (
-	echo Compile error.
-	cat error.txt
-	exit /B
-)
+rem echo.
+rem echo [unoptimized + plain-trans]
+rem java -jar target/unoptimized.jar>nul
+rem if %errorlevel% neq 0 (
+rem 	echo Compile error.
+rem 	cat error.txt
+rem 	exit /B
+rem )
 
-java -jar marsc.jar mips.txt
-echo Program exit with value %errorlevel%.
-echo.
+rem java -jar marsc.jar mips.txt
+rem echo Program exit with value %errorlevel%.
+rem echo.
 
-mv mips.txt target/mips_unopt.txt
-mv InstructionStatistics.txt target/statistics.txt
-echo statistics
-cat target/statistics.txt
+rem mv mips.txt target/mips_unopt.txt
+rem mv InstructionStatistics.txt target/statistics.txt
+rem echo statistics
+rem cat target/statistics.txt
 
 
 echo.

@@ -1,21 +1,13 @@
 INTTK int
-<FuncType>
-IDENFR f
+MAINTK main
 LPARENT (
-INTTK int
-IDENFR x
-<FuncFParam>
-<FuncFParams>
 RPARENT )
 LBRACE {
-RETURNTK return
-IDENFR x
-<LVal>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-<AddExp>
-PLUS +
+IFTK if
+LPARENT (
+INTTK int
+IDENFR a
+ASSIGN =
 INTCON 1
 <Number>
 <PrimaryExp>
@@ -23,103 +15,105 @@ INTCON 1
 <MulExp>
 <AddExp>
 <Exp>
-SEMICN ;
-<Stmt>
-RBRACE }
-<Block>
-<FuncDef>
-INTTK int
-<FuncType>
-IDENFR g
-LPARENT (
-INTTK int
-IDENFR x
-<FuncFParam>
-<FuncFParams>
+<InitVal>
+<VarDef>
 RPARENT )
 LBRACE {
-RETURNTK return
-IDENFR x
-<LVal>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-DIV /
-IDENFR f
-LPARENT (
-IDENFR x
-<LVal>
+INTTK int
+IDENFR b
+ASSIGN =
+INTCON 4
+<Number>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
 <Exp>
-<FuncRParams>
-RPARENT )
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
-SEMICN ;
-<Stmt>
-RBRACE }
-<Block>
-<FuncDef>
-INTTK int
-MAINTK main
-LPARENT (
-RPARENT )
-LBRACE {
-INTTK int
-IDENFR x
-<VarDef>
-COMMA ,
-IDENFR n
-<VarDef>
-COMMA ,
-IDENFR m
+<InitVal>
 <VarDef>
 SEMICN ;
 <VarDecl>
-IDENFR x
-<LVal>
-ASSIGN =
-IDENFR g
+PRINTFTK printf
 LPARENT (
-IDENFR n
+STRCON "%d"
+COMMA ,
+IDENFR b
 <LVal>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
 <Exp>
-<FuncRParams>
 RPARENT )
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
 SEMICN ;
 <Stmt>
-IDENFR m
-<LVal>
+RBRACE }
+<Block>
+<Stmt>
+LBRACE {
+INTTK int
+IDENFR a
 ASSIGN =
-IDENFR g
+INTCON 1
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+IFTK if
 LPARENT (
-IDENFR x
+IDENFR a
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+RPARENT )
+LBRACE {
+INTTK int
+IDENFR b
+ASSIGN =
+INTCON 4
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+PRINTFTK printf
+LPARENT (
+STRCON "%d"
+COMMA ,
+IDENFR b
 <LVal>
 <PrimaryExp>
 <UnaryExp>
 <MulExp>
 <AddExp>
 <Exp>
-<FuncRParams>
 RPARENT )
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
 SEMICN ;
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
+RBRACE }
+<Block>
 <Stmt>
 RETURNTK return
 INTCON 0
