@@ -4,6 +4,11 @@ public class AstStmtBreak extends AstStmt {
     public Token token;
 
     @Override
+    public String toString() {
+        return token.toString() + ";";
+    }
+
+    @Override
     public String buildTreeBrack() {
         return null;
     }

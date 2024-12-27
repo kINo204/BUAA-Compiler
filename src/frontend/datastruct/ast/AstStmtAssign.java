@@ -4,6 +4,11 @@ public class AstStmtAssign extends AstStmt {
     public AstLVal lVal;
     public AstExp exp;
 
+    @Override
+    public String toString() {
+        return lVal + " = " + exp + ";";
+    }
+
     public void setExp(AstExp exp) {
         this.exp = exp;
     }

@@ -11,6 +11,21 @@ public class AstCompUnit extends AstNode{
     public final ArrayList<AstFuncDef> funcDefs = new ArrayList<>();
     public AstMainFuncDef mainFuncDef;
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+
+        for (AstDecl decl : decls) {
+            s.append(decl).append("\n");
+        }
+        for (AstFuncDef funcDef : funcDefs) {
+            s.append(funcDef).append("\n");
+        }
+        s.append(mainFuncDef);
+
+        return s.toString();
+    }
+
     public void addDecl(AstDecl decl) {
         decls.add(decl);
     }

@@ -3,6 +3,11 @@ package frontend.datastruct.ast;
 public class AstStmtBlock extends AstStmt {
     public AstBlock block;
 
+    @Override
+    public String toString() {
+        return block.toString();
+    }
+
     public void setBlock(AstBlock block) {
         this.block = block;
     }

@@ -1,6 +1,7 @@
 package frontend.datastruct.ast;
 
 import java.util.ArrayList;
+import java.util.StringJoiner;
 
 public class AstLOrExp extends AstNode {
     public AstLOrExp() {
@@ -8,6 +9,15 @@ public class AstLOrExp extends AstNode {
     }
 
     public final ArrayList<AstLAndExp> lAndExps = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        StringJoiner sj = new StringJoiner(" || ");
+        for (AstLAndExp e : lAndExps) {
+            sj.add(e.toString());
+        }
+        return sj.toString();
+    }
 
     public void addLAndExp(AstLAndExp lAndExp) {
         lAndExps.add(lAndExp);

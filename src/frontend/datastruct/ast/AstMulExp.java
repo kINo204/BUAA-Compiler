@@ -20,13 +20,20 @@ public class AstMulExp extends AstNode{
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (AstUnaryExp unaryExp : unaryExps) {
-            stringBuilder.append(unaryExp);
-            stringBuilder.append("*");
+        StringBuilder str = new StringBuilder();
+        str.append(unaryExps.get(0).toString());
+        for (int i = 1; i < unaryExps.size(); i++) {
+            str.append(switch (operators.get(i - 1)) {
+                case MULT -> " * ";
+                case DIV  -> " / ";
+                default -> {
+                    assert false;
+                    yield "";
+                }
+            });
+            str.append(unaryExps.get(i).toString());
         }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        return stringBuilder.toString();
+        return str.toString();
     }
 
     @Override

@@ -8,6 +8,11 @@ public class AstForStmt extends AstNode {
     public AstLVal lVal;
     public AstExp exp;
 
+    @Override
+    public String toString() {
+        return lVal + " = " + exp;
+    }
+
     public void setlVal(AstLVal lVal) {
         this.lVal = lVal;
     }

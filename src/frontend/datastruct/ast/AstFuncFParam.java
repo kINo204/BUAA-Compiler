@@ -9,6 +9,12 @@ public class AstFuncFParam extends AstNode{
     public Token ident;
     public boolean isArray;
 
+    @Override
+    public String toString() {
+        return type + " " + ident +
+                (isArray ? "[]" : "");
+    }
+
     public void setType(Token type) {
         this.type = type;
     }

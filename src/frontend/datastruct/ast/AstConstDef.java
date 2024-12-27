@@ -10,6 +10,16 @@ public class AstConstDef extends AstNode{
     public AstConstExp constExp = null;
     public AstConstInitVal constInitVal;
 
+    @Override
+    public String toString() {
+        String sIdent = ident.toString();
+        if (constExp != null) {
+            sIdent += String.format("[%s]", constExp);
+        }
+        return String.format("%s = %s",
+                sIdent, constInitVal);
+    }
+
     public void setIdent(Token ident) {
         this.ident = ident;
     }

@@ -7,6 +7,11 @@ public class AstMainFuncDef extends AstNode{
 
     public AstBlock block;
 
+    @Override
+    public String toString() {
+        return "int main () " + block.toString();
+    }
+
     public void setBlock(AstBlock block) {
         this.block = block;
     }
