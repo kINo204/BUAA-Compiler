@@ -40,7 +40,6 @@ public class Compiler {
 
         Parser parser = new Parser(lexer, "CompUnit", parserOut, errOut);
         AstCompUnit ast = (AstCompUnit) parser.parse();
-        ast.toString();
         sourceProgram.close();
         parserOut.close();
 
