@@ -3,23 +3,25 @@ define fun main:
 	a_3: i32 = 1
 	%1: i32 = a_3
 	if false %1 goto  $L0_if_end
-	b_4 = alloc: i32
-	b_4: i32 = 4
-	param: i32  b_4
-	call: void  putint
-	b_5 = alloc: i32
-	b_5: i32 = 3
-	%2: i32 = b_5
-	if false %2 goto  $L1_if_end
-	param: i32  b_5
-	call: void  putint
-	c_6 = alloc: i8
-	%3 = call: i8  getchar
-	c_6: i8 = %3
-	param: i8  c_6
-	call: void  putchar
+	b_4 = alloc: i32  2
+	b_4[0]: i32 = 2
+	b_4[1]: i32 = 4
 
-$L1_if_end:
+$L1_for_cond:
+	%2: i32 = b_4[1]
+	%3: i32 = %2 <= 6
+	if false %3 goto  $L3_for_end
+	%4: i32 = b_4[1]
+	param: i32  %4
+	call: void  putint
+
+$L2_for_motion:
+	%5: i32 = b_4[1]
+	%6: i32 = %5 + 1
+	b_4[1]: i32 = %6
+	goto  $L1_for_cond
+
+$L3_for_end:
 
 $L0_if_end:
 	ret: i32  0

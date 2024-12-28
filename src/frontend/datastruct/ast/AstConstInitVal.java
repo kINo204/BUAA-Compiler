@@ -23,7 +23,7 @@ public class AstConstInitVal extends AstNode{
             for (AstConstExp e : constExps) {
                 sj.add(e.toString());
             }
-            return sj.toString();
+            return "{" + sj + "}";
         }
     }
 

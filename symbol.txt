@@ -1,4 +1,2 @@
 3 a Int
-4 b Int
-5 b Int
-6 c Char
+4 b IntArray

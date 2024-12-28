@@ -24,7 +24,7 @@ public class AstInitVal extends AstNode {
             for (AstExp e : exps) {
                 sj.add(e.toString());
             }
-            return sj.toString();
+            return "{" + sj + "}";
         }
     }
 
