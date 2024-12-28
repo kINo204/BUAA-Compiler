@@ -1,6 +1,6 @@
 # BUAA Compiler Project
 
-![image](https://github.com/user-attachments/assets/0fe6d87b-a060-456f-9b31-fb6806323a84)
+![image](https://github.com/user-attachments/assets/309ba01b-dab6-48b4-a79b-4803ca7b5b42)
 
 This is a repository containing labs for BUAA compiler course. DO NOT USE THE CODE DIRECTLY!
 
